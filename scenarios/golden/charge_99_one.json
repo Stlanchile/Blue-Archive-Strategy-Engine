@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "document_type": "scenario",
+  "scenario_id": "charge_99_one",
+  "ruleset_id": "jp_2026_07_29_provisional_v1",
+  "reward_schedule_id": "empty_v1",
+  "students": [
+    {
+      "student_id": "target_a"
+    }
+  ],
+  "banners": [
+    {
+      "banner_id": "banner_a",
+      "featured_student_id": "target_a",
+      "charge_group_id": "shared"
+    }
+  ],
+  "initial_charges": [
+    {
+      "charge_group_id": "shared",
+      "pre_recruitment_charge": 99
+    }
+  ],
+  "initial_resources": {
+    "pyroxene": 120,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0
+  },
+  "initial_owned_targets": [],
+  "strategy": {
+    "strategy_id": "sequential",
+    "kind": "sequential_targets_prefer_tickets",
+    "max_total_recruitments": 1
+  },
+  "targets": [
+    {
+      "student_id": "target_a",
+      "banner_id": "banner_a"
+    }
+  ]
+}

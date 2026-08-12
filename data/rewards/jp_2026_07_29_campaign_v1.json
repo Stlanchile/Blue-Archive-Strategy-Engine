@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "document_type": "reward_schedule",
+  "reward_schedule_id": "jp_2026_07_29_campaign_v1",
+  "compatible_ruleset_ids": [
+    "jp_2026_07_29_provisional_v1"
+  ],
+  "milestones": [
+    {
+      "count": 10,
+      "rewards": [
+        {
+          "resource": "advanced_bd_selectors",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "count": 30,
+      "rewards": [
+        {
+          "resource": "eligma",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "count": 50,
+      "rewards": [
+        {
+          "resource": "advanced_tech_note_selectors",
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "count": 70,
+      "rewards": [
+        {
+          "resource": "limited_ten_recruitment_tickets",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "count": 90,
+      "rewards": [
+        {
+          "resource": "gift_boxes",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "count": 110,
+      "rewards": [
+        {
+          "resource": "eligma",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "count": 130,
+      "rewards": [
+        {
+          "resource": "limited_ten_recruitment_tickets",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "count": 150,
+      "rewards": [
+        {
+          "resource": "limited_ten_recruitment_tickets",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "count": 170,
+      "rewards": [
+        {
+          "resource": "limited_ten_recruitment_tickets",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "count": 190,
+      "rewards": [
+        {
+          "resource": "superior_tech_note_selectors",
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "count": 210,
+      "rewards": [
+        {
+          "resource": "advanced_bd_selectors",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "count": 230,
+      "rewards": [
+        {
+          "resource": "eligma",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "count": 250,
+      "rewards": [
+        {
+          "resource": "advanced_tech_note_selectors",
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "count": 270,
+      "rewards": [
+        {
+          "resource": "limited_ten_recruitment_tickets",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "count": 290,
+      "rewards": [
+        {
+          "resource": "gift_boxes",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "count": 310,
+      "rewards": [
+        {
+          "resource": "eligma",
+          "quantity": 20
+        }
+      ]
+    }
+  ]
+}

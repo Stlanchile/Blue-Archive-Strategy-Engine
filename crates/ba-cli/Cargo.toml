@@ -1,0 +1,24 @@
+[package]
+name = "ba-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "ba-strategy"
+path = "src/main.rs"
+
+[dependencies]
+ba-core = { path = "../ba-core" }
+ba-engine = { path = "../ba-engine" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

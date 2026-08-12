@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
   "document_type": "reward_schedule",
-  "reward_schedule_id": "synthetic_non_v1_reward",
+  "reward_schedule_id": "synthetic_custom_reward",
   "provenance": {
     "verification_status": "provisional",
     "sources": []
   },
   "compatible_ruleset_ids": [
-    "synthetic_non_v1_ruleset"
+    "synthetic_custom_ruleset"
   ],
   "milestones": [
     {

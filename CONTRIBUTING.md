@@ -1,7 +1,8 @@
 # Contributing
 
 Thank you for improving this local research tool. Please keep changes narrow,
-deterministic, and compatible with the documented schema-v1 contract.
+deterministic, and compatible with the documented schema-v2 and protocol
+contracts.
 
 ## Development
 
@@ -20,7 +21,7 @@ Do not modify `Cargo.lock` incidentally. Dependency changes must be intentional,
 reviewed with their manifests and resolved lockfile, and then all ordinary Cargo
 commands must continue to use `--locked`.
 
-## Data and compatibility
+## Data and contracts
 
 - Put shipped provisional runtime documents only under `data/`.
 - Put user-facing examples under `scenarios/examples/`; they must reference only
@@ -28,12 +29,11 @@ commands must continue to use `--locked`.
 - Keep frozen regression scenarios under `scenarios/golden/`.
 - Put fictional, adversarial, or schema-boundary data only under
   `tests/fixtures/`; never present it as gameplay data.
-- Preserve schema-v1 bytes, validation precedence, result fields, fingerprints,
-  seeds, traces, and command behavior unless an explicitly documented exception
-  applies.
+- Version intentional changes to document schemas, result fields, canonical
+  fingerprints, seed derivation, traces, or command behavior.
 
 Please add focused tests for new behavior, including behavioral-versus-document
-fingerprint assertions when changing schema-v2 provenance. Do not add remote
+fingerprint assertions when changing provenance. Do not add remote
 ingestion, executable policies, plugins, parallel Monte Carlo, or more than two
 targets without a separately reviewed design.
 

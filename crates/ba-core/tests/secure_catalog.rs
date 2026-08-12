@@ -17,8 +17,8 @@ fn copy_data(destination: &Path) {
     fs::create_dir_all(destination.join("rulesets")).expect("rulesets");
     fs::create_dir_all(destination.join("rewards")).expect("rewards");
     for source in [
-        "data/rulesets/jp_2026_07_29_provisional_v1.json",
-        "data/rewards/empty_v1.json",
+        "data/rulesets/jp_2026_07_29_provisional_v2.json",
+        "data/rewards/jp_2026_07_29_empty_v2.json",
     ] {
         let source = workspace_path(source);
         let child = if source.to_string_lossy().contains("/rulesets/") {
@@ -55,7 +55,7 @@ fn selected_ambient_roots_follow_once_but_descendant_symlinks_do_not() {
     symlink(workspace_path("data/rulesets"), &direct_parent).expect("document parent");
     validate_document(
         workspace_path("data"),
-        direct_parent.join("jp_2026_07_29_provisional_v1.json"),
+        direct_parent.join("jp_2026_07_29_provisional_v2.json"),
     )
     .expect("selected document parent may resolve through a symlink");
 
@@ -73,7 +73,7 @@ fn final_json_symlinks_and_json_directories_remain_rejected() {
     copy_data(temp.path());
     symlink(
         temp.path()
-            .join("rulesets/jp_2026_07_29_provisional_v1.json"),
+            .join("rulesets/jp_2026_07_29_provisional_v2.json"),
         temp.path().join("rulesets/link.json"),
     )
     .expect("link");

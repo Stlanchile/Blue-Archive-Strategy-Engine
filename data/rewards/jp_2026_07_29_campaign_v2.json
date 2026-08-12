@@ -1,9 +1,13 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "document_type": "reward_schedule",
-  "reward_schedule_id": "jp_2026_07_29_campaign_v1",
+  "reward_schedule_id": "jp_2026_07_29_campaign_v2",
+  "provenance": {
+    "verification_status": "provisional",
+    "sources": []
+  },
   "compatible_ruleset_ids": [
-    "jp_2026_07_29_provisional_v1"
+    "jp_2026_07_29_provisional_v2"
   ],
   "milestones": [
     {

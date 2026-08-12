@@ -10,9 +10,8 @@ use crate::id::{
 };
 use crate::schema::{
     REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, RawFundingKind, RawProvenance,
-    RawRewardScheduleV1, RawRewardScheduleV2, RawRulesetV1, RawRulesetV2, RawScenarioV1,
-    RawScenarioV2, RawStrategyKind, RawStrategyKindV2, SCENARIO_DOCUMENT_TYPE, SCHEMA_VERSION_V1,
-    SCHEMA_VERSION_V2, VerificationStatus,
+    RawRewardScheduleV2, RawRulesetV2, RawScenarioV2, RawStrategyKindV2, SCENARIO_DOCUMENT_TYPE,
+    SCHEMA_VERSION, VerificationStatus,
 };
 use crate::{CoreError, OwnershipMask, ProbabilityRatio, ResourceKind, Resources};
 
@@ -28,7 +27,7 @@ pub struct CompiledRuleset {
     hit_reset_charge: u64,
     miss_increment: NonZeroU64,
     threshold_overrides: Vec<(u64, ProbabilityRatio)>,
-    provenance: Option<Provenance>,
+    provenance: Provenance,
 }
 
 #[derive(Debug, Clone)]
@@ -57,6 +56,16 @@ pub struct Provenance {
     pub sources: Vec<ProvenanceSource>,
 }
 
+impl Provenance {
+    #[must_use]
+    pub const fn provisional() -> Self {
+        Self {
+            verification_status: VerificationStatus::Provisional,
+            sources: Vec::new(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum FundingKind {
@@ -67,11 +76,6 @@ pub enum FundingKind {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum CompiledStrategy {
-    #[serde(rename = "legacy_sequential_v1")]
-    LegacySequentialV1 {
-        strategy_id: StrategyId,
-        legacy_horizon: Option<NonZeroU64>,
-    },
     #[serde(rename = "sequential_targets")]
     SequentialTargetsV2 {
         strategy_schema_version: u64,
@@ -85,26 +89,23 @@ impl CompiledStrategy {
     #[must_use]
     pub const fn strategy_id(&self) -> &StrategyId {
         match self {
-            Self::LegacySequentialV1 { strategy_id, .. }
-            | Self::SequentialTargetsV2 { strategy_id, .. } => strategy_id,
+            Self::SequentialTargetsV2 { strategy_id, .. } => strategy_id,
         }
     }
 
     #[must_use]
-    pub const fn max_total_recruitments(&self) -> Option<NonZeroU64> {
+    pub const fn max_total_recruitments(&self) -> NonZeroU64 {
         match self {
-            Self::LegacySequentialV1 { legacy_horizon, .. } => *legacy_horizon,
             Self::SequentialTargetsV2 {
                 max_total_recruitments,
                 ..
-            } => Some(*max_total_recruitments),
+            } => *max_total_recruitments,
         }
     }
 
     #[must_use]
     pub const fn funding_priority(&self) -> [FundingKind; 2] {
         match self {
-            Self::LegacySequentialV1 { .. } => [FundingKind::TicketTen, FundingKind::PaidSingle],
             Self::SequentialTargetsV2 {
                 funding_priority, ..
             } => *funding_priority,
@@ -114,7 +115,6 @@ impl CompiledStrategy {
     #[must_use]
     pub const fn schema_version(&self) -> u64 {
         match self {
-            Self::LegacySequentialV1 { .. } => 0,
             Self::SequentialTargetsV2 {
                 strategy_schema_version,
                 ..
@@ -124,52 +124,12 @@ impl CompiledStrategy {
 }
 
 impl CompiledRuleset {
-    pub fn from_raw_provisional(raw: RawRulesetV1, path: Option<&Path>) -> Result<Self, CoreError> {
-        validate_header(
-            raw.schema_version,
-            &raw.document_type,
-            RULESET_DOCUMENT_TYPE,
-            path,
-        )?;
-        let id = RulesetId::new(raw.ruleset_id)
-            .map_err(|error| CoreError::validation(path, error.to_string()))?;
-        let ordinary = ProbabilityRatio::new(
-            raw.ordinary_pickup_probability.numerator,
-            raw.ordinary_pickup_probability.denominator,
-        )
-        .map_err(|error| CoreError::validation(path, error.to_string()))?;
-        let mut overrides = Vec::with_capacity(raw.threshold_overrides.len());
-        for item in raw.threshold_overrides {
-            overrides.push((
-                item.pre_charge,
-                ProbabilityRatio::new(
-                    item.pickup_probability.numerator,
-                    item.pickup_probability.denominator,
-                )
-                .map_err(|error| CoreError::validation(path, error.to_string()))?,
-            ));
-        }
-        let mechanics = RulesetMechanics {
-            paid_single_cost: raw.paid_single_cost,
-            paid_single_action_size: raw.paid_single_action_size,
-            ticket_action_size: raw.ticket_action_size,
-            ordinary_pickup_probability: ordinary,
-            maximum_pre_recruitment_charge: raw.maximum_pre_recruitment_charge,
-            hit_reset_charge: raw.hit_reset_charge,
-            miss_increment: raw.miss_increment,
-            threshold_overrides: overrides,
-        };
-        validate_provisional_v1(&mechanics, path)?;
-        Self::from_parts(id, mechanics)
-            .map_err(|error| CoreError::validation(path, error.to_string()))
-    }
-
-    pub fn from_raw_v2(raw: RawRulesetV2, path: Option<&Path>) -> Result<Self, CoreError> {
+    pub fn from_raw(raw: RawRulesetV2, path: Option<&Path>) -> Result<Self, CoreError> {
         validate_header_version(
             raw.schema_version,
             &raw.document_type,
             RULESET_DOCUMENT_TYPE,
-            SCHEMA_VERSION_V2,
+            SCHEMA_VERSION,
             path,
         )?;
         let id = RulesetId::new(raw.ruleset_id)
@@ -201,19 +161,18 @@ impl CompiledRuleset {
             miss_increment: raw.miss_increment,
             threshold_overrides: overrides,
         };
-        Self::compile_parts(id, mechanics, SCHEMA_VERSION_V2, Some(provenance))
+        Self::compile_parts(id, mechanics, provenance)
             .map_err(|error| CoreError::validation(path, error.to_string()))
     }
 
     pub fn from_parts(id: RulesetId, mechanics: RulesetMechanics) -> Result<Self, CoreError> {
-        Self::compile_parts(id, mechanics, SCHEMA_VERSION_V1, None)
+        Self::compile_parts(id, mechanics, Provenance::provisional())
     }
 
     fn compile_parts(
         id: RulesetId,
         mechanics: RulesetMechanics,
-        schema_version: u64,
-        provenance: Option<Provenance>,
+        provenance: Provenance,
     ) -> Result<Self, CoreError> {
         let paid_single_cost = NonZeroU64::new(mechanics.paid_single_cost)
             .ok_or_else(|| CoreError::validation(None, "paid_single_cost must be positive"))?;
@@ -256,7 +215,7 @@ impl CompiledRuleset {
             &mechanics.threshold_overrides,
         )?;
         Ok(Self {
-            schema_version,
+            schema_version: SCHEMA_VERSION,
             id,
             paid_single_cost,
             paid_single_action_size,
@@ -330,53 +289,11 @@ impl CompiledRuleset {
     }
 
     #[must_use]
-    pub const fn provenance(&self) -> Option<&Provenance> {
-        self.provenance.as_ref()
+    pub const fn provenance(&self) -> &Provenance {
+        &self.provenance
     }
 
     pub fn semantic_node(&self) -> CanonicalNode {
-        if self.schema_version == SCHEMA_VERSION_V1 {
-            return object([
-                (
-                    "document_type",
-                    CanonicalNode::String(RULESET_DOCUMENT_TYPE.to_owned()),
-                ),
-                (
-                    "hit_reset_charge",
-                    CanonicalNode::Integer(self.hit_reset_charge),
-                ),
-                (
-                    "maximum_pre_recruitment_charge",
-                    CanonicalNode::Integer(self.maximum_pre_recruitment_charge),
-                ),
-                (
-                    "miss_increment",
-                    CanonicalNode::Integer(self.miss_increment.get()),
-                ),
-                (
-                    "ordinary_pickup_probability",
-                    ratio_node(self.ordinary_pickup_probability),
-                ),
-                (
-                    "paid_single_action_size",
-                    CanonicalNode::Integer(self.paid_single_action_size.get()),
-                ),
-                (
-                    "paid_single_cost",
-                    CanonicalNode::Integer(self.paid_single_cost.get()),
-                ),
-                ("ruleset_id", CanonicalNode::String(self.id.to_string())),
-                ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
-                (
-                    "threshold_overrides",
-                    threshold_overrides_node(&self.threshold_overrides),
-                ),
-                (
-                    "ticket_action_size",
-                    CanonicalNode::Integer(self.ticket_action_size.get()),
-                ),
-            ]);
-        }
         object([
             (
                 "document_type",
@@ -407,13 +324,8 @@ impl CompiledRuleset {
                 CanonicalNode::Integer(self.paid_single_cost.get()),
             ),
             ("ruleset_id", CanonicalNode::String(self.id.to_string())),
-            (
-                "provenance",
-                self.provenance
-                    .as_ref()
-                    .map_or(CanonicalNode::Null, provenance_node),
-            ),
-            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V2)),
+            ("provenance", provenance_node(&self.provenance)),
+            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION)),
             (
                 "threshold_overrides",
                 threshold_overrides_node(&self.threshold_overrides),
@@ -426,9 +338,6 @@ impl CompiledRuleset {
     }
 
     pub fn behavior_node(&self) -> CanonicalNode {
-        if self.schema_version == SCHEMA_VERSION_V1 {
-            return self.semantic_node();
-        }
         object([
             ("behavior_schema_version", CanonicalNode::Integer(2)),
             (
@@ -522,32 +431,6 @@ fn validate_safe_misses(
     Ok(())
 }
 
-fn validate_provisional_v1(
-    mechanics: &RulesetMechanics,
-    path: Option<&Path>,
-) -> Result<(), CoreError> {
-    let ordinary = ProbabilityRatio::new(7, 1_000)?;
-    let half = ProbabilityRatio::new(1, 2)?;
-    let certain = ProbabilityRatio::new(1, 1)?;
-    let expected_thresholds = vec![(99, half), (199, certain)];
-    let valid = mechanics.paid_single_cost == 120
-        && mechanics.paid_single_action_size == 1
-        && mechanics.ticket_action_size == 10
-        && mechanics.ordinary_pickup_probability == ordinary
-        && mechanics.maximum_pre_recruitment_charge == 199
-        && mechanics.hit_reset_charge == 0
-        && mechanics.miss_increment == 1
-        && mechanics.threshold_overrides == expected_thresholds;
-    if valid {
-        Ok(())
-    } else {
-        Err(CoreError::validation(
-            path,
-            "schema-v1 rulesets must exactly implement jp_2026_07_29_provisional_v1 mechanics",
-        ))
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Reward {
     pub resource: ResourceKind,
@@ -568,33 +451,16 @@ pub struct RewardSchedule {
     milestones: Vec<Milestone>,
     cumulative_resources: Vec<Resources>,
     total_ticket_rewards: u64,
-    provenance: Option<Provenance>,
+    provenance: Provenance,
 }
 
 impl RewardSchedule {
-    pub fn from_raw(raw: RawRewardScheduleV1, path: Option<&Path>) -> Result<Self, CoreError> {
-        validate_header(
-            raw.schema_version,
-            &raw.document_type,
-            REWARD_SCHEDULE_DOCUMENT_TYPE,
-            path,
-        )?;
-        Self::from_raw_parts(
-            raw.reward_schedule_id,
-            raw.compatible_ruleset_ids,
-            raw.milestones,
-            SCHEMA_VERSION_V1,
-            None,
-            path,
-        )
-    }
-
-    pub fn from_raw_v2(raw: RawRewardScheduleV2, path: Option<&Path>) -> Result<Self, CoreError> {
+    pub fn from_raw(raw: RawRewardScheduleV2, path: Option<&Path>) -> Result<Self, CoreError> {
         validate_header_version(
             raw.schema_version,
             &raw.document_type,
             REWARD_SCHEDULE_DOCUMENT_TYPE,
-            SCHEMA_VERSION_V2,
+            SCHEMA_VERSION,
             path,
         )?;
         let provenance = validate_provenance(raw.provenance, path)?;
@@ -602,8 +468,7 @@ impl RewardSchedule {
             raw.reward_schedule_id,
             raw.compatible_ruleset_ids,
             raw.milestones.into_iter().map(Into::into).collect(),
-            SCHEMA_VERSION_V2,
-            Some(provenance),
+            provenance,
             path,
         )
     }
@@ -612,8 +477,7 @@ impl RewardSchedule {
         raw_id: String,
         raw_compatible_ruleset_ids: Vec<String>,
         raw_milestones: Vec<crate::schema::RawMilestone>,
-        schema_version: u64,
-        provenance: Option<Provenance>,
+        provenance: Provenance,
         path: Option<&Path>,
     ) -> Result<Self, CoreError> {
         let id = RewardScheduleId::new(raw_id)
@@ -718,7 +582,7 @@ impl RewardSchedule {
             .unwrap_or_default()
             .limited_ten_recruitment_tickets;
         Ok(Self {
-            schema_version,
+            schema_version: SCHEMA_VERSION,
             id,
             compatible_ruleset_ids,
             milestones,
@@ -754,8 +618,8 @@ impl RewardSchedule {
     }
 
     #[must_use]
-    pub const fn provenance(&self) -> Option<&Provenance> {
-        self.provenance.as_ref()
+    pub const fn provenance(&self) -> &Provenance {
+        &self.provenance
     }
 
     #[must_use]
@@ -789,21 +653,6 @@ impl RewardSchedule {
             .collect::<Vec<_>>();
         compatible.sort();
         let milestones = reward_milestones_node(&self.milestones);
-        if self.schema_version == SCHEMA_VERSION_V1 {
-            return object([
-                ("compatible_ruleset_ids", CanonicalNode::Array(compatible)),
-                (
-                    "document_type",
-                    CanonicalNode::String(REWARD_SCHEDULE_DOCUMENT_TYPE.to_owned()),
-                ),
-                ("milestones", milestones),
-                (
-                    "reward_schedule_id",
-                    CanonicalNode::String(self.id.to_string()),
-                ),
-                ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
-            ]);
-        }
         object([
             ("compatible_ruleset_ids", CanonicalNode::Array(compatible)),
             (
@@ -811,24 +660,16 @@ impl RewardSchedule {
                 CanonicalNode::String(REWARD_SCHEDULE_DOCUMENT_TYPE.to_owned()),
             ),
             ("milestones", milestones),
-            (
-                "provenance",
-                self.provenance
-                    .as_ref()
-                    .map_or(CanonicalNode::Null, provenance_node),
-            ),
+            ("provenance", provenance_node(&self.provenance)),
             (
                 "reward_schedule_id",
                 CanonicalNode::String(self.id.to_string()),
             ),
-            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V2)),
+            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION)),
         ])
     }
 
     pub fn behavior_node(&self) -> CanonicalNode {
-        if self.schema_version == SCHEMA_VERSION_V1 {
-            return self.semantic_node();
-        }
         object([
             ("behavior_schema_version", CanonicalNode::Integer(2)),
             ("milestones", reward_milestones_node(&self.milestones)),
@@ -865,13 +706,13 @@ pub struct Target {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct StrategyConstraints {
-    pub max_total_recruitments: Option<NonZeroU64>,
+    pub max_total_recruitments: NonZeroU64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct StrategyConfiguration {
     pub strategy_id: StrategyId,
-    pub kind: RawStrategyKind,
+    pub kind: RawStrategyKindV2,
     pub constraints: StrategyConstraints,
 }
 
@@ -896,17 +737,48 @@ pub struct ValidatedScenario {
 
 impl ValidatedScenario {
     pub fn from_raw(
-        raw: RawScenarioV1,
+        raw: RawScenarioV2,
         ruleset: &CompiledRuleset,
         rewards: &RewardSchedule,
         path: Option<&Path>,
     ) -> Result<Self, CoreError> {
-        validate_header(
+        validate_header_version(
             raw.schema_version,
             &raw.document_type,
             SCENARIO_DOCUMENT_TYPE,
+            SCHEMA_VERSION,
             path,
         )?;
+        if raw.strategy.strategy_schema_version != 1 {
+            return Err(CoreError::validation(
+                path,
+                format!(
+                    "unsupported strategy_schema_version {}",
+                    raw.strategy.strategy_schema_version
+                ),
+            ));
+        }
+        if raw.strategy.kind != RawStrategyKindV2::SequentialTargets {
+            return Err(CoreError::validation(path, "unsupported strategy kind"));
+        }
+        let funding_priority = match raw.strategy.funding_priority.as_slice() {
+            [RawFundingKind::TicketTen, RawFundingKind::PaidSingle] => {
+                [FundingKind::TicketTen, FundingKind::PaidSingle]
+            }
+            [RawFundingKind::PaidSingle, RawFundingKind::TicketTen] => {
+                [FundingKind::PaidSingle, FundingKind::TicketTen]
+            }
+            _ => {
+                return Err(CoreError::validation(
+                    path,
+                    "funding_priority must be an exact permutation of ticket_ten and paid_single",
+                ));
+            }
+        };
+        let strategy_schema_version = raw.strategy.strategy_schema_version;
+        let strategy_kind = raw.strategy.kind;
+        let strategy_id_raw = raw.strategy.strategy_id;
+        let max_total_recruitments = raw.strategy.max_total_recruitments;
         let id = ScenarioId::new(raw.scenario_id)
             .map_err(|error| CoreError::validation(path, error.to_string()))?;
         let ruleset_id = RulesetId::new(raw.ruleset_id)
@@ -1120,31 +992,21 @@ impl ValidatedScenario {
         }
         let initial_owned_targets = owned_set.into_iter().collect::<Vec<_>>();
 
-        let strategy_id = StrategyId::new(raw.strategy.strategy_id)
+        let strategy_id = StrategyId::new(strategy_id_raw)
             .map_err(|error| CoreError::validation(path, error.to_string()))?;
-        let max_total_recruitments = match raw.strategy.max_total_recruitments {
-            crate::schema::NullablePositive::Missing => {
-                return Err(CoreError::validation(
-                    path,
-                    "strategy max_total_recruitments is required and must be null or a positive integer",
-                ));
-            }
-            crate::schema::NullablePositive::Present(value) => value,
-        };
         let strategy = StrategyConfiguration {
             strategy_id: strategy_id.clone(),
-            kind: raw.strategy.kind,
+            kind: strategy_kind,
             constraints: StrategyConstraints {
                 max_total_recruitments,
             },
         };
-        let compiled_strategy = CompiledStrategy::LegacySequentialV1 {
+        let compiled_strategy = CompiledStrategy::SequentialTargetsV2 {
+            strategy_schema_version,
             strategy_id,
-            legacy_horizon: max_total_recruitments,
+            funding_priority,
+            max_total_recruitments,
         };
-        if strategy.kind != RawStrategyKind::SequentialTargetsPreferTickets {
-            return Err(CoreError::validation(path, "unsupported strategy kind"));
-        }
 
         let all_rewards = rewards
             .resources_earned_through(u64::MAX)
@@ -1171,7 +1033,7 @@ impl ValidatedScenario {
         })?;
 
         Ok(Self {
-            schema_version: SCHEMA_VERSION_V1,
+            schema_version: SCHEMA_VERSION,
             id,
             ruleset_id,
             reward_schedule_id,
@@ -1187,77 +1049,6 @@ impl ValidatedScenario {
             targets,
             termination_bound,
         })
-    }
-
-    pub fn from_raw_v2(
-        raw: RawScenarioV2,
-        ruleset: &CompiledRuleset,
-        rewards: &RewardSchedule,
-        path: Option<&Path>,
-    ) -> Result<Self, CoreError> {
-        validate_header_version(
-            raw.schema_version,
-            &raw.document_type,
-            SCENARIO_DOCUMENT_TYPE,
-            SCHEMA_VERSION_V2,
-            path,
-        )?;
-        if raw.strategy.strategy_schema_version != 1 {
-            return Err(CoreError::validation(
-                path,
-                format!(
-                    "unsupported strategy_schema_version {}",
-                    raw.strategy.strategy_schema_version
-                ),
-            ));
-        }
-        if raw.strategy.kind != RawStrategyKindV2::SequentialTargets {
-            return Err(CoreError::validation(path, "unsupported strategy kind"));
-        }
-        let funding_priority = match raw.strategy.funding_priority.as_slice() {
-            [RawFundingKind::TicketTen, RawFundingKind::PaidSingle] => {
-                [FundingKind::TicketTen, FundingKind::PaidSingle]
-            }
-            [RawFundingKind::PaidSingle, RawFundingKind::TicketTen] => {
-                [FundingKind::PaidSingle, FundingKind::TicketTen]
-            }
-            _ => {
-                return Err(CoreError::validation(
-                    path,
-                    "funding_priority must be an exact permutation of ticket_ten and paid_single",
-                ));
-            }
-        };
-        let strategy_schema_version = raw.strategy.strategy_schema_version;
-        let strategy_id_raw = raw.strategy.strategy_id;
-        let horizon = raw.strategy.max_total_recruitments;
-        let converted = RawScenarioV1 {
-            schema_version: SCHEMA_VERSION_V1,
-            document_type: SCENARIO_DOCUMENT_TYPE.to_owned(),
-            scenario_id: raw.scenario_id,
-            ruleset_id: raw.ruleset_id,
-            reward_schedule_id: raw.reward_schedule_id,
-            students: raw.students,
-            banners: raw.banners,
-            initial_charges: raw.initial_charges,
-            initial_resources: raw.initial_resources,
-            initial_owned_targets: raw.initial_owned_targets,
-            strategy: crate::schema::RawStrategy {
-                strategy_id: strategy_id_raw,
-                kind: RawStrategyKind::SequentialTargetsPreferTickets,
-                max_total_recruitments: crate::schema::NullablePositive::Present(Some(horizon)),
-            },
-            targets: raw.targets,
-        };
-        let mut scenario = Self::from_raw(converted, ruleset, rewards, path)?;
-        scenario.schema_version = SCHEMA_VERSION_V2;
-        scenario.compiled_strategy = CompiledStrategy::SequentialTargetsV2 {
-            strategy_schema_version,
-            strategy_id: scenario.strategy.strategy_id.clone(),
-            funding_priority,
-            max_total_recruitments: horizon,
-        };
-        Ok(scenario)
     }
 
     #[must_use]
@@ -1434,10 +1225,6 @@ impl ValidatedScenario {
     }
 
     pub fn behavior_node(&self) -> CanonicalNode {
-        if self.schema_version == SCHEMA_VERSION_V1 {
-            return self.semantic_node();
-        }
-
         let mut normalized_groups = BTreeMap::<usize, usize>::new();
         let mut initial_charges = Vec::new();
         let mut targets = Vec::with_capacity(self.targets.len());
@@ -1501,24 +1288,6 @@ impl ValidatedScenario {
 
     pub fn document_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
         self.fingerprint()
-    }
-}
-
-fn validate_header(
-    version: u64,
-    actual_type: &str,
-    expected_type: &str,
-    path: Option<&Path>,
-) -> Result<(), CoreError> {
-    if version != SCHEMA_VERSION_V1 || actual_type != expected_type {
-        Err(CoreError::validation(
-            path,
-            format!(
-                "typed document header mismatch: expected schema_version=1 and document_type={expected_type}"
-            ),
-        ))
-    } else {
-        Ok(())
     }
 }
 
@@ -1724,25 +1493,6 @@ fn reward_milestones_node(milestones: &[Milestone]) -> CanonicalNode {
 
 fn strategy_node(strategy: &CompiledStrategy) -> CanonicalNode {
     match strategy {
-        CompiledStrategy::LegacySequentialV1 {
-            strategy_id,
-            legacy_horizon,
-        } => object([
-            (
-                "kind",
-                CanonicalNode::String("sequential_targets_prefer_tickets".to_owned()),
-            ),
-            (
-                "max_total_recruitments",
-                legacy_horizon.map_or(CanonicalNode::Null, |value| {
-                    CanonicalNode::Integer(value.get())
-                }),
-            ),
-            (
-                "strategy_id",
-                CanonicalNode::String(strategy_id.to_string()),
-            ),
-        ]),
         CompiledStrategy::SequentialTargetsV2 {
             strategy_schema_version,
             strategy_id,
@@ -1788,18 +1538,6 @@ fn strategy_node(strategy: &CompiledStrategy) -> CanonicalNode {
 
 fn strategy_behavior_node(strategy: &CompiledStrategy) -> CanonicalNode {
     match strategy {
-        CompiledStrategy::LegacySequentialV1 { legacy_horizon, .. } => object([
-            (
-                "kind",
-                CanonicalNode::String("sequential_targets_prefer_tickets".to_owned()),
-            ),
-            (
-                "max_total_recruitments",
-                legacy_horizon.map_or(CanonicalNode::Null, |value| {
-                    CanonicalNode::Integer(value.get())
-                }),
-            ),
-        ]),
         CompiledStrategy::SequentialTargetsV2 {
             strategy_schema_version,
             funding_priority,

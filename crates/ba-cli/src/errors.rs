@@ -227,7 +227,6 @@ fn core_error_code(error: &CoreError) -> &'static str {
         CoreError::DocumentSizeLimitExceeded { .. } => "document_size_limit_exceeded",
         CoreError::InvalidJson { .. } => "invalid_json",
         CoreError::UnsupportedDocument { .. } => "unsupported_document",
-        CoreError::IncompatibleSchemaReference { .. } => "incompatible_schema_reference",
         CoreError::Validation { .. } => "validation_failed",
         CoreError::ArithmeticOverflow { .. } => "arithmetic_overflow",
         CoreError::InvalidAction { .. } => "invalid_action",
@@ -258,7 +257,6 @@ fn engine_error_code(error: &EngineError) -> &'static str {
 fn core_pointer(error: &CoreError) -> Option<String> {
     match error {
         CoreError::InvalidJson { pointer, .. } => pointer.clone(),
-        CoreError::IncompatibleSchemaReference { pointer, .. } => Some((*pointer).to_owned()),
         _ => None,
     }
 }
@@ -274,10 +272,7 @@ fn core_hint(error: &CoreError) -> Option<&'static str> {
     match error {
         CoreError::InvalidJson { .. } => Some("correct the JSON value at the reported location"),
         CoreError::UnsupportedDocument { .. } => {
-            Some("use schema_version 1 or 2 with a supported document_type")
-        }
-        CoreError::IncompatibleSchemaReference { .. } => {
-            Some("use schema-v1 references for a schema-v1 scenario or migrate the scenario to v2")
+            Some("use schema_version 2 with a supported document_type")
         }
         CoreError::PathPolicy { .. } => {
             Some("use a regular JSON file below the selected pinned directory")

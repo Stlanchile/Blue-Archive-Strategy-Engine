@@ -3,7 +3,7 @@ mod common;
 use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 
-use ba_core::schema::{RawMilestone, RawReward};
+use ba_core::schema::{RawMilestoneV2, RawReward};
 use ba_core::{ResourceKind, Resources, load_bundle};
 use ba_engine::{
     DEFAULT_MAX_MONTE_CARLO_RUNS, EngineError, ExactSolverOptions, SimulationLimits, analyze_exact,
@@ -36,11 +36,11 @@ fn per_run_seed_vectors_are_stable_and_indexed_independently() {
     let bundle = bundle("single_target_200");
     assert_eq!(
         hex(derive_run_seed(&bundle, 42, 0)),
-        "2854b21b8943e8bf589c063dc3fb7fde782a305bdfb948f14377334c14ea04e9"
+        "f4961abc88b274005e73410aa82bc46b0cd6f652187e42cfc070882c85cab70d"
     );
     assert_eq!(
         hex(derive_run_seed(&bundle, 42, 1)),
-        "dd3b7fef826ebc82af5092431d9e9a7c279988b0292b8cbd5c520263955221b5"
+        "34a9d3c9fbdd95ac4452a44dae301415a28c436165284c4071e20d2d529428f5"
     );
     assert_ne!(
         derive_run_seed(&bundle, 42, 0),
@@ -65,7 +65,7 @@ fn repeated_simulation_is_byte_for_byte_deterministic() {
 
 #[test]
 fn set_like_reward_order_has_canonical_trace_and_fingerprint() {
-    let milestone = |rewards| RawMilestone { count: 1, rewards };
+    let milestone = |rewards| RawMilestoneV2 { count: 1, rewards };
     let first = synthetic_bundle(
         "canonical_rewards",
         half_probability_mechanics(),
@@ -74,7 +74,7 @@ fn set_like_reward_order_has_canonical_trace_and_fingerprint() {
             ..Resources::default()
         },
         0,
-        Some(1),
+        1,
         vec![milestone(vec![
             RawReward {
                 resource: ResourceKind::GiftBoxes,
@@ -94,7 +94,7 @@ fn set_like_reward_order_has_canonical_trace_and_fingerprint() {
             ..Resources::default()
         },
         0,
-        Some(1),
+        1,
         vec![milestone(vec![
             RawReward {
                 resource: ResourceKind::Eligma,

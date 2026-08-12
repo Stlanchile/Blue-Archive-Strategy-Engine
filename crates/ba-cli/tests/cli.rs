@@ -40,7 +40,7 @@ fn stderr(output: &Output) -> String {
 fn validate_and_analyze_keep_success_on_stdout() {
     let validate = run(&[
         "validate",
-        "data/rulesets/jp_2026_07_29_provisional_v1.json",
+        "data/rulesets/jp_2026_07_29_provisional_v2.json",
         "--format",
         "json",
     ]);
@@ -152,7 +152,7 @@ fn validation_catalog_and_engine_failures_have_stable_exit_classes() {
     let malformed = temp.path().join("malformed.json");
     fs::write(
         &malformed,
-        r#"{"schema_version":1,"document_type":"ruleset","schema_version":1}"#,
+        r#"{"schema_version":2,"document_type":"ruleset","schema_version":2}"#,
     )
     .expect("fixture");
     let validation = run(&[
@@ -257,10 +257,9 @@ fn catalog_listing_and_inspection_are_deterministic_and_exclude_test_fixtures() 
     let body: serde_json::Value = serde_json::from_slice(&first.stdout).expect("catalog JSON");
     assert_eq!(body["output_schema_version"], 1);
     let rendered = stdout(&first);
-    assert!(rendered.contains("jp_2026_07_29_provisional_v1"));
     assert!(rendered.contains("jp_2026_07_29_provisional_v2"));
     assert!(rendered.contains("jp_2026_07_29_empty_v2"));
-    assert!(!rendered.contains("synthetic_non_v1"));
+    assert!(!rendered.contains("synthetic_custom"));
 
     let inspect = run(&[
         "catalog",
@@ -389,7 +388,7 @@ fn scenario_explanation_and_template_round_trip_without_analysis() {
     let body: serde_json::Value =
         serde_json::from_slice(&explain.stdout).expect("explanation JSON");
     assert_eq!(body["document_type"], "scenario_explanation");
-    assert_eq!(body["compatibility_profile"], "v2");
+    assert!(body.get("compatibility_profile").is_none());
     assert_eq!(
         body["compiled_strategy"]["funding_priority"][0],
         "paid_single"

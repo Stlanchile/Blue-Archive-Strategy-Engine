@@ -11,8 +11,8 @@ by, or a source of official information from Nexon, Yostar, Blue Archive, or
 their affiliates. The repository contains no copyrighted game assets.
 
 The shipped data is explicitly provisional. In particular,
-`jp_2026_07_29_provisional_v2` is a schema-v2 encoding of the bundled v1
-mechanics, not an independently verified or official statement of game rules.
+`jp_2026_07_29_provisional_v2` is not an independently verified or official
+statement of game rules.
 
 ## Build and run
 
@@ -44,13 +44,13 @@ is valid schema-v2 JSON on stdout and defaults to ticket-first funding with a
 `--data-dir` defaults to `./data`. With `--scenario-dir <PATH>`, a bare name
 such as `foo` or `foo.json` resolves to `<PATH>/foo.json`; `./foo.json`,
 `../foo.json`, nested paths, and absolute paths remain explicit paths. Without
-`--scenario-dir`, the legacy golden-scenario resolver is retained.
+`--scenario-dir`, bare names resolve against `scenarios/golden/`.
 
 `validate --diagnostics` emits a diagnostics-schema-v1 error envelope on
 failure, including a stable class/code/message and, when available, a pointer,
-line/column, and corrective hint. Normal validation output and normal error
-formatting remain unchanged. Successful output is written to stdout; failures
-are written to stderr with no authoritative stdout result.
+line/column, and corrective hint. Successful validation reports include
+behavior and document fingerprints. Successful output is written to stdout;
+failures are written to stderr with no authoritative stdout result.
 
 | Exit | Meaning |
 |---:|---|
@@ -66,14 +66,12 @@ are written to stderr with no authoritative stdout result.
 `data/` is shipped provisional runtime data; `scenarios/examples/` contains
 authoring examples using only shipped data; `scenarios/golden/` contains frozen
 regression scenarios; and `tests/fixtures/` is synthetic/adversarial test data.
-The `synthetic_non_v1_*` fixtures are deliberately non-gameplay mechanics and
+The `synthetic_custom_*` fixtures are deliberately non-gameplay mechanics and
 are never runtime catalog data or release-facing examples.
 
-Schema-v1 behavior and result wire shapes remain frozen. A v1 scenario may
-reference only v1 rulesets and reward schedules and produces semantics/result
-schema 1. A v2 scenario may reference either version, subject to reward
-compatibility, and produces semantics/result schema 2. Details are in
-[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
+All input documents use schema version 2. Schema version 1 was an unused
+development format and is not accepted. Successful analysis uses engine
+semantics 2 and result schema 2. Details are in
 [`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md).
 
 V2 results distinguish behavior fingerprints from document fingerprints.
@@ -97,9 +95,8 @@ See [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
 Actions are atomic: a locked banner continues for every primitive draw even
 after an early pickup, and policy is reevaluated only at the action boundary.
-Schema v1 retains the legacy ticket-first strategy and nullable positive
-horizon. Schema v2 requires an explicit positive horizon and an exact
-permutation of `ticket_ten` and `paid_single` as funding priority. See
+Every scenario requires an explicit positive horizon and an exact permutation
+of `ticket_ten` and `paid_single` as funding priority. See
 [`docs/STRATEGIES.md`](docs/STRATEGIES.md).
 
 Document limits are 1 MiB, JSON depth 64, 512 inspected immediate directory

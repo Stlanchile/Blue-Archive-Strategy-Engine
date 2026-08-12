@@ -13,15 +13,9 @@ continues for its full primitive action size even if an early draw acquires the
 target. Tickets earned during that action become available only once it ends.
 An action must fit the remaining configured horizon in full.
 
-## Schema v1
+## Supported strategy
 
-V1 compiles to `LegacySequentialV1`. Its legacy horizon field is required and
-accepts `null` or a positive integer; `null` retains the existing unlimited
-semantics. Its funding order is permanently ticket-ten first, then paid-single.
-
-## Schema v2
-
-V2 strategy schema version 1 compiles to `SequentialTargetsV2`:
+Strategy schema version 1 compiles to `SequentialTargetsV2`:
 
 ```json
 "strategy": {

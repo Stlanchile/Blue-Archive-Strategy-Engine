@@ -29,7 +29,7 @@ fn first_success_history_merges_outside_the_markov_key_and_matches_oracle() {
             ..Resources::default()
         },
         0,
-        Some(10),
+        10,
         Vec::new(),
     );
     let initial = initial_world(&bundle);
@@ -145,7 +145,7 @@ fn exact_guards_fail_without_returning_partial_results() {
             ..Resources::default()
         },
         0,
-        Some(10),
+        10,
         Vec::new(),
     );
     let active = ExactSolverOptions {
@@ -212,7 +212,7 @@ fn exact_analysis_continues_through_subnormal_long_tail_branches() {
             ..Resources::default()
         },
         0,
-        Some(1_075),
+        1_075,
         Vec::new(),
     );
 
@@ -243,12 +243,12 @@ fn immutable_bundle_analysis_never_rereads_source_files() {
     fs::create_dir_all(data.join("rewards")).expect("rewards");
     fs::create_dir_all(&scenarios).expect("scenarios");
     fs::copy(
-        workspace_path("data/rulesets/jp_2026_07_29_provisional_v1.json"),
+        workspace_path("data/rulesets/jp_2026_07_29_provisional_v2.json"),
         data.join("rulesets/rules.json"),
     )
     .expect("copy rules");
     fs::copy(
-        workspace_path("data/rewards/empty_v1.json"),
+        workspace_path("data/rewards/jp_2026_07_29_empty_v2.json"),
         data.join("rewards/empty.json"),
     )
     .expect("copy rewards");
@@ -276,7 +276,7 @@ fn action_completion_activates_deferred_tickets_only_at_boundary() {
             ..Resources::default()
         },
         0,
-        Some(20),
+        20,
         vec![common::ticket_reward(5, 1)],
     );
     let world = initial_world(&bundle);

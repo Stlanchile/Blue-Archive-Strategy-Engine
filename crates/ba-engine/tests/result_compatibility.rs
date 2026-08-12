@@ -2,7 +2,7 @@ use std::fs;
 use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 
-use ba_core::{BundleCompatibilityProfile, load_bundle};
+use ba_core::load_bundle;
 use ba_engine::{
     ExactSolverOptions, analyze_exact, derive_run_seed, replay, simulate_monte_carlo,
     simulate_trace,
@@ -64,51 +64,6 @@ fn strip_document_identity(value: &mut serde_json::Value) {
     ] {
         provenance.remove(key);
     }
-}
-
-#[test]
-fn v1_projection_remains_exactly_v1_while_v2_is_selected_only_by_scenario() {
-    let v1 = load_bundle(
-        workspace_path("data"),
-        workspace_path("scenarios/golden/charge_99_one.json"),
-    )
-    .expect("v1");
-    assert_eq!(v1.profile(), BundleCompatibilityProfile::V1);
-    let value =
-        serde_json::to_value(analyze_exact(&v1, ExactSolverOptions::default()).expect("v1 exact"))
-            .expect("serialize");
-    assert_eq!(value["provenance"]["engine_semantics_version"], 1);
-    assert_eq!(value["provenance"]["result_schema_version"], 1);
-    assert!(
-        value["provenance"]
-            .get("ruleset_document_fingerprint")
-            .is_none()
-    );
-
-    let v2_with_v1 = {
-        let temp = TempDir::new().expect("tempdir");
-        let mut scenario: serde_json::Value = serde_json::from_slice(
-            &fs::read(workspace_path("scenarios/examples/single_target_v2.json"))
-                .expect("scenario"),
-        )
-        .expect("JSON");
-        scenario["ruleset_id"] = serde_json::json!("jp_2026_07_29_provisional_v1");
-        scenario["reward_schedule_id"] = serde_json::json!("empty_v1");
-        let path = temp.path().join("scenario.json");
-        write_json(&path, &scenario);
-        load_bundle(workspace_path("data"), path).expect("v2 with v1 references")
-    };
-    let value = serde_json::to_value(
-        analyze_exact(&v2_with_v1, ExactSolverOptions::default()).expect("v2 exact"),
-    )
-    .expect("serialize");
-    assert_eq!(value["provenance"]["engine_semantics_version"], 2);
-    assert_eq!(value["provenance"]["result_schema_version"], 2);
-    assert_eq!(
-        value["provenance"]["ruleset_behavior_fingerprint"],
-        value["provenance"]["ruleset_document_fingerprint"]
-    );
-    assert!(value["provenance"]["ruleset_verification_status"].is_null());
 }
 
 #[test]

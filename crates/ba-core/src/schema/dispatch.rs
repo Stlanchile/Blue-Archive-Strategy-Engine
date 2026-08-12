@@ -1,7 +1,6 @@
 use super::{REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, SCENARIO_DOCUMENT_TYPE};
 
-pub const SCHEMA_VERSION_V1: u64 = 1;
-pub const SCHEMA_VERSION_V2: u64 = 2;
+pub const SCHEMA_VERSION: u64 = 2;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DocumentKind {

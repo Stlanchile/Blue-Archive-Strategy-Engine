@@ -190,16 +190,16 @@ fn synthetic_v2_mechanics_drive_costs_probabilities_charges_and_action_sizes() {
     fs::create_dir_all(temp.path().join("rulesets")).expect("rulesets");
     fs::create_dir_all(temp.path().join("rewards")).expect("rewards");
     fs::copy(
-        workspace_path("tests/fixtures/schema_v2/non_v1_ruleset.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_ruleset.json"),
         temp.path().join("rulesets/rules.json"),
     )
     .expect("ruleset");
     fs::copy(
-        workspace_path("tests/fixtures/schema_v2/non_v1_reward.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_reward.json"),
         temp.path().join("rewards/rewards.json"),
     )
     .expect("rewards");
-    let scenario_path = workspace_path("tests/fixtures/schema_v2/non_v1_scenario.json");
+    let scenario_path = workspace_path("tests/fixtures/schema_v2/custom_scenario.json");
     let bundle = load_bundle(temp.path(), &scenario_path).expect("synthetic bundle");
 
     let exact = analyze_exact(&bundle, ExactSolverOptions::default()).expect("exact");

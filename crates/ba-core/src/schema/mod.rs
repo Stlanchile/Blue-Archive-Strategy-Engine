@@ -1,6 +1,5 @@
 mod common;
 mod dispatch;
-mod v1;
 mod v2;
 
 pub use common::{
@@ -8,11 +7,7 @@ pub use common::{
     RawMilestone, RawProbabilityRatio, RawReward, RawStudent, RawTarget, RawThresholdOverride,
     SCENARIO_DOCUMENT_TYPE,
 };
-pub use dispatch::{DocumentDispatch, DocumentKind, SCHEMA_VERSION_V1, SCHEMA_VERSION_V2};
-pub use v1::{
-    NullablePositive, RawRewardScheduleV1, RawRulesetV1, RawScenarioV1, RawStrategy,
-    RawStrategyKind,
-};
+pub use dispatch::{DocumentDispatch, DocumentKind, SCHEMA_VERSION};
 pub use v2::{
     RawFundingKind, RawMilestoneV2, RawProvenance, RawProvenanceSource, RawRewardScheduleV2,
     RawRulesetV2, RawScenarioV2, RawStrategyKindV2, RawStrategyV2, VerificationStatus,

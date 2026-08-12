@@ -201,18 +201,17 @@ pub fn begin_action(
             (bundle.ruleset().ticket_action_size(), 0_u64, 1_u64)
         }
     };
-    if let Some(horizon) = bundle.compiled_strategy().max_total_recruitments() {
-        let completion = state
-            .cumulative_primitive_recruitments
-            .checked_add(primitive_draws)
-            .ok_or(CoreError::ArithmeticOverflow {
-                context: "checking action fit against strategy horizon",
-            })?;
-        if completion > horizon.get() {
-            return Err(CoreError::InvalidAction {
-                message: "requested action crosses the strategy horizon".to_owned(),
-            });
-        }
+    let horizon = bundle.compiled_strategy().max_total_recruitments();
+    let completion = state
+        .cumulative_primitive_recruitments
+        .checked_add(primitive_draws)
+        .ok_or(CoreError::ArithmeticOverflow {
+            context: "checking action fit against strategy horizon",
+        })?;
+    if completion > horizon.get() {
+        return Err(CoreError::InvalidAction {
+            message: "requested action crosses the strategy horizon".to_owned(),
+        });
     }
     let mut world = state.clone();
     world.remaining_pyroxene = world

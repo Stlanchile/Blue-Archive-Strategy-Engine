@@ -1,32 +1,31 @@
 # Schema v2
 
-Schema v2 adds provenance-aware rulesets and reward schedules, explicit
-compiled strategies, and result schema 2 while retaining the one/two-target
-finite model. All documents use `schema_version: 2` and their existing
+Schema v2 defines provenance-aware rulesets and reward schedules, explicit
+compiled strategies, and result schema 2 for the one/two-target finite model.
+All documents use `schema_version: 2` and their
 `document_type` (`ruleset`, `reward_schedule`, or `scenario`). Unknown
-version/type pairs are rejected as unsupported documents.
+version/type pairs, including schema version 1, are rejected as unsupported
+documents.
 
 ## Shipped provisional data
 
 - `data/rulesets/jp_2026_07_29_provisional_v2.json`
 - `data/rewards/jp_2026_07_29_empty_v2.json`
+- `data/rewards/jp_2026_07_29_campaign_v2.json`
 
-The ruleset exactly mirrors the behavior-affecting values in the shipped v1
-provisional ruleset and is marked `provisional` with no sources. It is not
-independently verified, official, or an endorsement by the engine. The empty
-v2 reward schedule is also provisional and declares compatibility with both
-shipped provisional ruleset IDs.
+The ruleset and reward schedules are marked `provisional` with no sources.
+They are not independently verified, official, or an endorsement by the
+engine.
 
-`tests/fixtures/schema_v2/non_v1_*` deliberately demonstrates generic
-mechanics outside the v1 authority table. Those `synthetic_*` documents are
-test-only: they do not appear in runtime `data/`, normal catalog listings,
-authoring examples, or runtime archives.
+`tests/fixtures/schema_v2/custom_*` deliberately demonstrates generic custom
+mechanics. Those `synthetic_custom_*` documents are test-only: they do not
+appear in runtime `data/`, normal catalog listings, authoring examples, or
+runtime archives.
 
 ## Rulesets, rewards, and provenance
 
-A v2 ruleset declares the same mechanics as v1, but generic validation is used
-without the v1 provisional authority lock. It requires positive costs/action
-sizes and miss increment; normalized valid probabilities; unique strictly
+A ruleset requires positive costs/action sizes and miss increment; normalized
+valid probabilities; unique strictly
 increasing thresholds within the maximum charge; an in-range hit reset; checked
 derived arithmetic; and a probability-one override at every charge where a
 miss would exceed the maximum. At most 4,096 threshold overrides are allowed.
@@ -53,15 +52,14 @@ references to 2,048 UTF-8 bytes, optional `retrieved_on` must be a Gregorian
 characters. The engine validates declarations only: `verified` is not engine
 endorsement or a claim that a source is official or true.
 
-## Scenarios and compatibility
+## Scenarios and references
 
-A v2 scenario still has exactly one or two ordered targets, distinct target
+A scenario has exactly one or two ordered targets, distinct target
 students and banners, shared or independent charge groups, one initial charge
 per used group, complete explicit resources, zero initial cumulative count, and
-initial ownership limited to configured targets. It may reference either v1 or
-v2 rulesets and rewards, provided the reward schedule declares compatibility.
-V1 scenarios may reference only v1 documents. The scenario version—not the
-referenced document versions—selects semantics/result profile.
+initial ownership limited to configured targets. It references schema-v2
+rulesets and rewards, and the reward schedule must declare compatibility with
+the selected ruleset.
 
 The authoring examples are in `scenarios/examples/`. `scenario template`
 produces a valid v2 scenario with a 200-recruitment ticket-first strategy and
@@ -90,6 +88,3 @@ events, serial Monte Carlo primitive outcomes, aggregate behavioral metrics,
 and per-run seeds for a fixed master seed. It changes the document fingerprint
 and corresponding declared provenance/status in v2 output. Full serialized v2
 results may therefore differ even when their behavioral projections are equal.
-
-When a v2 scenario references a v1 document, the legacy fingerprint is used for
-both v2 fingerprint roles and the declared verification status is `null`.

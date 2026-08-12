@@ -16,9 +16,8 @@ pub mod strategy;
 pub mod strict_json;
 
 pub use catalog::{
-    BundleCompatibilityProfile, BundleFingerprints, Catalog, SourcePaths, ValidatedScenarioBundle,
-    ValidationReport, compile_buffered_bundle, load_buffered_bundle, load_bundle,
-    validate_document,
+    BundleFingerprints, Catalog, SourcePaths, ValidatedScenarioBundle, ValidationReport,
+    compile_buffered_bundle, load_buffered_bundle, load_bundle, validate_document,
 };
 pub use error::{
     CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES,

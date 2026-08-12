@@ -34,7 +34,7 @@ fn changed_cost_controls_affordability_deduction_and_metric_reconstruction() {
             ..Resources::default()
         },
         0,
-        Some(1),
+        1,
         Vec::new(),
     );
     let state = initial_world(&affordable);
@@ -63,7 +63,7 @@ fn changed_cost_controls_affordability_deduction_and_metric_reconstruction() {
             ..Resources::default()
         },
         0,
-        Some(1),
+        1,
         Vec::new(),
     );
     assert!(matches!(
@@ -82,7 +82,7 @@ fn changed_action_size_controls_horizon_fit_and_atomic_expansion() {
             ..Resources::default()
         },
         0,
-        Some(1),
+        1,
         Vec::new(),
     );
     assert!(matches!(
@@ -100,7 +100,7 @@ fn changed_action_size_controls_horizon_fit_and_atomic_expansion() {
             ..Resources::default()
         },
         0,
-        Some(2),
+        2,
         Vec::new(),
     );
     let exact = analyze_exact(&fits, ExactSolverOptions::default()).expect("exact");
@@ -132,7 +132,7 @@ fn changed_thresholds_flow_through_the_common_exact_and_monte_carlo_kernel() {
             ..Resources::default()
         },
         1,
-        Some(1),
+        1,
         Vec::new(),
     );
     let always = synthetic_bundle(
@@ -143,7 +143,7 @@ fn changed_thresholds_flow_through_the_common_exact_and_monte_carlo_kernel() {
             ..Resources::default()
         },
         1,
-        Some(1),
+        1,
         Vec::new(),
     );
     assert_eq!(
@@ -195,7 +195,7 @@ fn maximum_reset_and_increment_are_compiled_ruleset_authority() {
             ..Resources::default()
         },
         2,
-        Some(2),
+        2,
         Vec::new(),
     );
     let action = match decide(&bundle, &initial_world(&bundle)).expect("decision") {

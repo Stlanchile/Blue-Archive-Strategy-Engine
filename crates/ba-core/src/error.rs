@@ -65,17 +65,6 @@ pub enum CoreError {
         document_type: Option<String>,
     },
 
-    #[error(
-        "scenario schema version {scenario_schema_version} cannot reference {referenced_kind} {referenced_id} with schema version {referenced_schema_version}"
-    )]
-    IncompatibleSchemaReference {
-        scenario_schema_version: u64,
-        referenced_kind: &'static str,
-        referenced_id: String,
-        referenced_schema_version: u64,
-        pointer: &'static str,
-    },
-
     #[error("validation failed{path_suffix}: {message}")]
     Validation {
         path_suffix: String,
@@ -126,7 +115,6 @@ impl CoreError {
             | Self::DocumentSizeLimitExceeded { .. } => CoreErrorClass::CatalogIo,
             Self::InvalidJson { .. }
             | Self::UnsupportedDocument { .. }
-            | Self::IncompatibleSchemaReference { .. }
             | Self::Validation { .. } => CoreErrorClass::Validation,
             Self::ArithmeticOverflow { .. }
             | Self::InvalidAction { .. }

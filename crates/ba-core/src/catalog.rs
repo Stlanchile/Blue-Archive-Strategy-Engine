@@ -11,8 +11,7 @@ use crate::fs_secure::{DirectoryEntrySnapshot, PinnedDirectory, is_json_candidat
 use crate::id::{RewardScheduleId, RulesetId};
 use crate::model::{CompiledRuleset, CompiledStrategy, RewardSchedule, ValidatedScenario};
 use crate::schema::{
-    DocumentKind, RawRewardScheduleV1, RawRewardScheduleV2, RawRulesetV1, RawRulesetV2,
-    RawScenarioV1, RawScenarioV2, SCHEMA_VERSION_V1, SCHEMA_VERSION_V2, VerificationStatus,
+    DocumentKind, RawRewardScheduleV2, RawRulesetV2, RawScenarioV2, VerificationStatus,
 };
 use crate::strict_json::BufferedDocument;
 
@@ -63,21 +62,8 @@ impl Catalog {
                     "rulesets catalog contains a non-ruleset document",
                 ));
             }
-            let ruleset = Arc::new(match document.dispatch().schema_version {
-                SCHEMA_VERSION_V1 => {
-                    let raw: RawRulesetV1 = document.parse_typed()?;
-                    CompiledRuleset::from_raw_provisional(raw, Some(&path))?
-                }
-                SCHEMA_VERSION_V2 => {
-                    let raw: RawRulesetV2 = document.parse_typed()?;
-                    CompiledRuleset::from_raw_v2(raw, Some(&path))?
-                }
-                _ => {
-                    return Err(CoreError::InternalInvariant {
-                        message: "validated ruleset dispatch has an unknown version".to_owned(),
-                    });
-                }
-            });
+            let raw: RawRulesetV2 = document.parse_typed()?;
+            let ruleset = Arc::new(CompiledRuleset::from_raw(raw, Some(&path))?);
             let id = ruleset.id().clone();
             if rulesets.insert(id.clone(), ruleset).is_some() {
                 return Err(CoreError::validation(
@@ -104,21 +90,8 @@ impl Catalog {
                     "rewards catalog contains a non-reward-schedule document",
                 ));
             }
-            let rewards = Arc::new(match document.dispatch().schema_version {
-                SCHEMA_VERSION_V1 => {
-                    let raw: RawRewardScheduleV1 = document.parse_typed()?;
-                    RewardSchedule::from_raw(raw, Some(&path))?
-                }
-                SCHEMA_VERSION_V2 => {
-                    let raw: RawRewardScheduleV2 = document.parse_typed()?;
-                    RewardSchedule::from_raw_v2(raw, Some(&path))?
-                }
-                _ => {
-                    return Err(CoreError::InternalInvariant {
-                        message: "validated reward dispatch has an unknown version".to_owned(),
-                    });
-                }
-            });
+            let raw: RawRewardScheduleV2 = document.parse_typed()?;
+            let rewards = Arc::new(RewardSchedule::from_raw(raw, Some(&path))?);
             let id = rewards.id().clone();
             if reward_schedules.insert(id.clone(), rewards).is_some() {
                 return Err(CoreError::validation(
@@ -241,13 +214,6 @@ pub struct BundleFingerprints {
     pub reward_schedule_document: SemanticFingerprint,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum BundleCompatibilityProfile {
-    V1,
-    V2,
-}
-
 #[derive(Debug, Clone)]
 pub struct ValidatedScenarioBundle {
     scenario: Arc<ValidatedScenario>,
@@ -255,12 +221,11 @@ pub struct ValidatedScenarioBundle {
     reward_schedule: Arc<RewardSchedule>,
     fingerprints: BundleFingerprints,
     source_paths: SourcePaths,
-    profile: BundleCompatibilityProfile,
 }
 
 impl ValidatedScenarioBundle {
     pub fn from_programmatic(
-        raw_scenario: RawScenarioV1,
+        raw_scenario: RawScenarioV2,
         ruleset: CompiledRuleset,
         reward_schedule: RewardSchedule,
     ) -> Result<Self, CoreError> {
@@ -283,7 +248,6 @@ impl ValidatedScenarioBundle {
                 ruleset: PathBuf::from("<programmatic-ruleset>"),
                 reward_schedule: PathBuf::from("<programmatic-reward-schedule>"),
             },
-            profile: BundleCompatibilityProfile::V1,
         })
     }
 
@@ -313,41 +277,8 @@ impl ValidatedScenarioBundle {
     }
 
     #[must_use]
-    pub const fn profile(&self) -> BundleCompatibilityProfile {
-        self.profile
-    }
-
-    #[must_use]
     pub fn compiled_strategy(&self) -> &CompiledStrategy {
         self.scenario.compiled_strategy()
-    }
-}
-
-enum RawScenarioDocument {
-    V1(RawScenarioV1),
-    V2(RawScenarioV2),
-}
-
-impl RawScenarioDocument {
-    const fn schema_version(&self) -> u64 {
-        match self {
-            Self::V1(_) => SCHEMA_VERSION_V1,
-            Self::V2(_) => SCHEMA_VERSION_V2,
-        }
-    }
-
-    fn ruleset_id(&self) -> &str {
-        match self {
-            Self::V1(value) => &value.ruleset_id,
-            Self::V2(value) => &value.ruleset_id,
-        }
-    }
-
-    fn reward_schedule_id(&self) -> &str {
-        match self {
-            Self::V1(value) => &value.reward_schedule_id,
-            Self::V2(value) => &value.reward_schedule_id,
-        }
     }
 }
 
@@ -379,7 +310,7 @@ pub fn compile_buffered_bundle(
 
 struct ParsedScenarioDocument {
     path: PathBuf,
-    raw: RawScenarioDocument,
+    raw: RawScenarioV2,
     ruleset_lookup: RulesetId,
     reward_lookup: RewardScheduleId,
 }
@@ -394,18 +325,10 @@ fn parse_scenario_document(
             "analysis input must be a scenario document",
         ));
     }
-    let raw = match scenario_document.dispatch().schema_version {
-        SCHEMA_VERSION_V1 => RawScenarioDocument::V1(scenario_document.parse_typed()?),
-        SCHEMA_VERSION_V2 => RawScenarioDocument::V2(scenario_document.parse_typed()?),
-        _ => {
-            return Err(CoreError::InternalInvariant {
-                message: "validated scenario dispatch has an unknown version".to_owned(),
-            });
-        }
-    };
-    let ruleset_lookup = RulesetId::new(raw.ruleset_id().to_owned())
+    let raw: RawScenarioV2 = scenario_document.parse_typed()?;
+    let ruleset_lookup = RulesetId::new(raw.ruleset_id.clone())
         .map_err(|error| CoreError::validation(Some(scenario_path), error.to_string()))?;
-    let reward_lookup = RewardScheduleId::new(raw.reward_schedule_id().to_owned())
+    let reward_lookup = RewardScheduleId::new(raw.reward_schedule_id.clone())
         .map_err(|error| CoreError::validation(Some(scenario_path), error.to_string()))?;
     Ok(ParsedScenarioDocument {
         path: scenario_path.to_path_buf(),
@@ -447,36 +370,8 @@ fn compile_parsed_scenario(
                 ),
             )
         })?;
-    if raw.schema_version() == SCHEMA_VERSION_V1 && ruleset.schema_version() != SCHEMA_VERSION_V1 {
-        return Err(CoreError::IncompatibleSchemaReference {
-            scenario_schema_version: SCHEMA_VERSION_V1,
-            referenced_kind: "ruleset",
-            referenced_id: ruleset_lookup.to_string(),
-            referenced_schema_version: ruleset.schema_version(),
-            pointer: "/ruleset_id",
-        });
-    }
-    if raw.schema_version() == SCHEMA_VERSION_V1
-        && reward_schedule.schema_version() != SCHEMA_VERSION_V1
-    {
-        return Err(CoreError::IncompatibleSchemaReference {
-            scenario_schema_version: SCHEMA_VERSION_V1,
-            referenced_kind: "reward_schedule",
-            referenced_id: reward_lookup.to_string(),
-            referenced_schema_version: reward_schedule.schema_version(),
-            pointer: "/reward_schedule_id",
-        });
-    }
-    let (scenario, profile) = match raw {
-        RawScenarioDocument::V1(raw) => (
-            ValidatedScenario::from_raw(raw, &ruleset, &reward_schedule, Some(&scenario_path))?,
-            BundleCompatibilityProfile::V1,
-        ),
-        RawScenarioDocument::V2(raw) => (
-            ValidatedScenario::from_raw_v2(raw, &ruleset, &reward_schedule, Some(&scenario_path))?,
-            BundleCompatibilityProfile::V2,
-        ),
-    };
+    let scenario =
+        ValidatedScenario::from_raw(raw, &ruleset, &reward_schedule, Some(&scenario_path))?;
     let scenario = Arc::new(scenario);
     let fingerprints = BundleFingerprints {
         scenario: scenario.behavior_fingerprint()?,
@@ -509,7 +404,6 @@ fn compile_parsed_scenario(
             ruleset: ruleset_path,
             reward_schedule: reward_path,
         },
-        profile,
     })
 }
 
@@ -519,11 +413,8 @@ pub struct ValidationReport {
     pub schema_version: u64,
     pub document_type: String,
     pub id: String,
-    pub fingerprint: SemanticFingerprint,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub behavior_fingerprint: Option<SemanticFingerprint>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub document_fingerprint: Option<SemanticFingerprint>,
+    pub behavior_fingerprint: SemanticFingerprint,
+    pub document_fingerprint: SemanticFingerprint,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verification_status: Option<VerificationStatus>,
 }
@@ -536,76 +427,40 @@ pub fn validate_document(
     let document = BufferedDocument::read(path)?;
     match document.dispatch().kind {
         DocumentKind::Ruleset => {
-            let value = match document.dispatch().schema_version {
-                SCHEMA_VERSION_V1 => {
-                    let raw: RawRulesetV1 = document.parse_typed()?;
-                    CompiledRuleset::from_raw_provisional(raw, Some(path))?
-                }
-                SCHEMA_VERSION_V2 => {
-                    let raw: RawRulesetV2 = document.parse_typed()?;
-                    CompiledRuleset::from_raw_v2(raw, Some(path))?
-                }
-                _ => {
-                    return Err(CoreError::InternalInvariant {
-                        message: "validated ruleset dispatch has an unknown version".to_owned(),
-                    });
-                }
-            };
-            let is_v2 = value.schema_version() == SCHEMA_VERSION_V2;
+            let raw: RawRulesetV2 = document.parse_typed()?;
+            let value = CompiledRuleset::from_raw(raw, Some(path))?;
             Ok(ValidationReport {
                 valid: true,
                 schema_version: value.schema_version(),
                 document_type: DocumentKind::Ruleset.as_str().to_owned(),
                 id: value.id().to_string(),
-                fingerprint: value.document_fingerprint()?,
-                behavior_fingerprint: is_v2.then(|| value.behavior_fingerprint()).transpose()?,
-                document_fingerprint: is_v2.then(|| value.document_fingerprint()).transpose()?,
-                verification_status: value
-                    .provenance()
-                    .map(|provenance| provenance.verification_status),
+                behavior_fingerprint: value.behavior_fingerprint()?,
+                document_fingerprint: value.document_fingerprint()?,
+                verification_status: Some(value.provenance().verification_status),
             })
         }
         DocumentKind::RewardSchedule => {
-            let value = match document.dispatch().schema_version {
-                SCHEMA_VERSION_V1 => {
-                    let raw: RawRewardScheduleV1 = document.parse_typed()?;
-                    RewardSchedule::from_raw(raw, Some(path))?
-                }
-                SCHEMA_VERSION_V2 => {
-                    let raw: RawRewardScheduleV2 = document.parse_typed()?;
-                    RewardSchedule::from_raw_v2(raw, Some(path))?
-                }
-                _ => {
-                    return Err(CoreError::InternalInvariant {
-                        message: "validated reward dispatch has an unknown version".to_owned(),
-                    });
-                }
-            };
-            let is_v2 = value.schema_version() == SCHEMA_VERSION_V2;
+            let raw: RawRewardScheduleV2 = document.parse_typed()?;
+            let value = RewardSchedule::from_raw(raw, Some(path))?;
             Ok(ValidationReport {
                 valid: true,
                 schema_version: value.schema_version(),
                 document_type: DocumentKind::RewardSchedule.as_str().to_owned(),
                 id: value.id().to_string(),
-                fingerprint: value.document_fingerprint()?,
-                behavior_fingerprint: is_v2.then(|| value.behavior_fingerprint()).transpose()?,
-                document_fingerprint: is_v2.then(|| value.document_fingerprint()).transpose()?,
-                verification_status: value
-                    .provenance()
-                    .map(|provenance| provenance.verification_status),
+                behavior_fingerprint: value.behavior_fingerprint()?,
+                document_fingerprint: value.document_fingerprint()?,
+                verification_status: Some(value.provenance().verification_status),
             })
         }
         DocumentKind::Scenario => {
             let bundle = load_buffered_bundle(data_dir, &document)?;
-            let is_v2 = bundle.profile() == BundleCompatibilityProfile::V2;
             Ok(ValidationReport {
                 valid: true,
                 schema_version: bundle.scenario().schema_version(),
                 document_type: DocumentKind::Scenario.as_str().to_owned(),
                 id: bundle.scenario().id().to_string(),
-                fingerprint: bundle.fingerprints().scenario_document,
-                behavior_fingerprint: is_v2.then_some(bundle.fingerprints().scenario),
-                document_fingerprint: is_v2.then_some(bundle.fingerprints().scenario_document),
+                behavior_fingerprint: bundle.fingerprints().scenario,
+                document_fingerprint: bundle.fingerprints().scenario_document,
                 verification_status: None,
             })
         }
@@ -635,12 +490,12 @@ mod tests {
         fs::create_dir_all(root.join("rulesets")).expect("rulesets");
         fs::create_dir_all(root.join("rewards")).expect("rewards");
         fs::copy(
-            workspace_path("data/rulesets/jp_2026_07_29_provisional_v1.json"),
+            workspace_path("data/rulesets/jp_2026_07_29_provisional_v2.json"),
             root.join("rulesets/rules.json"),
         )
         .expect("rules");
         fs::copy(
-            workspace_path("data/rewards/empty_v1.json"),
+            workspace_path("data/rewards/jp_2026_07_29_empty_v2.json"),
             root.join("rewards/rewards.json"),
         )
         .expect("rewards");
@@ -803,7 +658,7 @@ mod tests {
                     catalog
                         .rulesets()
                         .keys()
-                        .any(|id| id.as_str() == "jp_2026_07_29_provisional_v1")
+                        .any(|id| id.as_str() == "jp_2026_07_29_provisional_v2")
                 );
             }
             Err(CoreError::CatalogGenerationChanged { .. }) => {}

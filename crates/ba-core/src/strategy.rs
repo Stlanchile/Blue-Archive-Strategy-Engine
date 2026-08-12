@@ -10,8 +10,8 @@ pub struct DecisionView<'a> {
     pub resources: Resources,
     pub charges: &'a [u64],
     pub cumulative_primitive_recruitments: u64,
-    pub configured_horizon: Option<u64>,
-    pub remaining_horizon: Option<u64>,
+    pub configured_horizon: u64,
+    pub remaining_horizon: u64,
     pub ruleset: &'a CompiledRuleset,
     scenario: &'a ValidatedScenario,
 }
@@ -21,19 +21,12 @@ impl<'a> DecisionView<'a> {
         bundle: &'a ValidatedScenarioBundle,
         state: &'a WorldStateKey,
     ) -> Result<Self, CoreError> {
-        let configured_horizon = bundle
-            .compiled_strategy()
-            .max_total_recruitments()
-            .map(std::num::NonZeroU64::get);
+        let configured_horizon = bundle.compiled_strategy().max_total_recruitments().get();
         let remaining_horizon = configured_horizon
-            .map(|horizon| {
-                horizon
-                    .checked_sub(state.cumulative_primitive_recruitments)
-                    .ok_or_else(|| CoreError::InvalidAction {
-                        message: "world count exceeds the configured strategy horizon".to_owned(),
-                    })
-            })
-            .transpose()?;
+            .checked_sub(state.cumulative_primitive_recruitments)
+            .ok_or_else(|| CoreError::InvalidAction {
+                message: "world count exceeds the configured strategy horizon".to_owned(),
+            })?;
         let mut resources = bundle.scenario().initial_resources();
         resources.checked_add(
             bundle
@@ -87,7 +80,7 @@ fn decide_sequential(
     if view.all_targets_owned() {
         return Ok(StrategyDecision::Stop(TerminalReason::TargetsAcquired));
     }
-    if view.remaining_horizon == Some(0) {
+    if view.remaining_horizon == 0 {
         return Ok(StrategyDecision::Stop(
             TerminalReason::StrategyHorizonReached,
         ));
@@ -143,13 +136,12 @@ pub fn decide(
 ) -> Result<StrategyDecision, CoreError> {
     let view = DecisionView::new(bundle, state)?;
     match bundle.compiled_strategy() {
-        CompiledStrategy::LegacySequentialV1 { .. } => SequentialTargetsPreferTickets.decide(&view),
         CompiledStrategy::SequentialTargetsV2 {
             funding_priority, ..
         } => decide_sequential(&view, *funding_priority),
     }
 }
 
-fn fits(remaining: Option<u64>, action_size: u64) -> bool {
-    remaining.is_none_or(|value| action_size <= value)
+fn fits(remaining: u64, action_size: u64) -> bool {
+    action_size <= remaining
 }

@@ -8,7 +8,7 @@ use crate::CoreError;
 use crate::error::MAX_JSON_DEPTH;
 use crate::schema::{
     DocumentKind, REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, SCENARIO_DOCUMENT_TYPE,
-    SCHEMA_VERSION_V1, SCHEMA_VERSION_V2,
+    SCHEMA_VERSION,
 };
 
 pub use crate::document::BufferedDocument;
@@ -42,12 +42,10 @@ pub(crate) fn scan_dispatch(path: &Path, bytes: &[u8]) -> Result<DocumentDispatc
         _ => None,
     };
     match (capture.schema_version, kind) {
-        (Some(version @ (SCHEMA_VERSION_V1 | SCHEMA_VERSION_V2)), Some(kind)) => {
-            Ok(DocumentDispatch {
-                schema_version: version,
-                kind,
-            })
-        }
+        (Some(SCHEMA_VERSION), Some(kind)) => Ok(DocumentDispatch {
+            schema_version: SCHEMA_VERSION,
+            kind,
+        }),
         _ => Err(CoreError::UnsupportedDocument {
             path: path.to_path_buf(),
             schema_version: capture.schema_version,

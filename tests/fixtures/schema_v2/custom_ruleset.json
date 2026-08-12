@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "document_type": "ruleset",
-  "ruleset_id": "synthetic_non_v1_ruleset",
+  "ruleset_id": "synthetic_custom_ruleset",
   "provenance": {
     "verification_status": "provisional",
     "sources": []

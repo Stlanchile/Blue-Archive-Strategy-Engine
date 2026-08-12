@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "document_type": "reward_schedule",
-  "reward_schedule_id": "empty_v1",
-  "compatible_ruleset_ids": [
-    "jp_2026_07_29_provisional_v1"
-  ],
-  "milestones": []
-}

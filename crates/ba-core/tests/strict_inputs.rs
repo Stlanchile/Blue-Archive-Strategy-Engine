@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use ba_core::schema::{RawRulesetV1, RawScenarioV1};
+use ba_core::schema::{RawRulesetV2, RawScenarioV2};
 use ba_core::strict_json::BufferedDocument;
 use ba_core::{
     Catalog, CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES,
@@ -25,9 +25,10 @@ fn write(path: &Path, bytes: impl AsRef<[u8]>) {
 fn valid_ruleset(id: &str) -> String {
     format!(
         r#"{{
-  "schema_version":1,
+  "schema_version":2,
   "document_type":"ruleset",
   "ruleset_id":"{id}",
+  "provenance":{{"verification_status":"provisional","sources":[]}},
   "paid_single_cost":120,
   "paid_single_action_size":1,
   "ticket_action_size":10,
@@ -47,14 +48,14 @@ fn valid_ruleset(id: &str) -> String {
 fn duplicate_keys_are_rejected_at_every_depth_and_after_escape_decoding() {
     let temp = TempDir::new().expect("tempdir");
     let cases = [
-        r#"{"schema_version":1,"schema_version":1,"document_type":"ruleset"}"#,
-        r#"{"schema_version":1,"document_type":"ruleset","document_type":"ruleset"}"#,
-        r#"{"schema_version":1,"document_type":"scenario","x":{"banner_id":"a","banner_\u0069d":"b"}}"#,
-        r#"{"schema_version":1,"document_type":"scenario","x":{"charge_group_id":"a","charge_group_id":"b"}}"#,
-        r#"{"schema_version":1,"document_type":"ruleset","x":{"numerator":1,"numerator":2}}"#,
-        r#"{"schema_version":1,"document_type":"ruleset","x":{"denominator":1,"denominator":2}}"#,
-        r#"{"schema_version":1,"document_type":"reward_schedule","x":{"resource":"eligma","resource":"gift_boxes"}}"#,
-        r#"{"schema_version":1,"document_type":"scenario","x":{"quantity":1,"quantity":2}}"#,
+        r#"{"schema_version":2,"schema_version":2,"document_type":"ruleset"}"#,
+        r#"{"schema_version":2,"document_type":"ruleset","document_type":"ruleset"}"#,
+        r#"{"schema_version":2,"document_type":"scenario","x":{"banner_id":"a","banner_\u0069d":"b"}}"#,
+        r#"{"schema_version":2,"document_type":"scenario","x":{"charge_group_id":"a","charge_group_id":"b"}}"#,
+        r#"{"schema_version":2,"document_type":"ruleset","x":{"numerator":1,"numerator":2}}"#,
+        r#"{"schema_version":2,"document_type":"ruleset","x":{"denominator":1,"denominator":2}}"#,
+        r#"{"schema_version":2,"document_type":"reward_schedule","x":{"resource":"eligma","resource":"gift_boxes"}}"#,
+        r#"{"schema_version":2,"document_type":"scenario","x":{"quantity":1,"quantity":2}}"#,
     ];
     for (index, document) in cases.into_iter().enumerate() {
         let path = temp.path().join(format!("{index}.json"));
@@ -77,7 +78,7 @@ fn strict_typed_parse_rejects_unknown_fields_and_trailing_data() {
     let unknown_path = temp.path().join("unknown.json");
     write(&unknown_path, unknown);
     let buffered = BufferedDocument::read(&unknown_path).expect("scan should succeed");
-    assert!(buffered.parse_typed::<RawRulesetV1>().is_err());
+    assert!(buffered.parse_typed::<RawRulesetV2>().is_err());
 
     let trailing_path = temp.path().join("trailing.json");
     write(
@@ -91,7 +92,7 @@ fn strict_typed_parse_rejects_unknown_fields_and_trailing_data() {
 fn depth_malformed_utf8_and_non_object_roots_fail_without_panicking() {
     let temp = TempDir::new().expect("tempdir");
     let deep = format!(
-        r#"{{"schema_version":1,"document_type":"ruleset","x":{}{}}}"#,
+        r#"{{"schema_version":2,"document_type":"ruleset","x":{}{}}}"#,
         "[".repeat(65),
         "]".repeat(65)
     );
@@ -122,7 +123,7 @@ fn document_size_boundary_is_complete_and_fail_closed() {
     write(&exact_path, exact);
     let document = BufferedDocument::read(&exact_path).expect("exact limit should scan");
     document
-        .parse_typed::<RawRulesetV1>()
+        .parse_typed::<RawRulesetV2>()
         .expect("exact limit should parse completely");
     let catalog_root = temp.path().join("catalog");
     fs::create_dir_all(catalog_root.join("rulesets")).expect("rules catalog");
@@ -169,7 +170,7 @@ fn non_utf8_document_paths_are_handled_without_panicking() {
     write(&path, valid_ruleset("non_utf8_path"));
     let document = BufferedDocument::read(&path).expect("non-UTF-8 path should load");
     document
-        .parse_typed::<RawRulesetV1>()
+        .parse_typed::<RawRulesetV2>()
         .expect("non-UTF-8 path should not affect JSON");
 }
 
@@ -284,27 +285,24 @@ fn catalog_and_documents_reject_json_symlinks_and_non_regular_entries() {
 }
 
 #[test]
-fn required_nullable_horizon_and_every_resource_field_are_enforced() {
+fn required_positive_horizon_and_every_resource_field_are_enforced() {
     let source = fs::read_to_string(workspace_path("scenarios/golden/single_target_200.json"))
         .expect("shipped scenario");
     let temp = TempDir::new().expect("tempdir");
 
-    let missing_horizon = source.replace(
-        "    \"kind\": \"sequential_targets_prefer_tickets\",\n    \"max_total_recruitments\": 200",
-        "    \"kind\": \"sequential_targets_prefer_tickets\"",
-    );
+    let missing_horizon = source.replace("    \"max_total_recruitments\": 200\n", "");
     let horizon_path = temp.path().join("missing_horizon.json");
     write(&horizon_path, missing_horizon);
     assert!(
         load_bundle(workspace_path("data"), &horizon_path).is_err(),
-        "missing required nullable horizon must fail semantic validation"
+        "missing required positive horizon must fail typed validation"
     );
 
     let missing_zero = source.replace("    \"eligma\": 0,\n", "");
     let resource_path = temp.path().join("missing_resource.json");
     write(&resource_path, missing_zero);
     let document = BufferedDocument::read(&resource_path).expect("scan");
-    assert!(document.parse_typed::<RawScenarioV1>().is_err());
+    assert!(document.parse_typed::<RawScenarioV2>().is_err());
 }
 
 #[test]
@@ -315,10 +313,11 @@ fn user_derived_overflow_is_rejected_as_domain_validation() {
         &rewards,
         format!(
             r#"{{
-  "schema_version":1,
+  "schema_version":2,
   "document_type":"reward_schedule",
   "reward_schedule_id":"overflow",
-  "compatible_ruleset_ids":["jp_2026_07_29_provisional_v1"],
+  "provenance":{{"verification_status":"provisional","sources":[]}},
+  "compatible_ruleset_ids":["jp_2026_07_29_provisional_v2"],
   "milestones":[
     {{"count":1,"rewards":[{{"resource":"limited_ten_recruitment_tickets","quantity":{}}}]}},
     {{"count":2,"rewards":[{{"resource":"limited_ten_recruitment_tickets","quantity":1}}]}}
@@ -336,10 +335,11 @@ fn user_derived_overflow_is_rejected_as_domain_validation() {
         &non_ticket_rewards,
         format!(
             r#"{{
-  "schema_version":1,
+  "schema_version":2,
   "document_type":"reward_schedule",
   "reward_schedule_id":"overflow_non_ticket",
-  "compatible_ruleset_ids":["jp_2026_07_29_provisional_v1"],
+  "provenance":{{"verification_status":"provisional","sources":[]}},
+  "compatible_ruleset_ids":["jp_2026_07_29_provisional_v2"],
   "milestones":[
     {{"count":1,"rewards":[{{"resource":"eligma","quantity":{}}}]}},
     {{"count":2,"rewards":[{{"resource":"eligma","quantity":1}}]}}
@@ -391,39 +391,15 @@ fn semantic_fingerprint_vectors_and_loaded_bundle_are_stable() {
     .expect("bundle");
     assert_eq!(
         bundle.fingerprints().ruleset.to_hex(),
-        "f0303e90198db957a29175060554e7bdfdd7b5032e93b0e83a6b8f138919769f"
+        "db0af908e4436e396e9a55e7e0bd39aa8ae30d8a148c34abb07c24cb347fb6ad"
     );
     assert_eq!(
         bundle.fingerprints().reward_schedule.to_hex(),
-        "dc21556fdb7d9aa65c06e689987d0cfa0dd1094dbbf329c32dc272cb5bc845f6"
+        "41387171a8507e76f595d0571b3d21028c166cb487bc49e64f3c072c09e6b10e"
     );
     assert_eq!(
         bundle.fingerprints().scenario.to_hex(),
-        "0847ac1e278d5a8c41913a4ed523dd2b0e364d7068ad098f8c0d9189d3427644"
-    );
-    assert_eq!(
-        bundle
-            .ruleset()
-            .semantic_node()
-            .to_canonical_bytes()
-            .expect("canonical ruleset"),
-        br#"{"document_type":"ruleset","hit_reset_charge":0,"maximum_pre_recruitment_charge":199,"miss_increment":1,"ordinary_pickup_probability":{"denominator":1000,"numerator":7},"paid_single_action_size":1,"paid_single_cost":120,"ruleset_id":"jp_2026_07_29_provisional_v1","schema_version":1,"threshold_overrides":[{"pickup_probability":{"denominator":2,"numerator":1},"pre_charge":99},{"pickup_probability":{"denominator":1,"numerator":1},"pre_charge":199}],"ticket_action_size":10}"#
-    );
-    assert_eq!(
-        bundle
-            .reward_schedule()
-            .semantic_node()
-            .to_canonical_bytes()
-            .expect("canonical rewards"),
-        br#"{"compatible_ruleset_ids":["jp_2026_07_29_provisional_v1"],"document_type":"reward_schedule","milestones":[],"reward_schedule_id":"empty_v1","schema_version":1}"#
-    );
-    assert_eq!(
-        bundle
-            .scenario()
-            .semantic_node()
-            .to_canonical_bytes()
-            .expect("canonical scenario"),
-        br#"{"banners":[{"banner_id":"banner_a","charge_group_id":"shared","featured_student_id":"target_a"}],"document_type":"scenario","initial_charges":[{"charge_group_id":"shared","pre_recruitment_charge":0}],"initial_owned_targets":[],"initial_resources":{"advanced_bd_selectors":0,"advanced_tech_note_selectors":0,"eligma":0,"gift_boxes":0,"limited_ten_recruitment_tickets":0,"pyroxene":24000,"superior_tech_note_selectors":0},"reward_schedule_id":"empty_v1","ruleset_id":"jp_2026_07_29_provisional_v1","scenario_id":"single_target_200","schema_version":1,"strategy":{"kind":"sequential_targets_prefer_tickets","max_total_recruitments":200,"strategy_id":"sequential"},"students":["target_a"],"targets":[{"banner_id":"banner_a","student_id":"target_a"}]}"#
+        "95eb5b476e17e148909fefd24da3ab00e0e15c4cbc8fdd5ed26758bc4fdb66af"
     );
 }
 

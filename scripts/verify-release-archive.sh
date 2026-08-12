@@ -55,9 +55,9 @@ require_entry() {
 
 for path in \
     ba-strategy RELEASE-MANIFEST.sha256 README.md CHANGELOG.md SECURITY.md LICENSE-MIT LICENSE-APACHE \
-    docs/CALIBRATION.md docs/COMPATIBILITY.md docs/PROTOCOLS.md docs/SCHEMA_V1.md docs/SCHEMA_V2.md docs/STRATEGIES.md docs/THREAT_MODEL.md \
-    data/rulesets/jp_2026_07_29_provisional_v1.json data/rulesets/jp_2026_07_29_provisional_v2.json \
-    data/rewards/empty_v1.json data/rewards/jp_2026_07_29_campaign_v1.json data/rewards/jp_2026_07_29_empty_v2.json; do
+    docs/CALIBRATION.md docs/PROTOCOLS.md docs/SCHEMA_V2.md docs/STRATEGIES.md docs/THREAT_MODEL.md \
+    data/rulesets/jp_2026_07_29_provisional_v2.json \
+    data/rewards/jp_2026_07_29_campaign_v2.json data/rewards/jp_2026_07_29_empty_v2.json; do
     require_entry "$path"
 done
 

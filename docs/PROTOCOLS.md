@@ -28,12 +28,9 @@ Fixed writer vector:
 ef7399b9e14e5bc9393892927aff176ede3c1416d3af75cc0e44eaa6312a133d
 ```
 
-The shipped minimal v1 bundle vectors are frozen in
-`crates/ba-core/tests/strict_inputs.rs`. V2 uses the same canonical writer but
-exposes separate behavior and document projections. Provenance is excluded from
-behavior fingerprints and included in v2 document fingerprints. A v1 document
-referenced by a v2 scenario uses its unchanged legacy fingerprint for both
-roles.
+Shipped bundle vectors are frozen in `crates/ba-core/tests/strict_inputs.rs`.
+Schema v2 exposes separate behavior and document projections. Provenance is
+excluded from behavior fingerprints and included in document fingerprints.
 
 ## Monte Carlo streams
 
@@ -78,23 +75,23 @@ run_index_contract = zero-based ascending indices 0..runs-1
 Fixed run-seed vectors and repeatability are tested in
 `crates/ba-engine/tests/simulation.rs`.
 
-## Result versions
+## Result version
 
-Schema-v1 successful result provenance remains:
+Successful results use engine semantics 2 and result schema 2. Their provenance
+includes each input schema version, behavior/document fingerprint roles,
+declared ruleset/reward verification status and provenance, and
+compiled-strategy context:
 
 ```text
 engine_version
-engine_semantics_version = 1
-result_schema_version = 1
+engine_semantics_version = 2
+result_schema_version = 2
 semantic_encoding_version = canonical-json-v1
-scenario/ruleset/reward-schedule IDs and fingerprints
+scenario/ruleset/reward-schedule IDs, schema versions, and fingerprints
+ruleset/reward-schedule provenance
 ```
 
-Schema-v2 scenarios select engine semantics 2 and result schema 2 regardless of
-the referenced document versions. Their provenance includes each input schema
-version, behavior/document fingerprint roles, declared ruleset/reward
-verification status and provenance, and compiled-strategy context. A
-provenance-only mutation can therefore change complete serialized v2 result
+A provenance-only mutation can therefore change complete serialized result
 bytes without changing any behavioral metric, event, state transition, or run
 seed.
 

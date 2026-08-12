@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "document_type": "scenario",
-  "scenario_id": "synthetic_non_v1_scenario",
-  "ruleset_id": "synthetic_non_v1_ruleset",
-  "reward_schedule_id": "synthetic_non_v1_reward",
+  "scenario_id": "synthetic_custom_scenario",
+  "ruleset_id": "synthetic_custom_ruleset",
+  "reward_schedule_id": "synthetic_custom_reward",
   "students": [
     {
       "student_id": "synthetic_target"

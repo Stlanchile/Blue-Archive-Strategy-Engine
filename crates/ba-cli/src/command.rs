@@ -3,9 +3,9 @@ use std::path::{Path, PathBuf};
 
 use ba_core::document::read_document_directory;
 use ba_core::{
-    BundleCompatibilityProfile, Catalog, CoreError, DocumentKind, RewardScheduleId, RulesetId,
-    ScenarioId, ValidatedScenarioBundle, compile_buffered_bundle, load_buffered_bundle,
-    load_bundle, validate_document,
+    Catalog, CoreError, DocumentKind, RewardScheduleId, RulesetId, ScenarioId,
+    ValidatedScenarioBundle, compile_buffered_bundle, load_buffered_bundle, load_bundle,
+    validate_document,
 };
 use ba_engine::{
     ExactSolverOptions, analyze_exact_detailed, compare, simulate_monte_carlo, simulate_trace,
@@ -243,7 +243,6 @@ struct CatalogDocumentSummary {
 struct ScenarioSummary {
     id: String,
     schema_version: u64,
-    compatibility_profile: BundleCompatibilityProfile,
     behavior_fingerprint: String,
     document_fingerprint: String,
 }
@@ -268,9 +267,7 @@ fn catalog_list(
                     schema_version: value.schema_version(),
                     behavior_fingerprint: value.behavior_fingerprint()?.to_hex(),
                     document_fingerprint: value.document_fingerprint()?.to_hex(),
-                    verification_status: value
-                        .provenance()
-                        .map(|provenance| provenance.verification_status),
+                    verification_status: Some(value.provenance().verification_status),
                 })
             })
             .collect::<Result<Vec<_>, CoreError>>()
@@ -290,9 +287,7 @@ fn catalog_list(
                     schema_version: value.schema_version(),
                     behavior_fingerprint: value.behavior_fingerprint()?.to_hex(),
                     document_fingerprint: value.document_fingerprint()?.to_hex(),
-                    verification_status: value
-                        .provenance()
-                        .map(|provenance| provenance.verification_status),
+                    verification_status: Some(value.provenance().verification_status),
                 })
             })
             .collect::<Result<Vec<_>, CoreError>>()
@@ -341,7 +336,6 @@ fn scenario_summaries(
             let summary = ScenarioSummary {
                 id: id.clone(),
                 schema_version: bundle.scenario().schema_version(),
-                compatibility_profile: bundle.profile(),
                 behavior_fingerprint: bundle.fingerprints().scenario.to_hex(),
                 document_fingerprint: bundle.fingerprints().scenario_document.to_hex(),
             };
@@ -521,7 +515,6 @@ fn scenario_explanation(bundle: &ValidatedScenarioBundle) -> serde_json::Value {
             "behavior_fingerprint": bundle.fingerprints().scenario,
             "document_fingerprint": bundle.fingerprints().scenario_document,
         },
-        "compatibility_profile": bundle.profile(),
         "ruleset": {
             "id": bundle.ruleset().id(),
             "schema_version": bundle.ruleset().schema_version(),

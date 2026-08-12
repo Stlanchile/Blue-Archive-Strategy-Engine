@@ -63,7 +63,7 @@ fn a_milestone_ticket_recursively_enables_the_next_atomic_action() {
             ..Resources::default()
         },
         0,
-        Some(80),
+        80,
         vec![ticket_reward(70, 1)],
     );
     let result = analyze_exact(&bundle, ExactSolverOptions::default()).expect("exact");

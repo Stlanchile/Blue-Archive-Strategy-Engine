@@ -74,12 +74,10 @@ fi
 
 required_files=(
     README.md CHANGELOG.md SECURITY.md LICENSE-MIT LICENSE-APACHE
-    docs/CALIBRATION.md docs/COMPATIBILITY.md docs/PROTOCOLS.md docs/SCHEMA_V1.md
-    docs/SCHEMA_V2.md docs/STRATEGIES.md docs/THREAT_MODEL.md
-    data/rulesets/jp_2026_07_29_provisional_v1.json
+    docs/CALIBRATION.md docs/PROTOCOLS.md docs/SCHEMA_V2.md
+    docs/STRATEGIES.md docs/THREAT_MODEL.md
     data/rulesets/jp_2026_07_29_provisional_v2.json
-    data/rewards/empty_v1.json
-    data/rewards/jp_2026_07_29_campaign_v1.json
+    data/rewards/jp_2026_07_29_campaign_v2.json
     data/rewards/jp_2026_07_29_empty_v2.json
 )
 for relative_path in "${required_files[@]}"; do
@@ -114,8 +112,8 @@ cp -R -- "$repo_root/scenarios/golden" "$stage/scenarios/golden"
 cp -R -- "$repo_root/scenarios/examples" "$stage/scenarios/examples"
 cp -- "$repo_root/README.md" "$repo_root/CHANGELOG.md" "$repo_root/SECURITY.md" \
     "$repo_root/LICENSE-MIT" "$repo_root/LICENSE-APACHE" "$stage/"
-cp -- "$repo_root/docs/CALIBRATION.md" "$repo_root/docs/COMPATIBILITY.md" \
-    "$repo_root/docs/PROTOCOLS.md" "$repo_root/docs/SCHEMA_V1.md" "$repo_root/docs/SCHEMA_V2.md" \
+cp -- "$repo_root/docs/CALIBRATION.md" \
+    "$repo_root/docs/PROTOCOLS.md" "$repo_root/docs/SCHEMA_V2.md" \
     "$repo_root/docs/STRATEGIES.md" "$repo_root/docs/THREAT_MODEL.md" "$stage/docs/"
 
 find "$stage" -type d -exec chmod 0755 {} +

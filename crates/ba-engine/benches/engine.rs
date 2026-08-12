@@ -26,12 +26,12 @@ fn stage_synthetic() -> TempDir {
     fs::create_dir_all(temp.path().join("rulesets")).expect("rulesets");
     fs::create_dir_all(temp.path().join("rewards")).expect("rewards");
     fs::copy(
-        workspace_path("tests/fixtures/schema_v2/non_v1_ruleset.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_ruleset.json"),
         temp.path().join("rulesets/rules.json"),
     )
     .expect("synthetic rules");
     fs::copy(
-        workspace_path("tests/fixtures/schema_v2/non_v1_reward.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_reward.json"),
         temp.path().join("rewards/rewards.json"),
     )
     .expect("synthetic rewards");
@@ -84,10 +84,10 @@ fn main() {
     let synthetic = stage_synthetic();
     let synthetic_bundle = load_bundle(
         synthetic.path(),
-        workspace_path("tests/fixtures/schema_v2/non_v1_scenario.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_scenario.json"),
     )
     .expect("synthetic bundle");
-    measure("synthetic non-v1 exact", || {
+    measure("synthetic custom exact", || {
         analyze_exact(&synthetic_bundle, ExactSolverOptions::default()).expect("synthetic exact")
     });
 

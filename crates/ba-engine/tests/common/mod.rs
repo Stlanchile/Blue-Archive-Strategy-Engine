@@ -3,8 +3,9 @@
 use std::num::NonZeroU64;
 
 use ba_core::schema::{
-    NullablePositive, RawBanner, RawInitialCharge, RawMilestone, RawRewardScheduleV1,
-    RawScenarioV1, RawStrategy, RawStrategyKind, RawStudent, RawTarget,
+    RawBanner, RawFundingKind, RawInitialCharge, RawMilestoneV2, RawProvenance,
+    RawRewardScheduleV2, RawScenarioV2, RawStrategyKindV2, RawStrategyV2, RawStudent, RawTarget,
+    VerificationStatus,
 };
 use ba_core::{
     CompiledRuleset, ResourceKind, Resources, RewardSchedule, RulesetId, RulesetMechanics,
@@ -16,25 +17,29 @@ pub fn synthetic_bundle(
     mechanics: RulesetMechanics,
     initial_resources: Resources,
     initial_charge: u64,
-    horizon: Option<u64>,
-    milestones: Vec<RawMilestone>,
+    horizon: u64,
+    milestones: Vec<RawMilestoneV2>,
 ) -> ValidatedScenarioBundle {
     let ruleset_id = RulesetId::new(format!("rules_{name}")).expect("test ruleset ID");
     let ruleset =
         CompiledRuleset::from_parts(ruleset_id.clone(), mechanics).expect("test mechanics");
     let reward_schedule = RewardSchedule::from_raw(
-        RawRewardScheduleV1 {
-            schema_version: 1,
+        RawRewardScheduleV2 {
+            schema_version: 2,
             document_type: "reward_schedule".to_owned(),
             reward_schedule_id: format!("rewards_{name}"),
+            provenance: RawProvenance {
+                verification_status: VerificationStatus::Provisional,
+                sources: Vec::new(),
+            },
             compatible_ruleset_ids: vec![ruleset_id.to_string()],
             milestones,
         },
         None,
     )
     .expect("test rewards");
-    let raw_scenario = RawScenarioV1 {
-        schema_version: 1,
+    let raw_scenario = RawScenarioV2 {
+        schema_version: 2,
         document_type: "scenario".to_owned(),
         scenario_id: format!("scenario_{name}"),
         ruleset_id: ruleset_id.to_string(),
@@ -53,12 +58,12 @@ pub fn synthetic_bundle(
         }],
         initial_resources,
         initial_owned_targets: Vec::new(),
-        strategy: RawStrategy {
+        strategy: RawStrategyV2 {
+            strategy_schema_version: 1,
             strategy_id: "strategy".to_owned(),
-            kind: RawStrategyKind::SequentialTargetsPreferTickets,
-            max_total_recruitments: NullablePositive::Present(
-                horizon.map(|value| NonZeroU64::new(value).expect("positive test horizon")),
-            ),
+            kind: RawStrategyKindV2::SequentialTargets,
+            funding_priority: vec![RawFundingKind::TicketTen, RawFundingKind::PaidSingle],
+            max_total_recruitments: NonZeroU64::new(horizon).expect("positive test horizon"),
         },
         targets: vec![RawTarget {
             student_id: "target".to_owned(),
@@ -85,8 +90,8 @@ pub fn half_probability_mechanics() -> RulesetMechanics {
     }
 }
 
-pub fn ticket_reward(count: u64, quantity: u64) -> RawMilestone {
-    RawMilestone {
+pub fn ticket_reward(count: u64, quantity: u64) -> RawMilestoneV2 {
+    RawMilestoneV2 {
         count,
         rewards: vec![ba_core::schema::RawReward {
             resource: ResourceKind::LimitedTenRecruitmentTickets,

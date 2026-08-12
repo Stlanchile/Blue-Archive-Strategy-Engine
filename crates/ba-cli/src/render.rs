@@ -14,8 +14,12 @@ pub(crate) fn validation(
     match format {
         OutputFormat::Json => render_json(value),
         OutputFormat::Text => Ok(format!(
-            "Valid: yes\nDocument type: {}\nSchema version: {}\nID: {}\nFingerprint: {}\n",
-            value.document_type, value.schema_version, value.id, value.fingerprint
+            "Valid: yes\nDocument type: {}\nSchema version: {}\nID: {}\nBehavior fingerprint: {}\nDocument fingerprint: {}\n",
+            value.document_type,
+            value.schema_version,
+            value.id,
+            value.behavior_fingerprint,
+            value.document_fingerprint,
         )),
     }
 }

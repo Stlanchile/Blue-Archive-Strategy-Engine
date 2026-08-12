@@ -50,7 +50,7 @@ load materially affect them.
 | `dual_shared_200` exact | 9.334484 ms |
 | `campaign_dual_310` exact | 18.048731 ms |
 | Fixed-seed serial Monte Carlo, 10,000 runs | 124.653361 ms |
-| Synthetic non-v1 exact | 13.611 us |
+| Synthetic custom exact | 13.611 us |
 | Near-guard exact success | 16.644478 ms |
 | Over-guard exact failure | 16.160215 ms |
 

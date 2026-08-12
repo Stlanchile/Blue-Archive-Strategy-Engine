@@ -11,8 +11,7 @@
 游戏素材。
 
 随项目提供的数据均明确标记为暂定（provisional）数据。特别是，
-`jp_2026_07_29_provisional_v2` 是对随附 v1 机制的 schema v2 编码，
-既未经独立核验，也不是官方的游戏规则说明。
+`jp_2026_07_29_provisional_v2` 既未经独立核验，也不是官方的游戏规则说明。
 
 ## 构建与运行
 
@@ -44,13 +43,13 @@ schema v2 JSON 写入 stdout，默认先使用 10次招募券，再使用付费�
 
 `--data-dir` 默认为 `./data`。指定 `--scenario-dir <PATH>` 后，`foo` 或
 `foo.json` 这样的单独名称会解析为 `<PATH>/foo.json`；带有 `./`、`../` 的路径、
-嵌套路径和绝对路径仍按显式路径处理。未指定 `--scenario-dir` 时，则沿用旧版的
-golden 场景解析逻辑。
+嵌套路径和绝对路径仍按显式路径处理。未指定 `--scenario-dir` 时，单独名称会从
+`scenarios/golden/` 解析。
 
 `validate --diagnostics` 在失败时会输出 diagnostics-schema-v1 格式的错误封装，
 其中包含稳定的错误类别、代码和消息；如可用，还会包含指针、行号、列号和修正提示。
-普通验证输出及默认错误格式保持不变。成功结果写入 stdout；失败时错误写入 stderr，
-stdout 不会留下任何可视为权威结果的输出。
+成功的验证报告会包含行为指纹和文档指纹。成功结果写入 stdout；失败时错误写入
+stderr，stdout 不会留下任何可视为权威结果的输出。
 
 | 退出码 | 含义 |
 |---:|---|
@@ -65,13 +64,11 @@ stdout 不会留下任何可视为权威结果的输出。
 
 `data/` 存放随项目提供的暂定运行时数据；`scenarios/examples/` 存放仅使用这些数据
 的场景编写示例；`scenarios/golden/` 存放冻结的回归场景；`tests/fixtures/` 存放
-合成及对抗性测试数据。`synthetic_non_v1_*` 测试夹具刻意采用与实际游戏玩法无关的
+合成及对抗性测试数据。`synthetic_custom_*` 测试夹具刻意采用与实际游戏玩法无关的
 机制，绝不会作为运行时 `catalog` 数据或面向发布的示例。
 
-Schema v1 的行为和结果传输结构均保持冻结。v1 场景只能引用 v1 规则集和奖励计划，
-其语义和结果使用 schema 1。v2 场景可以引用任一版本，但须满足奖励兼容性约束，
-其语义和结果使用 schema 2。详情请参阅
-[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) 和
+所有输入文档均使用 schema 2。Schema 1 仅作为未投入使用的开发格式存在，现已不再接受。
+成功的分析统一使用引擎语义版本 2 和结果 schema 2。详情请参阅
 [`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md)。
 
 V2 结果区分行为指纹与文档指纹。若仅更改 v2 的来源元数据（provenance），文档身份
@@ -94,10 +91,9 @@ V2 结果区分行为指纹与文档指纹。若仅更改 v2 的来源元数据�
 ## 模型与限制
 
 每个动作都是原子的：一旦锁定招募卡池，该动作就会完成其中的全部基础招募，即使
-提前获得目标也不会中止；策略仅在动作边界重新评估。Schema v1 保留旧版的招募券
-优先策略，招募上限可为 `null` 或正整数。Schema v2 要求显式指定正整数招募上限；
-`funding_priority` 必须且只能是 `ticket_ten` 与 `paid_single` 各出现一次的两种
-排列之一。请参阅
+提前获得目标也不会中止；策略仅在动作边界重新评估。每个场景都必须显式指定正整数
+招募上限；`funding_priority` 必须且只能是 `ticket_ten` 与 `paid_single` 各出现
+一次的两种排列之一。请参阅
 [`docs/STRATEGIES.md`](docs/STRATEGIES.md)。
 
 单份文档的大小上限为 1 MiB，JSON 最大深度为 64；最多检查 512 个目录直接子项，

@@ -1,9 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use ba_core::{
-    BundleCompatibilityProfile, Catalog, CoreError, FundingKind, load_bundle, validate_document,
-};
+use ba_core::{Catalog, CoreError, FundingKind, load_bundle, validate_document};
 use tempfile::TempDir;
 
 fn workspace_path(relative: &str) -> PathBuf {
@@ -16,11 +14,9 @@ fn copy_runtime_data(destination: &Path) {
     fs::create_dir_all(destination.join("rulesets")).expect("rulesets dir");
     fs::create_dir_all(destination.join("rewards")).expect("rewards dir");
     for source in [
-        "data/rulesets/jp_2026_07_29_provisional_v1.json",
         "data/rulesets/jp_2026_07_29_provisional_v2.json",
-        "data/rewards/empty_v1.json",
-        "data/rewards/jp_2026_07_29_campaign_v1.json",
         "data/rewards/jp_2026_07_29_empty_v2.json",
+        "data/rewards/jp_2026_07_29_campaign_v2.json",
     ] {
         let source = workspace_path(source);
         let child = if source
@@ -45,152 +41,74 @@ fn write_json(path: &Path, value: &serde_json::Value) {
     fs::write(path, serde_json::to_vec_pretty(value).expect("serialize")).expect("write JSON");
 }
 
-fn v2_scenario() -> serde_json::Value {
-    serde_json::from_slice(
-        &fs::read(workspace_path("scenarios/examples/single_target_v2.json")).expect("v2 example"),
-    )
-    .expect("scenario JSON")
-}
-
 #[test]
-fn shipped_v2_documents_are_provisional_and_mirror_v1_mechanics() {
+fn shipped_documents_are_v2_and_provisional() {
     let catalog = Catalog::load(workspace_path("data")).expect("catalog");
-    let v1 = catalog
-        .rulesets()
-        .iter()
-        .find(|(id, _)| id.as_str() == "jp_2026_07_29_provisional_v1")
-        .map(|(_, value)| value)
-        .expect("v1");
-    let v2 = catalog
-        .rulesets()
-        .iter()
-        .find(|(id, _)| id.as_str() == "jp_2026_07_29_provisional_v2")
-        .map(|(_, value)| value)
-        .expect("v2");
-    assert_eq!(v1.paid_single_cost(), v2.paid_single_cost());
-    assert_eq!(v1.paid_single_action_size(), v2.paid_single_action_size());
-    assert_eq!(v1.ticket_action_size(), v2.ticket_action_size());
-    assert_eq!(
-        v1.ordinary_pickup_probability(),
-        v2.ordinary_pickup_probability()
+    assert_eq!(catalog.rulesets().len(), 1);
+    assert_eq!(catalog.reward_schedules().len(), 2);
+    assert!(
+        catalog
+            .rulesets()
+            .values()
+            .all(|value| value.schema_version() == 2
+                && value.provenance().verification_status.as_str() == "provisional"
+                && value.provenance().sources.is_empty())
     );
-    assert_eq!(
-        v1.maximum_pre_recruitment_charge(),
-        v2.maximum_pre_recruitment_charge()
+    assert!(
+        catalog
+            .reward_schedules()
+            .values()
+            .all(|value| value.schema_version() == 2
+                && value.provenance().verification_status.as_str() == "provisional"
+                && value.provenance().sources.is_empty())
     );
-    assert_eq!(v1.hit_reset_charge(), v2.hit_reset_charge());
-    assert_eq!(v1.miss_increment(), v2.miss_increment());
-    assert_eq!(v1.threshold_overrides(), v2.threshold_overrides());
-    let provenance = v2.provenance().expect("v2 provenance");
-    assert_eq!(provenance.verification_status.as_str(), "provisional");
-    assert!(provenance.sources.is_empty());
+    let ruleset_id = catalog.rulesets().keys().next().expect("ruleset");
+    assert!(
+        catalog
+            .reward_schedules()
+            .values()
+            .all(|value| value.compatible_ruleset_ids() == [ruleset_id.clone()])
+    );
 }
 
 #[test]
-fn all_mixed_schema_profiles_follow_the_scenario_version_gate() {
+fn schema_v1_documents_are_unsupported() {
     let temp = TempDir::new().expect("tempdir");
-    copy_runtime_data(temp.path());
-    fs::write(
-        temp.path().join("rewards/mixed_reward_v1.json"),
-        r#"{
-  "schema_version": 1,
-  "document_type": "reward_schedule",
-  "reward_schedule_id": "mixed_reward_v1",
-  "compatible_ruleset_ids": ["jp_2026_07_29_provisional_v2"],
-  "milestones": []
-}"#,
-    )
-    .expect("mixed reward");
-
-    let v1_v1_v1 = load_bundle(
-        temp.path(),
-        workspace_path("scenarios/golden/single_target_200.json"),
-    )
-    .expect("v1 profile");
-    assert_eq!(v1_v1_v1.profile(), BundleCompatibilityProfile::V1);
-
-    let mut v1_v2 = serde_json::from_slice::<serde_json::Value>(
-        &fs::read(workspace_path("scenarios/golden/single_target_200.json")).expect("v1"),
-    )
-    .expect("JSON");
-    v1_v2["ruleset_id"] = serde_json::json!("jp_2026_07_29_provisional_v2");
-    let v1_v2_path = temp.path().join("v1_v2.json");
-    write_json(&v1_v2_path, &v1_v2);
+    let path = temp.path().join("schema-v1.json");
+    write_json(
+        &path,
+        &serde_json::json!({
+            "schema_version": 1,
+            "document_type": "ruleset",
+        }),
+    );
     assert!(matches!(
-        load_bundle(temp.path(), &v1_v2_path),
-        Err(CoreError::IncompatibleSchemaReference {
-            referenced_kind: "ruleset",
+        validate_document(workspace_path("data"), path),
+        Err(CoreError::UnsupportedDocument {
+            schema_version: Some(1),
             ..
         })
     ));
-
-    let mut v1_reward_v2 = serde_json::from_slice::<serde_json::Value>(
-        &fs::read(workspace_path("scenarios/golden/single_target_200.json")).expect("v1"),
-    )
-    .expect("JSON");
-    v1_reward_v2["reward_schedule_id"] = serde_json::json!("jp_2026_07_29_empty_v2");
-    let v1_reward_v2_path = temp.path().join("v1_reward_v2.json");
-    write_json(&v1_reward_v2_path, &v1_reward_v2);
-    assert!(matches!(
-        load_bundle(temp.path(), &v1_reward_v2_path),
-        Err(CoreError::IncompatibleSchemaReference {
-            referenced_kind: "reward_schedule",
-            ..
-        })
-    ));
-
-    let combinations = [
-        ("jp_2026_07_29_provisional_v1", "empty_v1", "v2_v1_v1"),
-        (
-            "jp_2026_07_29_provisional_v2",
-            "mixed_reward_v1",
-            "v2_v2_v1",
-        ),
-        (
-            "jp_2026_07_29_provisional_v1",
-            "jp_2026_07_29_empty_v2",
-            "v2_v1_v2",
-        ),
-        (
-            "jp_2026_07_29_provisional_v2",
-            "jp_2026_07_29_empty_v2",
-            "v2_v2_v2",
-        ),
-    ];
-    for (ruleset, rewards, id) in combinations {
-        let mut scenario = v2_scenario();
-        scenario["scenario_id"] = serde_json::json!(id);
-        scenario["ruleset_id"] = serde_json::json!(ruleset);
-        scenario["reward_schedule_id"] = serde_json::json!(rewards);
-        let path = temp.path().join(format!("{id}.json"));
-        write_json(&path, &scenario);
-        assert_eq!(
-            load_bundle(temp.path(), path)
-                .expect("v2 combination")
-                .profile(),
-            BundleCompatibilityProfile::V2
-        );
-    }
 }
 
 #[test]
-fn synthetic_non_v1_documents_execute_only_when_staged_as_test_data() {
+fn synthetic_custom_documents_execute_only_when_staged_as_test_data() {
     let temp = TempDir::new().expect("tempdir");
     fs::create_dir_all(temp.path().join("rulesets")).expect("rules");
     fs::create_dir_all(temp.path().join("rewards")).expect("rewards");
     fs::copy(
-        workspace_path("tests/fixtures/schema_v2/non_v1_ruleset.json"),
-        temp.path().join("rulesets/non_v1.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_ruleset.json"),
+        temp.path().join("rulesets/custom.json"),
     )
     .expect("ruleset");
     fs::copy(
-        workspace_path("tests/fixtures/schema_v2/non_v1_reward.json"),
-        temp.path().join("rewards/non_v1.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_reward.json"),
+        temp.path().join("rewards/custom.json"),
     )
     .expect("reward");
     let bundle = load_bundle(
         temp.path(),
-        workspace_path("tests/fixtures/schema_v2/non_v1_scenario.json"),
+        workspace_path("tests/fixtures/schema_v2/custom_scenario.json"),
     )
     .expect("synthetic bundle");
     assert_eq!(bundle.ruleset().paid_single_cost(), 10);
@@ -216,7 +134,7 @@ fn synthetic_non_v1_documents_execute_only_when_staged_as_test_data() {
 }
 
 #[test]
-fn v2_provenance_validation_and_document_fingerprint_separation_are_enforced() {
+fn provenance_validation_and_document_fingerprint_separation_are_enforced() {
     let temp = TempDir::new().expect("tempdir");
     let source = workspace_path("data/rulesets/jp_2026_07_29_provisional_v2.json");
     let mut first: serde_json::Value =
@@ -253,21 +171,18 @@ fn v2_provenance_validation_and_document_fingerprint_separation_are_enforced() {
 }
 
 #[test]
-fn duplicate_ids_are_rejected_across_schema_versions() {
+fn duplicate_ids_are_rejected() {
     let temp = TempDir::new().expect("tempdir");
     copy_runtime_data(temp.path());
-    let mut duplicate: serde_json::Value = serde_json::from_slice(
-        &fs::read(workspace_path(
-            "data/rulesets/jp_2026_07_29_provisional_v2.json",
-        ))
-        .expect("v2"),
+    let duplicate = fs::read(workspace_path(
+        "data/rulesets/jp_2026_07_29_provisional_v2.json",
+    ))
+    .expect("ruleset");
+    fs::write(
+        temp.path().join("rulesets/duplicate-ruleset.json"),
+        duplicate,
     )
-    .expect("JSON");
-    duplicate["ruleset_id"] = serde_json::json!("jp_2026_07_29_provisional_v1");
-    write_json(
-        &temp.path().join("rulesets/cross_version_duplicate.json"),
-        &duplicate,
-    );
+    .expect("duplicate");
     assert!(Catalog::load(temp.path()).is_err());
 }
 

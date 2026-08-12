@@ -29,6 +29,12 @@ result. Concrete execution also limits Monte Carlo runs to 1,000,000, primitive
 transitions per run to 1,048,576, transitions per simulation call to
 100,000,000, and materialized trace/replay transitions to 100,000.
 
+Exact probability mass is propagated with a normalized binary scale and a
+compensated significand. This keeps mathematically nonzero branches alive when
+their magnitude is below the ordinary `f64` exponent range. Public result
+fields remain `f64`; values smaller than its representable range round to zero
+only at the output boundary.
+
 ## Benchmark observations
 
 The `ba-engine` benchmark executable measures representative operations without
@@ -38,15 +44,15 @@ load materially affect them.
 
 | Operation | Observed elapsed time |
 |---|---:|
-| Shipped v2 ruleset read and validation | 88.162 us |
-| Complete shipped catalog load | 99.975 us |
-| `single_target_200` exact | 440.016 us |
-| `dual_shared_200` exact | 7.9549 ms |
-| `campaign_dual_310` exact | 14.103599 ms |
-| Fixed-seed serial Monte Carlo, 10,000 runs | 120.575304 ms |
-| Synthetic non-v1 exact | 15.116 us |
-| Near-guard exact success | 14.422025 ms |
-| Over-guard exact failure | 13.467363 ms |
+| Shipped v2 ruleset read and validation | 89.710 us |
+| Complete shipped catalog load | 126.114 us |
+| `single_target_200` exact | 874.728 us |
+| `dual_shared_200` exact | 9.334484 ms |
+| `campaign_dual_310` exact | 18.048731 ms |
+| Fixed-seed serial Monte Carlo, 10,000 runs | 124.653361 ms |
+| Synthetic non-v1 exact | 13.611 us |
+| Near-guard exact success | 16.644478 ms |
+| Over-guard exact failure | 16.160215 ms |
 
 The synthetic operation stages `tests/fixtures/schema_v2/` into a temporary
 catalog; fictional mechanics are not installed in `data/`. The Monte Carlo

@@ -1,3 +1,5 @@
+use std::fmt::Write as _;
+
 use ba_core::ValidationReport;
 use ba_engine::{ComparisonResult, ExactAnalysisResult, MonteCarloAnalysisResult, RunTraceResult};
 use serde::Serialize;
@@ -116,6 +118,18 @@ pub(crate) fn render_json(value: &impl Serialize) -> Result<String, AppError> {
     Ok(rendered)
 }
 
+pub(crate) fn terminal_safe(value: &str) -> String {
+    let mut rendered = String::with_capacity(value.len());
+    push_terminal_safe(&mut rendered, value, false);
+    rendered
+}
+
+pub(crate) fn terminal_safe_multiline(value: &str) -> String {
+    let mut rendered = String::with_capacity(value.len());
+    push_terminal_safe(&mut rendered, value, true);
+    rendered
+}
+
 fn display_optional(value: Option<f64>) -> String {
     value.map_or_else(|| "null".to_owned(), |number| format!("{number:.10}"))
 }
@@ -171,13 +185,56 @@ fn push_scalar(output: &mut String, value: &serde_json::Value) {
         serde_json::Value::Null => output.push_str("null"),
         serde_json::Value::Bool(value) => output.push_str(if *value { "true" } else { "false" }),
         serde_json::Value::Number(value) => output.push_str(&value.to_string()),
-        serde_json::Value::String(value) => output.push_str(value),
+        serde_json::Value::String(value) => push_terminal_safe(output, value, false),
         serde_json::Value::Array(_) | serde_json::Value::Object(_) => {
             unreachable!("structured values are rendered recursively")
         }
     }
 }
 
+fn push_terminal_safe(output: &mut String, value: &str, preserve_newlines: bool) {
+    for character in value.chars() {
+        match character {
+            '\u{08}' => output.push_str("\\b"),
+            '\u{0c}' => output.push_str("\\f"),
+            '\n' if preserve_newlines => output.push('\n'),
+            '\n' => output.push_str("\\n"),
+            '\r' => output.push_str("\\r"),
+            '\t' => output.push_str("\\t"),
+            character if character.is_control() => {
+                let _ = write!(output, "\\u{{{:x}}}", u32::from(character));
+            }
+            character => output.push(character),
+        }
+    }
+}
+
 fn push_indentation(output: &mut String, indentation: usize) {
     output.extend(std::iter::repeat_n(' ', indentation));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::structured;
+    use crate::args::OutputFormat;
+
+    #[test]
+    fn structured_text_escapes_untrusted_control_characters() {
+        let value = serde_json::json!({
+            "reference": "before\u{1b}[2Jafter\nforged\rline\tcolumn"
+        });
+        let rendered = structured(&value, OutputFormat::Text).expect("render");
+
+        assert_eq!(
+            rendered,
+            "reference: before\\u{1b}[2Jafter\\nforged\\rline\\tcolumn\n"
+        );
+        assert!(
+            rendered
+                .strip_suffix('\n')
+                .expect("renderer newline")
+                .chars()
+                .all(|character| !character.is_control())
+        );
+    }
 }

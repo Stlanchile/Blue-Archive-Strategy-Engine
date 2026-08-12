@@ -43,10 +43,14 @@ done
 
 require_entry() {
     local path="$root/$1"
-    if ! printf '%s\n' "${entries[@]}" | rg -Fxq -- "$path"; then
-        printf 'error: archive is missing %s\n' "$path" >&2
-        exit 1
-    fi
+    local entry
+    for entry in "${entries[@]}"; do
+        if [[ "$entry" == "$path" ]]; then
+            return
+        fi
+    done
+    printf 'error: archive is missing %s\n' "$path" >&2
+    exit 1
 }
 
 for path in \

@@ -21,6 +21,26 @@ where
 {
     let raw = args.into_iter().map(Into::into).collect::<Vec<_>>();
     let usage_json = requests_json(&raw);
+    if raw
+        .iter()
+        .any(|argument| argument.to_string_lossy().chars().any(char::is_control))
+    {
+        let classified = errors::usage_error(
+            "command-line arguments must not contain control characters".to_owned(),
+        );
+        let rendered = if usage_json {
+            render::render_json(&ErrorEnvelope {
+                error: classified.body,
+            })
+            .unwrap_or_else(|_| {
+                "{\"error\":{\"class\":\"cli_usage\",\"code\":\"cli_usage\",\"message\":\"invalid command line\"}}\n".to_owned()
+            })
+        } else {
+            "error: command-line arguments must not contain control characters\n".to_owned()
+        };
+        let _ = stderr.write_all(rendered.as_bytes());
+        return 2;
+    }
     let cli = match Cli::try_parse_from(raw) {
         Ok(value) => value,
         Err(error) => {
@@ -45,7 +65,7 @@ where
                     "{\"error\":{\"class\":\"cli_usage\",\"code\":\"cli_usage\",\"message\":\"invalid command line\"}}\n".to_owned()
                 })
             } else {
-                error.render().to_string()
+                render::terminal_safe_multiline(&error.render().to_string())
             };
             let _ = stderr.write_all(rendered.as_bytes());
             return 2;
@@ -80,12 +100,13 @@ where
                     .unwrap_or_else(|_| {
                         "{\"error\":{\"class\":\"internal\",\"code\":\"render_failure\",\"message\":\"could not render error\"}}\n".to_owned()
                     }),
-                    OutputFormat::Text => format!(
-                        "error [{}:{}]: {}\n",
-                        classified.body.class,
-                        classified.body.code,
-                        classified.body.message
-                    ),
+                    OutputFormat::Text => {
+                        let message = render::terminal_safe(&classified.body.message);
+                        format!(
+                            "error [{}:{}]: {}\n",
+                            classified.body.class, classified.body.code, message
+                        )
+                    }
                 }
             };
             let _ = stderr.write_all(rendered.as_bytes());
@@ -113,5 +134,53 @@ mod tests {
             resolve_master_seed_with(None, || Err("unavailable".to_owned())),
             Err(AppError::Entropy(message)) if message == "unavailable"
         ));
+    }
+
+    #[test]
+    fn usage_rejects_terminal_controls_before_formatting() {
+        for argument in ["\u{1b}[2Jinvalid", "\nFORGED-TERMINAL-LINE"] {
+            let mut stdout = Vec::new();
+            let mut stderr = Vec::new();
+            let exit = super::run(["ba-strategy", argument], &mut stdout, &mut stderr);
+            let stderr = String::from_utf8(stderr).expect("UTF-8 error");
+
+            assert_eq!(exit, 2);
+            assert!(stdout.is_empty());
+            assert_eq!(
+                stderr,
+                "error: command-line arguments must not contain control characters\n"
+            );
+        }
+
+        let mut stdout = Vec::new();
+        let mut stderr = Vec::new();
+        let exit = super::run(
+            ["evil\nFORGED-PROGRAM-NAME", "--definitely-invalid"],
+            &mut stdout,
+            &mut stderr,
+        );
+        assert_eq!(exit, 2);
+        assert!(stdout.is_empty());
+        assert_eq!(
+            String::from_utf8(stderr).expect("UTF-8 error"),
+            "error: command-line arguments must not contain control characters\n"
+        );
+
+        let mut stdout = Vec::new();
+        let mut stderr = Vec::new();
+        let exit = super::run(
+            ["ba-strategy", "\nFORGED-TERMINAL-LINE", "--format", "json"],
+            &mut stdout,
+            &mut stderr,
+        );
+        let body: serde_json::Value =
+            serde_json::from_slice(&stderr).expect("structured usage error");
+        assert_eq!(exit, 2);
+        assert!(stdout.is_empty());
+        assert_eq!(body["error"]["class"], "cli_usage");
+        assert_eq!(
+            body["error"]["message"],
+            "command-line arguments must not contain control characters"
+        );
     }
 }

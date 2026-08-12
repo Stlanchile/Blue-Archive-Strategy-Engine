@@ -130,7 +130,7 @@ chmod 0755 -- "$stage/ba-strategy"
 )
 
 rm -f -- "$archive" "$checksum" "$metadata"
-if tar --version 2>/dev/null | head -n 1 | rg -q 'GNU tar'; then
+if [[ "$(tar --version 2>/dev/null)" == *"GNU tar"* ]]; then
     tar --create --gzip --file "$archive" --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner \
         --directory "$stage_root" "$base_name"
 else

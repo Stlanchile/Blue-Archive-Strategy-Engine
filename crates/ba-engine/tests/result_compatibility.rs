@@ -207,6 +207,128 @@ fn provenance_only_mutation_changes_identity_but_not_any_execution_behavior() {
 }
 
 #[test]
+fn scenario_identity_only_mutation_preserves_behavior_fingerprint_and_streams() {
+    let temp = TempDir::new().expect("tempdir");
+    let original: serde_json::Value = serde_json::from_slice(
+        &fs::read(workspace_path("scenarios/examples/single_target_v2.json")).expect("scenario"),
+    )
+    .expect("JSON");
+    let mut renamed = original.clone();
+    renamed["scenario_id"] = serde_json::json!("renamed_scenario");
+    renamed["strategy"]["strategy_id"] = serde_json::json!("renamed_strategy");
+    renamed["ruleset_id"] = serde_json::json!("renamed_ruleset");
+    renamed["reward_schedule_id"] = serde_json::json!("renamed_rewards");
+
+    let renamed_data = temp.path().join("data");
+    fs::create_dir_all(renamed_data.join("rulesets")).expect("rulesets");
+    fs::create_dir_all(renamed_data.join("rewards")).expect("rewards");
+    let mut ruleset: serde_json::Value = serde_json::from_slice(
+        &fs::read(workspace_path(
+            "data/rulesets/jp_2026_07_29_provisional_v2.json",
+        ))
+        .expect("ruleset"),
+    )
+    .expect("ruleset JSON");
+    ruleset["ruleset_id"] = serde_json::json!("renamed_ruleset");
+    let mut rewards: serde_json::Value = serde_json::from_slice(
+        &fs::read(workspace_path("data/rewards/jp_2026_07_29_empty_v2.json")).expect("rewards"),
+    )
+    .expect("rewards JSON");
+    rewards["reward_schedule_id"] = serde_json::json!("renamed_rewards");
+    rewards["compatible_ruleset_ids"] = serde_json::json!(["renamed_ruleset"]);
+    write_json(&renamed_data.join("rulesets/rules.json"), &ruleset);
+    write_json(&renamed_data.join("rewards/rewards.json"), &rewards);
+
+    let original_path = temp.path().join("original.json");
+    let renamed_path = temp.path().join("renamed.json");
+    write_json(&original_path, &original);
+    write_json(&renamed_path, &renamed);
+
+    let original_bundle = load_bundle(workspace_path("data"), original_path).expect("original");
+    let renamed_bundle = load_bundle(&renamed_data, renamed_path).expect("renamed");
+    assert_eq!(
+        original_bundle.fingerprints().scenario,
+        renamed_bundle.fingerprints().scenario
+    );
+    assert_ne!(
+        original_bundle.fingerprints().scenario_document,
+        renamed_bundle.fingerprints().scenario_document
+    );
+    assert_eq!(
+        original_bundle.fingerprints().ruleset,
+        renamed_bundle.fingerprints().ruleset
+    );
+    assert_ne!(
+        original_bundle.fingerprints().ruleset_document,
+        renamed_bundle.fingerprints().ruleset_document
+    );
+    assert_eq!(
+        original_bundle.fingerprints().reward_schedule,
+        renamed_bundle.fingerprints().reward_schedule
+    );
+    assert_ne!(
+        original_bundle.fingerprints().reward_schedule_document,
+        renamed_bundle.fingerprints().reward_schedule_document
+    );
+    for run_index in 0..16 {
+        assert_eq!(
+            derive_run_seed(&original_bundle, 42, run_index),
+            derive_run_seed(&renamed_bundle, 42, run_index)
+        );
+    }
+}
+
+#[test]
+fn scenario_label_alpha_renames_preserve_normalized_behavior_topology() {
+    let temp = TempDir::new().expect("tempdir");
+    let mut original: serde_json::Value = serde_json::from_slice(
+        &fs::read(workspace_path(
+            "scenarios/examples/dual_target_ticket_first_v2.json",
+        ))
+        .expect("scenario"),
+    )
+    .expect("JSON");
+    original["initial_charges"][0]["pre_recruitment_charge"] = serde_json::json!(3);
+    original["initial_charges"][1]["pre_recruitment_charge"] = serde_json::json!(7);
+    let mut renamed = original.clone();
+    renamed["students"][0]["student_id"] = serde_json::json!("z_student");
+    renamed["students"][1]["student_id"] = serde_json::json!("a_student");
+    renamed["banners"][0]["banner_id"] = serde_json::json!("z_banner");
+    renamed["banners"][0]["featured_student_id"] = serde_json::json!("z_student");
+    renamed["banners"][0]["charge_group_id"] = serde_json::json!("z_group");
+    renamed["banners"][1]["banner_id"] = serde_json::json!("a_banner");
+    renamed["banners"][1]["featured_student_id"] = serde_json::json!("a_student");
+    renamed["banners"][1]["charge_group_id"] = serde_json::json!("a_group");
+    renamed["initial_charges"][0]["charge_group_id"] = serde_json::json!("z_group");
+    renamed["initial_charges"][1]["charge_group_id"] = serde_json::json!("a_group");
+    renamed["targets"][0]["student_id"] = serde_json::json!("z_student");
+    renamed["targets"][0]["banner_id"] = serde_json::json!("z_banner");
+    renamed["targets"][1]["student_id"] = serde_json::json!("a_student");
+    renamed["targets"][1]["banner_id"] = serde_json::json!("a_banner");
+    let original_path = temp.path().join("topology-original.json");
+    let renamed_path = temp.path().join("topology-renamed.json");
+    write_json(&original_path, &original);
+    write_json(&renamed_path, &renamed);
+
+    let original_bundle = load_bundle(workspace_path("data"), original_path).expect("original");
+    let renamed_bundle = load_bundle(workspace_path("data"), renamed_path).expect("renamed");
+    assert_eq!(
+        original_bundle.fingerprints().scenario,
+        renamed_bundle.fingerprints().scenario
+    );
+    assert_ne!(
+        original_bundle.fingerprints().scenario_document,
+        renamed_bundle.fingerprints().scenario_document
+    );
+    for run_index in 0..16 {
+        assert_eq!(
+            derive_run_seed(&original_bundle, 42, run_index),
+            derive_run_seed(&renamed_bundle, 42, run_index)
+        );
+    }
+}
+
+#[test]
 fn behavior_mutation_changes_behavior_fingerprint_seed_and_reached_execution() {
     let first = TempDir::new().expect("first");
     let second = TempDir::new().expect("second");

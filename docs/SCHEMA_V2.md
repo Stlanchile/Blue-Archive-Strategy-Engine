@@ -76,6 +76,14 @@ V2 exposes two semantic SHA-256 surfaces for rulesets, rewards, and scenarios:
 - **Document fingerprint:** behavior plus semantically relevant provenance and
   other document identity fields.
 
+Scenario behavior normalization excludes scenario, strategy, referenced
+document, student, banner, and charge-group identifiers. It retains ordered
+target positions, initial ownership, resources, strategy behavior, and the
+target-to-charge-group topology. Charge groups are numbered by first appearance
+in ordered-target position, so an identifier-only rename cannot perturb a
+fixed-seed stream while shared-versus-independent charge behavior remains
+distinguishable.
+
 Consequently, a provenance-only change preserves compiled mechanics, strategy
 decisions, exact metrics, solver diagnostics, state transitions, trace/replay
 events, serial Monte Carlo primitive outcomes, aggregate behavioral metrics,

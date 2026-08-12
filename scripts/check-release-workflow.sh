@@ -15,7 +15,7 @@ fi
 require() {
     local expression="$1"
     local description="$2"
-    if ! rg -q -- "$expression" "$workflow"; then
+    if ! grep -Eq -- "$expression" "$workflow"; then
         printf 'error: release workflow is missing %s\n' "$description" >&2
         exit 1
     fi
@@ -32,11 +32,11 @@ require 'scripts/package-release.sh' 'verified artifact packaging'
 require 'scripts/verify-release-archive.sh' 'archive verification'
 
 publisher="$(sed -n '/^  release-publish:/,$p' "$workflow")"
-if rg -q 'actions/checkout|cargo[[:space:]]|rustup|scripts/' <<<"$publisher"; then
+if grep -Eq -- 'actions/checkout|cargo[[:space:]]|rustup|scripts/' <<<"$publisher"; then
     printf '%s\n' 'error: release-publish must not checkout, build, run Cargo, or execute project scripts' >&2
     exit 1
 fi
-if ! rg -q 'actions/download-artifact@[0-9a-f]{40}' <<<"$publisher"; then
+if ! grep -Eq -- 'actions/download-artifact@[0-9a-f]{40}' <<<"$publisher"; then
     printf '%s\n' 'error: release-publish must download only verified artifacts' >&2
     exit 1
 fi

@@ -1433,12 +1433,70 @@ impl ValidatedScenario {
         ])
     }
 
+    pub fn behavior_node(&self) -> CanonicalNode {
+        if self.schema_version == SCHEMA_VERSION_V1 {
+            return self.semantic_node();
+        }
+
+        let mut normalized_groups = BTreeMap::<usize, usize>::new();
+        let mut initial_charges = Vec::new();
+        let mut targets = Vec::with_capacity(self.targets.len());
+        for target in &self.targets {
+            let Some(banner) = self.banners.get(target.banner_index) else {
+                targets.push(CanonicalNode::Null);
+                continue;
+            };
+            let group_index = banner.charge_group_index;
+            let normalized_index = if let Some(index) = normalized_groups.get(&group_index) {
+                *index
+            } else {
+                let index = normalized_groups.len();
+                normalized_groups.insert(group_index, index);
+                initial_charges.push(
+                    self.initial_charges
+                        .get(group_index)
+                        .copied()
+                        .map_or(CanonicalNode::Null, CanonicalNode::Integer),
+                );
+                index
+            };
+            targets.push(object([(
+                "charge_group",
+                CanonicalNode::Integer(normalized_index as u64),
+            )]));
+        }
+        let initial_owned_target_positions = self
+            .targets
+            .iter()
+            .enumerate()
+            .map(|(index, _)| {
+                let owned = u32::try_from(index)
+                    .ok()
+                    .and_then(|shift| 1_u8.checked_shl(shift))
+                    .is_some_and(|bit| self.initial_owned_mask & bit != 0);
+                CanonicalNode::Bool(owned)
+            })
+            .collect();
+
+        object([
+            ("behavior_schema_version", CanonicalNode::Integer(2)),
+            ("initial_charges", CanonicalNode::Array(initial_charges)),
+            (
+                "initial_owned_target_positions",
+                CanonicalNode::Array(initial_owned_target_positions),
+            ),
+            ("initial_resources", resources_node(self.initial_resources)),
+            ("strategy", strategy_behavior_node(&self.compiled_strategy)),
+            ("targets", CanonicalNode::Array(targets)),
+        ])
+    }
+
     pub fn fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
         SemanticFingerprint::from_node(&self.semantic_node())
     }
 
     pub fn behavior_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
-        self.fingerprint()
+        SemanticFingerprint::from_node(&self.behavior_node())
     }
 
     pub fn document_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
@@ -1719,6 +1777,59 @@ fn strategy_node(strategy: &CompiledStrategy) -> CanonicalNode {
             (
                 "strategy_id",
                 CanonicalNode::String(strategy_id.to_string()),
+            ),
+            (
+                "strategy_schema_version",
+                CanonicalNode::Integer(*strategy_schema_version),
+            ),
+        ]),
+    }
+}
+
+fn strategy_behavior_node(strategy: &CompiledStrategy) -> CanonicalNode {
+    match strategy {
+        CompiledStrategy::LegacySequentialV1 { legacy_horizon, .. } => object([
+            (
+                "kind",
+                CanonicalNode::String("sequential_targets_prefer_tickets".to_owned()),
+            ),
+            (
+                "max_total_recruitments",
+                legacy_horizon.map_or(CanonicalNode::Null, |value| {
+                    CanonicalNode::Integer(value.get())
+                }),
+            ),
+        ]),
+        CompiledStrategy::SequentialTargetsV2 {
+            strategy_schema_version,
+            funding_priority,
+            max_total_recruitments,
+            ..
+        } => object([
+            (
+                "funding_priority",
+                CanonicalNode::Array(
+                    funding_priority
+                        .iter()
+                        .map(|kind| {
+                            CanonicalNode::String(
+                                match kind {
+                                    FundingKind::TicketTen => "ticket_ten",
+                                    FundingKind::PaidSingle => "paid_single",
+                                }
+                                .to_owned(),
+                            )
+                        })
+                        .collect(),
+                ),
+            ),
+            (
+                "kind",
+                CanonicalNode::String("sequential_targets".to_owned()),
+            ),
+            (
+                "max_total_recruitments",
+                CanonicalNode::Integer(max_total_recruitments.get()),
             ),
             (
                 "strategy_schema_version",

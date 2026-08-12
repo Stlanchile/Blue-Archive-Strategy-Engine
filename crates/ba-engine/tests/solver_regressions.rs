@@ -196,6 +196,45 @@ fn exact_guards_fail_without_returning_partial_results() {
 }
 
 #[test]
+fn exact_analysis_continues_through_subnormal_long_tail_branches() {
+    let mut mechanics = half_probability_mechanics();
+    mechanics.paid_single_cost = 1;
+    mechanics.maximum_pre_recruitment_charge = 1_075;
+    mechanics.threshold_overrides = vec![(
+        1_075,
+        ba_core::ProbabilityRatio::new(1, 1).expect("certain ratio"),
+    )];
+    let bundle = synthetic_bundle(
+        "subnormal_tail",
+        mechanics,
+        Resources {
+            pyroxene: 1_075,
+            ..Resources::default()
+        },
+        0,
+        Some(1_075),
+        Vec::new(),
+    );
+
+    let exact = analyze_exact(&bundle, ExactSolverOptions::default())
+        .expect("representational underflow must not abort valid exact analysis");
+    assert_eq!(exact.success_probability, 1.0);
+    assert_eq!(
+        exact.probability_conservation.final_terminal_probability,
+        1.0
+    );
+    assert_eq!(exact.first_success_pmf.len(), 1_075);
+    assert_eq!(
+        exact
+            .first_success_pmf
+            .last()
+            .expect("long-tail support")
+            .recruitment_count,
+        1_075
+    );
+}
+
+#[test]
 fn immutable_bundle_analysis_never_rereads_source_files() {
     let temp = TempDir::new().expect("tempdir");
     let data = temp.path().join("data");

@@ -15,16 +15,115 @@ use crate::result::{
 };
 
 #[derive(Debug, Clone, Copy, Default)]
-struct CompensatedMass {
+struct ScaledMass {
     sum: f64,
     correction: f64,
+    exponent: i128,
 }
 
-impl CompensatedMass {
-    fn add(&mut self, value: f64) -> Result<(), EngineError> {
+impl ScaledMass {
+    const fn one() -> Self {
+        Self {
+            sum: 0.5,
+            correction: 0.0,
+            exponent: 1,
+        }
+    }
+
+    fn from_f64(value: f64) -> Result<Self, EngineError> {
         if !value.is_finite() || value < 0.0 {
             return Err(EngineError::ProbabilityInvariantViolation {
-                message: format!("attempted to accumulate invalid mass {value}"),
+                message: format!("attempted to construct invalid mass {value}"),
+            });
+        }
+        if value == 0.0 {
+            return Ok(Self::default());
+        }
+
+        const FRACTION_MASK: u64 = (1_u64 << 52) - 1;
+        let bits = value.to_bits();
+        let biased_exponent = (bits >> 52) & 0x7ff;
+        let fraction = bits & FRACTION_MASK;
+        let (sum, exponent) = if biased_exponent == 0 {
+            let highest_bit = u64::BITS - 1 - fraction.leading_zeros();
+            let denominator = 1_u64 << (highest_bit + 1);
+            (
+                fraction as f64 / denominator as f64,
+                i128::from(highest_bit) + 1 - 1_074,
+            )
+        } else {
+            let significand = (1_u64 << 52) | fraction;
+            (
+                significand as f64 / (1_u64 << 53) as f64,
+                i128::from(biased_exponent) - 1_023 + 1,
+            )
+        };
+        Ok(Self {
+            sum,
+            correction: 0.0,
+            exponent,
+        })
+    }
+
+    fn add(&mut self, other: Self) -> Result<(), EngineError> {
+        if other.is_zero() {
+            return Ok(());
+        }
+        if self.is_zero() {
+            *self = other;
+            return Ok(());
+        }
+        if other.exponent > self.exponent {
+            let previous = *self;
+            *self = other;
+            return self.add(previous);
+        }
+        let exponent_delta =
+            other
+                .exponent
+                .checked_sub(self.exponent)
+                .ok_or(EngineError::ArithmeticOverflow {
+                    context: "aligning scaled probability exponents",
+                })?;
+        let scale = power_of_two(exponent_delta);
+        if scale == 0.0 {
+            return Ok(());
+        }
+        self.add_component(other.sum * scale)?;
+        self.add_component(other.correction * scale)?;
+        self.normalize()
+    }
+
+    fn multiplied_by(self, factor: f64) -> Result<Self, EngineError> {
+        if !factor.is_finite() || !(0.0..=1.0).contains(&factor) {
+            return Err(EngineError::ProbabilityInvariantViolation {
+                message: format!("attempted to multiply mass by invalid probability {factor}"),
+            });
+        }
+        if self.is_zero() || factor == 0.0 {
+            return Ok(Self::default());
+        }
+        let factor = Self::from_f64(factor)?;
+        let factor_significand = factor.sum + factor.correction;
+        let exponent =
+            self.exponent
+                .checked_add(factor.exponent)
+                .ok_or(EngineError::ArithmeticOverflow {
+                    context: "multiplying scaled probability exponents",
+                })?;
+        let mut product = Self {
+            sum: self.sum * factor_significand,
+            correction: self.correction * factor_significand,
+            exponent,
+        };
+        product.normalize()?;
+        Ok(product)
+    }
+
+    fn add_component(&mut self, value: f64) -> Result<(), EngineError> {
+        if !value.is_finite() {
+            return Err(EngineError::ProbabilityInvariantViolation {
+                message: "scaled probability accumulation became non-finite".to_owned(),
             });
         }
         let combined = self.sum + value;
@@ -34,16 +133,55 @@ impl CompensatedMass {
             self.correction += (value - combined) + self.sum;
         }
         self.sum = combined;
-        if !self.value().is_finite() || self.value() < 0.0 {
+        Ok(())
+    }
+
+    fn normalize(&mut self) -> Result<(), EngineError> {
+        let mut value = self.sum + self.correction;
+        if !value.is_finite() || value <= 0.0 {
             return Err(EngineError::ProbabilityInvariantViolation {
-                message: "compensated probability accumulation became invalid".to_owned(),
+                message: "scaled probability normalization became invalid".to_owned(),
             });
+        }
+        while value >= 1.0 {
+            self.sum *= 0.5;
+            self.correction *= 0.5;
+            self.exponent =
+                self.exponent
+                    .checked_add(1)
+                    .ok_or(EngineError::ArithmeticOverflow {
+                        context: "normalizing a scaled probability exponent",
+                    })?;
+            value *= 0.5;
+        }
+        while value < 0.5 {
+            self.sum *= 2.0;
+            self.correction *= 2.0;
+            self.exponent =
+                self.exponent
+                    .checked_sub(1)
+                    .ok_or(EngineError::ArithmeticOverflow {
+                        context: "normalizing a scaled probability exponent",
+                    })?;
+            value *= 2.0;
         }
         Ok(())
     }
 
-    fn value(self) -> f64 {
-        self.sum + self.correction
+    fn to_f64(self) -> f64 {
+        (self.sum + self.correction) * power_of_two(self.exponent)
+    }
+
+    const fn is_zero(self) -> bool {
+        self.sum == 0.0
+    }
+}
+
+fn power_of_two(exponent: i128) -> f64 {
+    match i32::try_from(exponent) {
+        Ok(exponent) => 2.0_f64.powi(exponent),
+        Err(_) if exponent.is_negative() => 0.0,
+        Err(_) => f64::INFINITY,
     }
 }
 
@@ -63,9 +201,9 @@ pub fn analyze_exact(
     let options = options.validate()?;
     let initial = initial_world(bundle);
     let mut boundary = BTreeMap::new();
-    add_mass(&mut boundary, initial.clone(), 1.0)?;
-    let mut terminal: BTreeMap<(WorldStateKey, TerminalReason), CompensatedMass> = BTreeMap::new();
-    let mut first_success: BTreeMap<u64, CompensatedMass> = BTreeMap::new();
+    add_mass(&mut boundary, initial.clone(), ScaledMass::one())?;
+    let mut terminal: BTreeMap<(WorldStateKey, TerminalReason), ScaledMass> = BTreeMap::new();
+    let mut first_success: BTreeMap<u64, ScaledMass> = BTreeMap::new();
     let mut diagnostics = RuntimeDiagnostics::default();
 
     if initial.owned_target_mask == bundle.scenario().all_targets_mask() {
@@ -73,9 +211,9 @@ pub fn analyze_exact(
         add_mass(
             &mut terminal,
             (initial, TerminalReason::TargetsAcquired),
-            1.0,
+            ScaledMass::one(),
         )?;
-        add_mass(&mut first_success, 0, 1.0)?;
+        add_mass(&mut first_success, 0, ScaledMass::one())?;
     }
 
     while !boundary.is_empty() {
@@ -86,18 +224,18 @@ pub fn analyze_exact(
             increment_processed(&mut diagnostics, &options)?;
             match decide(bundle, &state)? {
                 StrategyDecision::Stop(reason) => {
-                    add_mass(&mut terminal, (state, reason), mass.value())?;
+                    add_mass(&mut terminal, (state, reason), mass)?;
                 }
                 StrategyDecision::Act(action) => {
                     let (started, _) = begin_action(bundle, &state, &action)?;
-                    add_mass(&mut in_flight, started, mass.value())?;
+                    add_mass(&mut in_flight, started, mass)?;
                 }
             }
         }
         observe_conservation(
             &terminal,
             &in_flight,
-            &BTreeMap::<WorldStateKey, CompensatedMass>::new(),
+            &BTreeMap::<WorldStateKey, ScaledMass>::new(),
             &mut diagnostics,
             &options,
         )?;
@@ -125,12 +263,7 @@ pub fn analyze_exact(
                             maximum: options.max_transition_expansions,
                         });
                     }
-                    let child_mass = mass.value() * branch.probability.as_f64();
-                    if child_mass == 0.0 && mass.value() > 0.0 {
-                        return Err(EngineError::ProbabilityInvariantViolation {
-                            message: "a nonzero exact branch underflowed to zero".to_owned(),
-                        });
-                    }
+                    let child_mass = mass.multiplied_by(branch.probability.as_f64())?;
                     let transitioned = apply_primitive_transition(bundle, &state, branch.outcome)?;
                     if transitioned.event.first_success {
                         add_mass(
@@ -161,14 +294,14 @@ pub fn analyze_exact(
         boundary = completed_boundary;
         observe_conservation(
             &terminal,
-            &BTreeMap::<ba_core::InFlightStateKey, CompensatedMass>::new(),
+            &BTreeMap::<ba_core::InFlightStateKey, ScaledMass>::new(),
             &boundary,
             &mut diagnostics,
             &options,
         )?;
     }
 
-    let final_mass = sum_values(terminal.values().copied());
+    let final_mass = sum_values(terminal.values().copied())?;
     validate_total(
         final_mass,
         &mut diagnostics,
@@ -192,39 +325,39 @@ pub fn analyze_exact_detailed(
 fn build_result(
     bundle: &ValidatedScenarioBundle,
     options: ExactSolverOptions,
-    terminal: BTreeMap<(WorldStateKey, TerminalReason), CompensatedMass>,
-    first_success: BTreeMap<u64, CompensatedMass>,
+    terminal: BTreeMap<(WorldStateKey, TerminalReason), ScaledMass>,
+    first_success: BTreeMap<u64, ScaledMass>,
     diagnostics: RuntimeDiagnostics,
 ) -> Result<ExactAnalysisResult, EngineError> {
-    let final_terminal_probability = sum_values(terminal.values().copied());
-    let mut success_probability = CompensatedMass::default();
-    let mut terminal_reason_masses = BTreeMap::<TerminalReason, CompensatedMass>::new();
-    let mut owned_masses = BTreeMap::<u8, CompensatedMass>::new();
+    let final_terminal_probability = sum_values(terminal.values().copied())?.to_f64();
+    let mut success_probability = ScaledMass::default();
+    let mut terminal_reason_masses = BTreeMap::<TerminalReason, ScaledMass>::new();
+    let mut owned_masses = BTreeMap::<u8, ScaledMass>::new();
     let mut expected_terminal = 0.0;
     let mut expected_terminal_success = 0.0;
     let mut expected_paid_spend = 0.0;
     let mut expected_ticket_draws = 0.0;
     let mut expected_residual = ExpectedResources::default();
     let mut expected_rewards = ExpectedResources::default();
-    let mut terminal_count_masses = BTreeMap::<u64, CompensatedMass>::new();
+    let mut terminal_count_masses = BTreeMap::<u64, ScaledMass>::new();
 
     for ((state, reason), mass) in &terminal {
-        let weight = mass.value();
+        let weight = mass.to_f64();
         add_mass(
             &mut terminal_count_masses,
             state.cumulative_primitive_recruitments,
-            weight,
+            *mass,
         )?;
         terminal_reason_masses
             .entry(*reason)
             .or_default()
-            .add(weight)?;
+            .add(*mass)?;
         owned_masses
             .entry(state.owned_target_mask)
             .or_default()
-            .add(weight)?;
+            .add(*mass)?;
         if *reason == TerminalReason::TargetsAcquired {
-            success_probability.add(weight)?;
+            success_probability.add(*mass)?;
             expected_terminal_success += state.cumulative_primitive_recruitments as f64 * weight;
         }
         expected_terminal += state.cumulative_primitive_recruitments as f64 * weight;
@@ -238,14 +371,14 @@ fn build_result(
         );
     }
 
-    let success = success_probability.value();
+    let success = success_probability.to_f64();
     let mut pmf = Vec::with_capacity(first_success.len());
     let mut cdf = Vec::with_capacity(first_success.len());
-    let mut running = CompensatedMass::default();
+    let mut running = ScaledMass::default();
     let mut weighted_first_success = 0.0;
     for (count, mass) in first_success {
-        let probability = mass.value();
-        running.add(probability)?;
+        let probability = mass.to_f64();
+        running.add(mass)?;
         weighted_first_success += count as f64 * probability;
         pmf.push(FirstSuccessProbability {
             recruitment_count: count,
@@ -253,10 +386,10 @@ fn build_result(
         });
         cdf.push(FirstSuccessProbability {
             recruitment_count: count,
-            probability: running.value(),
+            probability: running.to_f64(),
         });
     }
-    let pmf_total = running.value();
+    let pmf_total = running.to_f64();
     let pmf_deviation = (pmf_total - success).abs();
     if pmf_deviation > options.conservation_tolerance {
         return Err(EngineError::ProbabilityInvariantViolation {
@@ -270,14 +403,14 @@ fn build_result(
         .into_iter()
         .map(|(mask, mass)| OwnedTargetTerminalProbability {
             owned_targets: owned_targets(bundle, mask),
-            probability: mass.value(),
+            probability: mass.to_f64(),
         })
         .collect();
     let terminal_reason_probabilities = terminal_reason_masses
         .into_iter()
         .map(|(terminal_reason, mass)| TerminalReasonProbability {
             terminal_reason,
-            probability: mass.value(),
+            probability: mass.to_f64(),
         })
         .collect();
     let milestone_reach_probabilities = milestone_reach_probabilities(
@@ -322,10 +455,10 @@ fn build_result(
 
 fn milestone_reach_probabilities(
     milestones: &[Milestone],
-    terminal_count_masses: &BTreeMap<u64, CompensatedMass>,
+    terminal_count_masses: &BTreeMap<u64, ScaledMass>,
 ) -> Result<Vec<MilestoneReachProbability>, EngineError> {
     let mut terminal_counts = terminal_count_masses.iter().rev().peekable();
-    let mut running_mass = CompensatedMass::default();
+    let mut running_mass = ScaledMass::default();
     let mut reversed = Vec::with_capacity(milestones.len());
 
     for milestone in milestones.iter().rev() {
@@ -334,12 +467,12 @@ fn milestone_reach_probabilities(
             .is_some_and(|(count, _)| **count >= milestone.count)
         {
             if let Some((_, mass)) = terminal_counts.next() {
-                running_mass.add(mass.value())?;
+                running_mass.add(*mass)?;
             }
         }
         reversed.push(MilestoneReachProbability {
             recruitment_count: milestone.count,
-            probability: running_mass.value(),
+            probability: running_mass.to_f64(),
         });
     }
     reversed.reverse();
@@ -395,9 +528,9 @@ fn check_active_limit(observed: usize, options: &ExactSolverOptions) -> Result<(
 }
 
 fn observe_conservation<I, K>(
-    terminal: &BTreeMap<(WorldStateKey, TerminalReason), CompensatedMass>,
-    in_flight: &BTreeMap<I, CompensatedMass>,
-    boundary: &BTreeMap<K, CompensatedMass>,
+    terminal: &BTreeMap<(WorldStateKey, TerminalReason), ScaledMass>,
+    in_flight: &BTreeMap<I, ScaledMass>,
+    boundary: &BTreeMap<K, ScaledMass>,
     diagnostics: &mut RuntimeDiagnostics,
     options: &ExactSolverOptions,
 ) -> Result<(), EngineError> {
@@ -407,16 +540,17 @@ fn observe_conservation<I, K>(
             .chain(in_flight.values())
             .chain(boundary.values())
             .copied(),
-    );
+    )?;
     validate_total(total, diagnostics, options, "exact propagation layer")
 }
 
 fn validate_total(
-    total: f64,
+    total: ScaledMass,
     diagnostics: &mut RuntimeDiagnostics,
     options: &ExactSolverOptions,
     context: &str,
 ) -> Result<(), EngineError> {
+    let total = total.to_f64();
     if !total.is_finite() || total < 0.0 {
         return Err(EngineError::ProbabilityInvariantViolation {
             message: format!("{context} has invalid total mass {total}"),
@@ -432,20 +566,18 @@ fn validate_total(
     Ok(())
 }
 
-fn sum_values(values: impl IntoIterator<Item = CompensatedMass>) -> f64 {
-    let mut total = CompensatedMass::default();
+fn sum_values(values: impl IntoIterator<Item = ScaledMass>) -> Result<ScaledMass, EngineError> {
+    let mut total = ScaledMass::default();
     for value in values {
-        if total.add(value.value()).is_err() {
-            return f64::NAN;
-        }
+        total.add(value)?;
     }
-    total.value()
+    Ok(total)
 }
 
 fn add_mass<K: Ord>(
-    map: &mut BTreeMap<K, CompensatedMass>,
+    map: &mut BTreeMap<K, ScaledMass>,
     key: K,
-    mass: f64,
+    mass: ScaledMass,
 ) -> Result<(), EngineError> {
     map.entry(key).or_default().add(mass)
 }

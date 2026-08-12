@@ -1,172 +1,21 @@
 use std::collections::BTreeSet;
 use std::fmt;
-#[cfg(any(target_os = "android", target_os = "linux"))]
-use std::fs::OpenOptions;
-use std::fs::{File, Metadata};
-use std::io::{Read, Take};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-#[cfg(any(target_os = "android", target_os = "linux"))]
-use std::os::unix::fs::MetadataExt;
-#[cfg(any(target_os = "android", target_os = "linux"))]
-use std::os::unix::fs::OpenOptionsExt;
-
-use serde::de::{DeserializeOwned, DeserializeSeed, MapAccess, SeqAccess, Visitor};
+use serde::de::{DeserializeSeed, MapAccess, SeqAccess, Visitor};
 
 use crate::CoreError;
-use crate::error::{MAX_DOCUMENT_BYTES, MAX_JSON_DEPTH, ObservedSize};
+use crate::error::MAX_JSON_DEPTH;
 use crate::schema::{
     DocumentKind, REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, SCENARIO_DOCUMENT_TYPE,
-    SCHEMA_VERSION_V1,
+    SCHEMA_VERSION_V1, SCHEMA_VERSION_V2,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DocumentDispatch {
-    pub schema_version: u64,
-    pub kind: DocumentKind,
-}
+pub use crate::document::BufferedDocument;
 
-#[derive(Debug)]
-pub struct BufferedDocument {
-    path: PathBuf,
-    bytes: Vec<u8>,
-    dispatch: DocumentDispatch,
-}
+pub use crate::schema::DocumentDispatch;
 
-impl BufferedDocument {
-    pub fn read(path: impl AsRef<Path>) -> Result<Self, CoreError> {
-        let path = path.as_ref();
-        let bytes = read_complete_bounded(path)?;
-        let dispatch = scan_dispatch(path, &bytes)?;
-        Ok(Self {
-            path: path.to_path_buf(),
-            bytes,
-            dispatch,
-        })
-    }
-
-    #[must_use]
-    pub fn path(&self) -> &Path {
-        &self.path
-    }
-
-    #[must_use]
-    pub fn bytes(&self) -> &[u8] {
-        &self.bytes
-    }
-
-    #[must_use]
-    pub fn dispatch(&self) -> &DocumentDispatch {
-        &self.dispatch
-    }
-
-    pub fn parse_typed<T: DeserializeOwned>(&self) -> Result<T, CoreError> {
-        serde_json::from_slice(&self.bytes).map_err(|error| CoreError::InvalidJson {
-            path: self.path.clone(),
-            message: format!("strict typed parse failed: {error}"),
-        })
-    }
-}
-
-fn read_complete_bounded(path: &Path) -> Result<Vec<u8>, CoreError> {
-    let link_metadata = std::fs::symlink_metadata(path).map_err(|source| CoreError::Io {
-        path: path.to_path_buf(),
-        source,
-    })?;
-    if link_metadata.file_type().is_symlink() || !link_metadata.file_type().is_file() {
-        return Err(CoreError::PathPolicy {
-            path: path.to_path_buf(),
-            message: "JSON documents must be non-symlink regular files".to_owned(),
-        });
-    }
-    if link_metadata.len() > MAX_DOCUMENT_BYTES {
-        return Err(CoreError::DocumentSizeLimitExceeded {
-            path: path.to_path_buf(),
-            observed: ObservedSize::Exact(link_metadata.len()),
-            maximum: MAX_DOCUMENT_BYTES,
-        });
-    }
-
-    let file = open_verified_regular_file(path, &link_metadata)?;
-    let opened_metadata = file.metadata().map_err(|source| CoreError::Io {
-        path: path.to_path_buf(),
-        source,
-    })?;
-    if opened_metadata.len() > MAX_DOCUMENT_BYTES {
-        return Err(CoreError::DocumentSizeLimitExceeded {
-            path: path.to_path_buf(),
-            observed: ObservedSize::Exact(opened_metadata.len()),
-            maximum: MAX_DOCUMENT_BYTES,
-        });
-    }
-    let mut limited: Take<File> = file.take(MAX_DOCUMENT_BYTES + 1);
-    let mut bytes = Vec::with_capacity(
-        usize::try_from(opened_metadata.len())
-            .unwrap_or(usize::try_from(MAX_DOCUMENT_BYTES).unwrap_or(0)),
-    );
-    limited
-        .read_to_end(&mut bytes)
-        .map_err(|source| CoreError::Io {
-            path: path.to_path_buf(),
-            source,
-        })?;
-    let observed = u64::try_from(bytes.len()).map_err(|_| CoreError::ArithmeticOverflow {
-        context: "converting buffered document length",
-    })?;
-    if observed > MAX_DOCUMENT_BYTES {
-        return Err(CoreError::DocumentSizeLimitExceeded {
-            path: path.to_path_buf(),
-            observed: ObservedSize::GreaterThan(MAX_DOCUMENT_BYTES),
-            maximum: MAX_DOCUMENT_BYTES,
-        });
-    }
-    Ok(bytes)
-}
-
-#[cfg(any(target_os = "android", target_os = "linux"))]
-fn open_verified_regular_file(path: &Path, expected: &Metadata) -> Result<File, CoreError> {
-    let mut options = OpenOptions::new();
-    options.read(true);
-    options.custom_flags(0o00_400_000 | 0o00_004_000);
-
-    let file = options.open(path).map_err(|source| CoreError::Io {
-        path: path.to_path_buf(),
-        source,
-    })?;
-    let opened = file.metadata().map_err(|source| CoreError::Io {
-        path: path.to_path_buf(),
-        source,
-    })?;
-    if !opened.file_type().is_file() {
-        return Err(CoreError::PathPolicy {
-            path: path.to_path_buf(),
-            message: "opened JSON source is not a regular file".to_owned(),
-        });
-    }
-    if !same_file_identity(expected, &opened) {
-        return Err(CoreError::PathPolicy {
-            path: path.to_path_buf(),
-            message: "JSON source changed identity between inspection and open".to_owned(),
-        });
-    }
-    Ok(file)
-}
-
-#[cfg(not(any(target_os = "android", target_os = "linux")))]
-fn open_verified_regular_file(path: &Path, _expected: &Metadata) -> Result<File, CoreError> {
-    Err(CoreError::PathPolicy {
-        path: path.to_path_buf(),
-        message: "secure no-follow, nonblocking JSON opens are unsupported on this v0.1 target"
-            .to_owned(),
-    })
-}
-
-#[cfg(any(target_os = "android", target_os = "linux"))]
-fn same_file_identity(expected: &Metadata, opened: &Metadata) -> bool {
-    expected.dev() == opened.dev() && expected.ino() == opened.ino()
-}
-
-fn scan_dispatch(path: &Path, bytes: &[u8]) -> Result<DocumentDispatch, CoreError> {
+pub(crate) fn scan_dispatch(path: &Path, bytes: &[u8]) -> Result<DocumentDispatch, CoreError> {
     let mut deserializer = serde_json::Deserializer::from_slice(bytes);
     let capture = RootSeed
         .deserialize(&mut deserializer)
@@ -174,9 +23,16 @@ fn scan_dispatch(path: &Path, bytes: &[u8]) -> Result<DocumentDispatch, CoreErro
             deserializer.end()?;
             Ok(capture)
         })
-        .map_err(|error| CoreError::InvalidJson {
-            path: path.to_path_buf(),
-            message: format!("duplicate/depth scan failed: {error}"),
+        .map_err(|error| {
+            let line = u64::try_from(error.line()).ok().filter(|value| *value != 0);
+            let column = line.and_then(|_| u64::try_from(error.column()).ok());
+            CoreError::InvalidJson {
+                path: path.to_path_buf(),
+                message: format!("duplicate/depth scan failed: {error}"),
+                pointer: None,
+                line,
+                column,
+            }
         })?;
 
     let kind = match capture.document_type.as_deref() {
@@ -186,10 +42,12 @@ fn scan_dispatch(path: &Path, bytes: &[u8]) -> Result<DocumentDispatch, CoreErro
         _ => None,
     };
     match (capture.schema_version, kind) {
-        (Some(SCHEMA_VERSION_V1), Some(kind)) => Ok(DocumentDispatch {
-            schema_version: SCHEMA_VERSION_V1,
-            kind,
-        }),
+        (Some(version @ (SCHEMA_VERSION_V1 | SCHEMA_VERSION_V2)), Some(kind)) => {
+            Ok(DocumentDispatch {
+                schema_version: version,
+                kind,
+            })
+        }
         _ => Err(CoreError::UnsupportedDocument {
             path: path.to_path_buf(),
             schema_version: capture.schema_version,
@@ -362,46 +220,5 @@ impl<'de> Visitor<'de> for ScanVisitor {
             })?;
         }
         Ok(())
-    }
-}
-
-#[cfg(all(test, target_os = "linux"))]
-mod tests {
-    use std::fs;
-    use std::os::unix::fs::symlink;
-    use std::process::Command;
-
-    use tempfile::TempDir;
-
-    use super::open_verified_regular_file;
-
-    #[test]
-    fn replacement_symlink_cannot_pass_the_verified_open() {
-        let temp = TempDir::new().expect("tempdir");
-        let source = temp.path().join("source.json");
-        let moved = temp.path().join("moved.json");
-        let other = temp.path().join("other.json");
-        fs::write(&source, b"{}").expect("source");
-        fs::write(&other, b"{}").expect("other");
-        let inspected = fs::symlink_metadata(&source).expect("metadata");
-        fs::rename(&source, &moved).expect("move inspected file");
-        symlink(&other, &source).expect("replacement symlink");
-        assert!(open_verified_regular_file(&source, &inspected).is_err());
-    }
-
-    #[test]
-    fn replacement_fifo_is_opened_nonblocking_and_rejected() {
-        let temp = TempDir::new().expect("tempdir");
-        let source = temp.path().join("source.json");
-        let moved = temp.path().join("moved.json");
-        fs::write(&source, b"{}").expect("source");
-        let inspected = fs::symlink_metadata(&source).expect("metadata");
-        fs::rename(&source, &moved).expect("move inspected file");
-        let status = Command::new("mkfifo")
-            .arg(&source)
-            .status()
-            .expect("mkfifo executes");
-        assert!(status.success());
-        assert!(open_verified_regular_file(&source, &inspected).is_err());
     }
 }

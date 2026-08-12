@@ -35,6 +35,9 @@ pub enum CoreError {
         maximum: usize,
     },
 
+    #[error("catalog generation changed while loading {path}: {message}")]
+    CatalogGenerationChanged { path: PathBuf, message: String },
+
     #[error(
         "document size limit exceeded for {path}: observed {observed}, maximum {maximum} bytes"
     )]
@@ -45,7 +48,13 @@ pub enum CoreError {
     },
 
     #[error("invalid JSON document {path}: {message}")]
-    InvalidJson { path: PathBuf, message: String },
+    InvalidJson {
+        path: PathBuf,
+        message: String,
+        pointer: Option<String>,
+        line: Option<u64>,
+        column: Option<u64>,
+    },
 
     #[error(
         "unsupported document dispatch in {path}: schema_version={schema_version:?}, document_type={document_type:?}"
@@ -54,6 +63,17 @@ pub enum CoreError {
         path: PathBuf,
         schema_version: Option<u64>,
         document_type: Option<String>,
+    },
+
+    #[error(
+        "scenario schema version {scenario_schema_version} cannot reference {referenced_kind} {referenced_id} with schema version {referenced_schema_version}"
+    )]
+    IncompatibleSchemaReference {
+        scenario_schema_version: u64,
+        referenced_kind: &'static str,
+        referenced_id: String,
+        referenced_schema_version: u64,
+        pointer: &'static str,
     },
 
     #[error("validation failed{path_suffix}: {message}")]
@@ -102,9 +122,11 @@ impl CoreError {
             | Self::PathPolicy { .. }
             | Self::CatalogEntryLimitExceeded { .. }
             | Self::CatalogDirectoryEntryLimitExceeded { .. }
+            | Self::CatalogGenerationChanged { .. }
             | Self::DocumentSizeLimitExceeded { .. } => CoreErrorClass::CatalogIo,
             Self::InvalidJson { .. }
             | Self::UnsupportedDocument { .. }
+            | Self::IncompatibleSchemaReference { .. }
             | Self::Validation { .. } => CoreErrorClass::Validation,
             Self::ArithmeticOverflow { .. }
             | Self::InvalidAction { .. }

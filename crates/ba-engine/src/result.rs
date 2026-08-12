@@ -1,18 +1,23 @@
 use ba_core::{
-    ActionCompletedEvent, ActionStartedEvent, PrimitiveTransitionEvent, RecruitOutcome, Resources,
-    Reward, SEMANTIC_ENCODING_VERSION, StrategyConstraints, StudentId, TerminalReason,
-    ValidatedScenarioBundle,
+    ActionCompletedEvent, ActionStartedEvent, BundleCompatibilityProfile, CompiledStrategy,
+    FundingKind, PrimitiveTransitionEvent, Provenance, RecruitOutcome, Resources, Reward,
+    SEMANTIC_ENCODING_VERSION, StrategyConstraints, StudentId, TerminalReason,
+    ValidatedScenarioBundle, VerificationStatus,
 };
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 
 use crate::ExactSolverOptions;
 
-pub const ENGINE_SEMANTICS_VERSION: u64 = 1;
-pub const RESULT_SCHEMA_VERSION: u64 = 1;
+pub const ENGINE_SEMANTICS_VERSION_V1: u64 = 1;
+pub const ENGINE_SEMANTICS_VERSION_V2: u64 = 2;
+pub const RESULT_SCHEMA_VERSION_V1: u64 = 1;
+pub const RESULT_SCHEMA_VERSION_V2: u64 = 2;
+pub const ENGINE_SEMANTICS_VERSION: u64 = ENGINE_SEMANTICS_VERSION_V1;
+pub const RESULT_SCHEMA_VERSION: u64 = RESULT_SCHEMA_VERSION_V1;
 pub const STREAM_DERIVATION_VERSION: &str = "mc-run-stream-v1";
 pub const RNG_ALGORITHM: &str = "chacha8";
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct AnalysisProvenance {
     pub engine_version: &'static str,
     pub engine_semantics_version: u64,
@@ -24,15 +29,35 @@ pub struct AnalysisProvenance {
     pub ruleset_fingerprint: String,
     pub reward_schedule_id: String,
     pub reward_schedule_fingerprint: String,
+    pub scenario_schema_version: Option<u64>,
+    pub ruleset_schema_version: Option<u64>,
+    pub reward_schedule_schema_version: Option<u64>,
+    pub scenario_behavior_fingerprint: Option<String>,
+    pub scenario_document_fingerprint: Option<String>,
+    pub ruleset_behavior_fingerprint: Option<String>,
+    pub ruleset_document_fingerprint: Option<String>,
+    pub reward_schedule_behavior_fingerprint: Option<String>,
+    pub reward_schedule_document_fingerprint: Option<String>,
+    pub ruleset_verification_status: Option<VerificationStatus>,
+    pub reward_schedule_verification_status: Option<VerificationStatus>,
+    pub ruleset_provenance: Option<Provenance>,
+    pub reward_schedule_provenance: Option<Provenance>,
+    profile: BundleCompatibilityProfile,
 }
 
 impl AnalysisProvenance {
     #[must_use]
     pub fn from_bundle(bundle: &ValidatedScenarioBundle) -> Self {
+        let is_v2 = bundle.profile() == BundleCompatibilityProfile::V2;
+        let (engine_semantics_version, result_schema_version) = if is_v2 {
+            (ENGINE_SEMANTICS_VERSION_V2, RESULT_SCHEMA_VERSION_V2)
+        } else {
+            (ENGINE_SEMANTICS_VERSION_V1, RESULT_SCHEMA_VERSION_V1)
+        };
         Self {
             engine_version: env!("CARGO_PKG_VERSION"),
-            engine_semantics_version: ENGINE_SEMANTICS_VERSION,
-            result_schema_version: RESULT_SCHEMA_VERSION,
+            engine_semantics_version,
+            result_schema_version,
             semantic_encoding_version: SEMANTIC_ENCODING_VERSION,
             scenario_id: bundle.scenario().id().to_string(),
             scenario_fingerprint: bundle.fingerprints().scenario.to_hex(),
@@ -40,6 +65,115 @@ impl AnalysisProvenance {
             ruleset_fingerprint: bundle.fingerprints().ruleset.to_hex(),
             reward_schedule_id: bundle.reward_schedule().id().to_string(),
             reward_schedule_fingerprint: bundle.fingerprints().reward_schedule.to_hex(),
+            scenario_schema_version: is_v2.then(|| bundle.scenario().schema_version()),
+            ruleset_schema_version: is_v2.then(|| bundle.ruleset().schema_version()),
+            reward_schedule_schema_version: is_v2
+                .then(|| bundle.reward_schedule().schema_version()),
+            scenario_behavior_fingerprint: is_v2.then(|| bundle.fingerprints().scenario.to_hex()),
+            scenario_document_fingerprint: is_v2
+                .then(|| bundle.fingerprints().scenario_document.to_hex()),
+            ruleset_behavior_fingerprint: is_v2.then(|| bundle.fingerprints().ruleset.to_hex()),
+            ruleset_document_fingerprint: is_v2
+                .then(|| bundle.fingerprints().ruleset_document.to_hex()),
+            reward_schedule_behavior_fingerprint: is_v2
+                .then(|| bundle.fingerprints().reward_schedule.to_hex()),
+            reward_schedule_document_fingerprint: is_v2
+                .then(|| bundle.fingerprints().reward_schedule_document.to_hex()),
+            ruleset_verification_status: bundle
+                .ruleset()
+                .provenance()
+                .map(|value| value.verification_status),
+            reward_schedule_verification_status: bundle
+                .reward_schedule()
+                .provenance()
+                .map(|value| value.verification_status),
+            ruleset_provenance: bundle.ruleset().provenance().cloned(),
+            reward_schedule_provenance: bundle.reward_schedule().provenance().cloned(),
+            profile: bundle.profile(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+struct AnalysisProvenanceV1<'a> {
+    engine_version: &'static str,
+    engine_semantics_version: u64,
+    result_schema_version: u64,
+    semantic_encoding_version: &'static str,
+    scenario_id: &'a str,
+    scenario_fingerprint: &'a str,
+    ruleset_id: &'a str,
+    ruleset_fingerprint: &'a str,
+    reward_schedule_id: &'a str,
+    reward_schedule_fingerprint: &'a str,
+}
+
+#[derive(Serialize)]
+struct AnalysisProvenanceV2<'a> {
+    engine_version: &'static str,
+    engine_semantics_version: u64,
+    result_schema_version: u64,
+    semantic_encoding_version: &'static str,
+    scenario_id: &'a str,
+    scenario_schema_version: Option<u64>,
+    scenario_behavior_fingerprint: &'a Option<String>,
+    scenario_document_fingerprint: &'a Option<String>,
+    ruleset_id: &'a str,
+    ruleset_schema_version: Option<u64>,
+    ruleset_behavior_fingerprint: &'a Option<String>,
+    ruleset_document_fingerprint: &'a Option<String>,
+    ruleset_verification_status: Option<VerificationStatus>,
+    ruleset_provenance: &'a Option<Provenance>,
+    reward_schedule_id: &'a str,
+    reward_schedule_schema_version: Option<u64>,
+    reward_schedule_behavior_fingerprint: &'a Option<String>,
+    reward_schedule_document_fingerprint: &'a Option<String>,
+    reward_schedule_verification_status: Option<VerificationStatus>,
+    reward_schedule_provenance: &'a Option<Provenance>,
+}
+
+impl Serialize for AnalysisProvenance {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self.profile {
+            BundleCompatibilityProfile::V1 => AnalysisProvenanceV1 {
+                engine_version: self.engine_version,
+                engine_semantics_version: self.engine_semantics_version,
+                result_schema_version: self.result_schema_version,
+                semantic_encoding_version: self.semantic_encoding_version,
+                scenario_id: &self.scenario_id,
+                scenario_fingerprint: &self.scenario_fingerprint,
+                ruleset_id: &self.ruleset_id,
+                ruleset_fingerprint: &self.ruleset_fingerprint,
+                reward_schedule_id: &self.reward_schedule_id,
+                reward_schedule_fingerprint: &self.reward_schedule_fingerprint,
+            }
+            .serialize(serializer),
+            BundleCompatibilityProfile::V2 => AnalysisProvenanceV2 {
+                engine_version: self.engine_version,
+                engine_semantics_version: self.engine_semantics_version,
+                result_schema_version: self.result_schema_version,
+                semantic_encoding_version: self.semantic_encoding_version,
+                scenario_id: &self.scenario_id,
+                scenario_schema_version: self.scenario_schema_version,
+                scenario_behavior_fingerprint: &self.scenario_behavior_fingerprint,
+                scenario_document_fingerprint: &self.scenario_document_fingerprint,
+                ruleset_id: &self.ruleset_id,
+                ruleset_schema_version: self.ruleset_schema_version,
+                ruleset_behavior_fingerprint: &self.ruleset_behavior_fingerprint,
+                ruleset_document_fingerprint: &self.ruleset_document_fingerprint,
+                ruleset_verification_status: self.ruleset_verification_status,
+                ruleset_provenance: &self.ruleset_provenance,
+                reward_schedule_id: &self.reward_schedule_id,
+                reward_schedule_schema_version: self.reward_schedule_schema_version,
+                reward_schedule_behavior_fingerprint: &self.reward_schedule_behavior_fingerprint,
+                reward_schedule_document_fingerprint: &self.reward_schedule_document_fingerprint,
+                reward_schedule_verification_status: self.reward_schedule_verification_status,
+                reward_schedule_provenance: &self.reward_schedule_provenance,
+            }
+            .serialize(serializer),
         }
     }
 }
@@ -108,17 +242,43 @@ pub struct SolverDiagnostics {
     pub transition_expansions: u64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct AnalysisContext {
     pub strategy_constraints: StrategyConstraints,
     pub initial_resources: Resources,
     pub ordered_targets: Vec<StudentId>,
     pub ordered_banners: Vec<String>,
+    pub compiled_strategy: Option<CompiledStrategyContext>,
+    profile: BundleCompatibilityProfile,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct CompiledStrategyContext {
+    pub strategy_schema_version: u64,
+    pub strategy_id: String,
+    pub kind: &'static str,
+    pub funding_priority: [FundingKind; 2],
+    pub max_total_recruitments: u64,
 }
 
 impl AnalysisContext {
     #[must_use]
     pub fn from_bundle(bundle: &ValidatedScenarioBundle) -> Self {
+        let compiled_strategy = match bundle.compiled_strategy() {
+            CompiledStrategy::SequentialTargetsV2 {
+                strategy_schema_version,
+                strategy_id,
+                funding_priority,
+                max_total_recruitments,
+            } => Some(CompiledStrategyContext {
+                strategy_schema_version: *strategy_schema_version,
+                strategy_id: strategy_id.to_string(),
+                kind: "sequential_targets",
+                funding_priority: *funding_priority,
+                max_total_recruitments: max_total_recruitments.get(),
+            }),
+            CompiledStrategy::LegacySequentialV1 { .. } => None,
+        };
         Self {
             strategy_constraints: bundle.scenario().strategy().constraints.clone(),
             initial_resources: bundle.scenario().initial_resources(),
@@ -134,6 +294,50 @@ impl AnalysisContext {
                 .iter()
                 .map(|target| target.banner_id.to_string())
                 .collect(),
+            compiled_strategy,
+            profile: bundle.profile(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+struct AnalysisContextV1<'a> {
+    strategy_constraints: &'a StrategyConstraints,
+    initial_resources: Resources,
+    ordered_targets: &'a [StudentId],
+    ordered_banners: &'a [String],
+}
+
+#[derive(Serialize)]
+struct AnalysisContextV2<'a> {
+    strategy_constraints: &'a StrategyConstraints,
+    compiled_strategy: &'a Option<CompiledStrategyContext>,
+    initial_resources: Resources,
+    ordered_targets: &'a [StudentId],
+    ordered_banners: &'a [String],
+}
+
+impl Serialize for AnalysisContext {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self.profile {
+            BundleCompatibilityProfile::V1 => AnalysisContextV1 {
+                strategy_constraints: &self.strategy_constraints,
+                initial_resources: self.initial_resources,
+                ordered_targets: &self.ordered_targets,
+                ordered_banners: &self.ordered_banners,
+            }
+            .serialize(serializer),
+            BundleCompatibilityProfile::V2 => AnalysisContextV2 {
+                strategy_constraints: &self.strategy_constraints,
+                compiled_strategy: &self.compiled_strategy,
+                initial_resources: self.initial_resources,
+                ordered_targets: &self.ordered_targets,
+                ordered_banners: &self.ordered_banners,
+            }
+            .serialize(serializer),
         }
     }
 }

@@ -1,0 +1,21 @@
+name: Security
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --version 0.22.2 --locked
+      - name: Fresh advisory audit
+        run: bash scripts/audit.sh online

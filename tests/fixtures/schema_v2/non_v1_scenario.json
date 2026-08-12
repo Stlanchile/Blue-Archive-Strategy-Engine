@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "document_type": "scenario",
+  "scenario_id": "synthetic_non_v1_scenario",
+  "ruleset_id": "synthetic_non_v1_ruleset",
+  "reward_schedule_id": "synthetic_non_v1_reward",
+  "students": [
+    {
+      "student_id": "synthetic_target"
+    }
+  ],
+  "banners": [
+    {
+      "banner_id": "synthetic_banner",
+      "featured_student_id": "synthetic_target",
+      "charge_group_id": "synthetic_group"
+    }
+  ],
+  "initial_charges": [
+    {
+      "charge_group_id": "synthetic_group",
+      "pre_recruitment_charge": 8
+    }
+  ],
+  "initial_resources": {
+    "pyroxene": 20,
+    "limited_ten_recruitment_tickets": 1,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0
+  },
+  "initial_owned_targets": [],
+  "strategy": {
+    "strategy_schema_version": 1,
+    "strategy_id": "synthetic_sequential",
+    "kind": "sequential_targets",
+    "funding_priority": [
+      "paid_single",
+      "ticket_ten"
+    ],
+    "max_total_recruitments": 6
+  },
+  "targets": [
+    {
+      "student_id": "synthetic_target",
+      "banner_id": "synthetic_banner"
+    }
+  ]
+}

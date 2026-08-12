@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release-verify:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      - name: Validate tag and version
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          test "$tag" = "v$version"
+          test "$version" = "$(sed -n 's/^version = "\([^"]*\)"$/\1/p' Cargo.toml | head -n 1)"
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Build and test
+        run: |
+          cargo build --workspace --all-targets --locked
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --workspace --locked
+          RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
+          cargo bench --workspace --no-run --locked
+      - name: Verify runtime data and workflows
+        run: |
+          bash scripts/verify-shipped-data.sh
+          bash scripts/check-workflow-pins.sh
+          bash scripts/check-release-workflow.sh
+          bash scripts/test-release-tools.sh
+      - name: Fresh advisory audit
+        run: |
+          cargo install cargo-audit --version 0.22.2 --locked
+          bash scripts/audit.sh online
+      - name: Build Linux runtime binary
+        run: cargo build --release --locked -p ba-cli --bin ba-strategy --target x86_64-unknown-linux-gnu
+      - name: Package and verify runtime archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-artifacts
+          bash scripts/package-release.sh --version "${GITHUB_REF_NAME#v}" --tag "$GITHUB_REF_NAME" --commit "$GITHUB_SHA" --target x86_64-unknown-linux-gnu --output-dir release-artifacts
+          bash scripts/verify-release-archive.sh release-artifacts/ba-strategy-v"${GITHUB_REF_NAME#v}"-x86_64-unknown-linux-gnu.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: verified-release-artifacts
+          path: release-artifacts/
+          if-no-files-found: error
+
+  release-publish:
+    needs: release-verify
+    runs-on: ubuntu-24.04
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: verified-release-artifacts
+          path: verified-release-artifacts
+      - name: Reconfirm verified artifact identity and publish
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          metadata=(verified-release-artifacts/*.release-metadata)
+          archives=(verified-release-artifacts/*.tar.gz)
+          checksums=(verified-release-artifacts/*.tar.gz.sha256)
+          test "${#metadata[@]}" -eq 1
+          test "${#archives[@]}" -eq 1
+          test "${#checksums[@]}" -eq 1
+          version="$(sed -n 's/^version=\(.*\)$/\1/p' "${metadata[0]}")"
+          tag="$(sed -n 's/^tag=\(.*\)$/\1/p' "${metadata[0]}")"
+          commit="$(sed -n 's/^commit=\(.*\)$/\1/p' "${metadata[0]}")"
+          archive_name="$(sed -n 's/^archive=\(.*\)$/\1/p' "${metadata[0]}")"
+          archive_sha256="$(sed -n 's/^archive_sha256=\(.*\)$/\1/p' "${metadata[0]}")"
+          test "$tag" = "$RELEASE_TAG"
+          test "$tag" = "v$version"
+          test "$commit" = "$RELEASE_COMMIT"
+          test "$archive_name" = "$(basename "${archives[0]}")"
+          test "$archive_sha256" = "$(sha256sum "${archives[0]}" | awk '{print $1}')"
+          (cd verified-release-artifacts && sha256sum --check "$(basename "${checksums[0]}")")
+          gh release create "$RELEASE_TAG" "${archives[0]}" "${checksums[0]}" "${metadata[0]}" --title "$RELEASE_TAG" --generate-notes --target "$RELEASE_COMMIT"

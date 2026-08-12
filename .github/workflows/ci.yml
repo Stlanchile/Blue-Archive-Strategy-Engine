@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-quality:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Build
+        run: cargo build --workspace --all-targets --locked
+      - name: Lint
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test
+        run: cargo test --workspace --locked
+      - name: Documentation
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
+      - name: Benchmark compilation
+        run: cargo bench --workspace --no-run --locked
+      - name: Verify shipped data
+        run: bash scripts/verify-shipped-data.sh
+      - name: Verify workflow pins
+        run: bash scripts/check-workflow-pins.sh
+      - name: Verify release workflow policy
+        run: bash scripts/check-release-workflow.sh
+      - name: Verify release tools
+        run: bash scripts/test-release-tools.sh
+
+  native-compile:
+    name: Native compile (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Compile
+        run: cargo check --workspace --all-targets --locked

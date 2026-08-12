@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "document_type": "reward_schedule",
+  "reward_schedule_id": "synthetic_non_v1_reward",
+  "provenance": {
+    "verification_status": "provisional",
+    "sources": []
+  },
+  "compatible_ruleset_ids": [
+    "synthetic_non_v1_ruleset"
+  ],
+  "milestones": [
+    {
+      "count": 2,
+      "rewards": [
+        {
+          "resource": "gift_boxes",
+          "quantity": 1
+        }
+      ]
+    }
+  ]
+}

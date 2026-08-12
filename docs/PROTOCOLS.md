@@ -28,8 +28,12 @@ Fixed writer vector:
 ef7399b9e14e5bc9393892927aff176ede3c1416d3af75cc0e44eaa6312a133d
 ```
 
-The shipped minimal bundle vectors are frozen in
-`crates/ba-core/tests/strict_inputs.rs`.
+The shipped minimal v1 bundle vectors are frozen in
+`crates/ba-core/tests/strict_inputs.rs`. V2 uses the same canonical writer but
+exposes separate behavior and document projections. Provenance is excluded from
+behavior fingerprints and included in v2 document fingerprints. A v1 document
+referenced by a v2 scenario uses its unchanged legacy fingerprint for both
+roles.
 
 ## Monte Carlo streams
 
@@ -47,9 +51,9 @@ SHA-256(
   UTF8("ba-strategy/mc-run-stream/v1\0")
   || master_seed as 8 little-endian bytes
   || run_index as 8 little-endian bytes
-  || raw scenario fingerprint
-  || raw ruleset fingerprint
-  || raw reward-schedule fingerprint
+  || raw scenario behavior fingerprint
+  || raw ruleset behavior fingerprint
+  || raw reward-schedule behavior fingerprint
 )
 ```
 
@@ -76,7 +80,7 @@ Fixed run-seed vectors and repeatability are tested in
 
 ## Result versions
 
-Successful result provenance includes:
+Schema-v1 successful result provenance remains:
 
 ```text
 engine_version
@@ -85,6 +89,14 @@ result_schema_version = 1
 semantic_encoding_version = canonical-json-v1
 scenario/ruleset/reward-schedule IDs and fingerprints
 ```
+
+Schema-v2 scenarios select engine semantics 2 and result schema 2 regardless of
+the referenced document versions. Their provenance includes each input schema
+version, behavior/document fingerprint roles, declared ruleset/reward
+verification status and provenance, and compiled-strategy context. A
+provenance-only mutation can therefore change complete serialized v2 result
+bytes without changing any behavioral metric, event, state transition, or run
+seed.
 
 Mechanics or strategy behavior changes require an engine semantics and package
 version change. Aggregate wire changes require a result schema change.

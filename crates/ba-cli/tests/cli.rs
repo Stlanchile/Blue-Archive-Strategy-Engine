@@ -1,4 +1,6 @@
 use std::fs;
+#[cfg(target_os = "linux")]
+use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
@@ -13,6 +15,14 @@ fn workspace_path(relative: &str) -> PathBuf {
 fn run(args: &[&str]) -> Output {
     Command::new(env!("CARGO_BIN_EXE_ba-strategy"))
         .current_dir(workspace_path(""))
+        .args(args)
+        .output()
+        .expect("CLI should execute")
+}
+
+fn run_in(directory: &Path, args: &[&str]) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_ba-strategy"))
+        .current_dir(directory)
         .args(args)
         .output()
         .expect("CLI should execute")
@@ -220,4 +230,222 @@ fn excessive_run_count_fails_as_an_engine_guard_without_starting_work() {
     let body: serde_json::Value =
         serde_json::from_slice(&output.stderr).expect("engine error JSON");
     assert_eq!(body["error"]["code"], "simulation_run_limit_exceeded");
+}
+
+#[test]
+fn help_is_version_neutral_and_version_comes_from_package_metadata() {
+    let help = run(&["--help"]);
+    let text = stdout(&help);
+    assert!(text.contains("Blue Archive Strategy Engine"));
+    assert!(!text.contains("Blue Archive Strategy Engine v0.1"));
+
+    let version = run(&["--version"]);
+    assert_eq!(
+        stdout(&version).trim(),
+        format!("ba-strategy {}", env!("CARGO_PKG_VERSION"))
+    );
+}
+
+#[test]
+fn catalog_listing_and_inspection_are_deterministic_and_exclude_test_fixtures() {
+    let args = ["catalog", "list", "all", "--format", "json"];
+    let first = run(&args);
+    let second = run(&args);
+    assert_eq!(first.status.code(), Some(0));
+    assert!(first.stderr.is_empty());
+    assert_eq!(first.stdout, second.stdout);
+    let body: serde_json::Value = serde_json::from_slice(&first.stdout).expect("catalog JSON");
+    assert_eq!(body["output_schema_version"], 1);
+    let rendered = stdout(&first);
+    assert!(rendered.contains("jp_2026_07_29_provisional_v1"));
+    assert!(rendered.contains("jp_2026_07_29_provisional_v2"));
+    assert!(rendered.contains("jp_2026_07_29_empty_v2"));
+    assert!(!rendered.contains("synthetic_non_v1"));
+
+    let inspect = run(&[
+        "catalog",
+        "inspect",
+        "rulesets",
+        "jp_2026_07_29_provisional_v2",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(inspect.status.code(), Some(0));
+    let body: serde_json::Value = serde_json::from_slice(&inspect.stdout).expect("inspection JSON");
+    assert_eq!(body["schema_version"], 2);
+    assert_eq!(body["provenance"]["verification_status"], "provisional");
+
+    let text = run(&["catalog", "list", "rulesets"]);
+    assert_eq!(text.status.code(), Some(0), "{}", stderr(&text));
+    let rendered = stdout(&text);
+    assert!(!rendered.trim_start().starts_with('{'));
+    assert!(rendered.contains("output_schema_version: 1"));
+    assert!(rendered.contains("jp_2026_07_29_provisional_v2"));
+}
+
+#[test]
+fn scenario_directory_resolves_names_by_selected_directory_not_cwd_shadows() {
+    let temp = TempDir::new().expect("tempdir");
+    let selected = temp.path().join("selected");
+    fs::create_dir(&selected).expect("selected");
+    fs::copy(
+        workspace_path("scenarios/examples/single_target_v2.json"),
+        selected.join("single_target_v2.json"),
+    )
+    .expect("scenario");
+    fs::write(temp.path().join("single_target_v2"), b"{not json").expect("shadow");
+    fs::write(temp.path().join("single_target_v2.json"), b"{not json").expect("shadow");
+    let data = workspace_path("data");
+    for supplied in ["single_target_v2", "single_target_v2.json"] {
+        let output = run_in(
+            temp.path(),
+            &[
+                "--data-dir",
+                data.to_str().expect("data path"),
+                "--scenario-dir",
+                selected.to_str().expect("scenario path"),
+                "analyze",
+                supplied,
+                "--format",
+                "json",
+            ],
+        );
+        assert_eq!(output.status.code(), Some(0), "{}", stderr(&output));
+        let body: serde_json::Value =
+            serde_json::from_slice(&output.stdout).expect("analysis JSON");
+        assert_eq!(
+            body["provenance"]["scenario_id"],
+            "example_single_target_v2"
+        );
+    }
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn scenario_directory_symlinks_and_all_explicit_path_forms_resolve_securely() {
+    let temp = TempDir::new().expect("tempdir");
+    let selected = temp.path().join("selected");
+    let work = temp.path().join("work");
+    let nested = work.join("nested");
+    fs::create_dir(&selected).expect("selected");
+    fs::create_dir(&work).expect("work");
+    fs::create_dir(&nested).expect("nested");
+    let source = workspace_path("scenarios/examples/single_target_v2.json");
+    fs::copy(&source, selected.join("single_target_v2.json")).expect("selected scenario");
+    fs::copy(&source, work.join("explicit.json")).expect("explicit scenario");
+    fs::copy(&source, nested.join("explicit.json")).expect("nested scenario");
+    let selected_link = temp.path().join("selected-link");
+    symlink(&selected, &selected_link).expect("selected symlink");
+    let data = workspace_path("data");
+    let data = data.to_str().expect("data path");
+    let scenario_dir = selected_link.to_str().expect("scenario dir");
+    let absolute = selected
+        .join("single_target_v2.json")
+        .to_str()
+        .expect("absolute path")
+        .to_owned();
+
+    for supplied in [
+        "single_target_v2",
+        "./explicit.json",
+        "nested/explicit.json",
+        "../selected/single_target_v2.json",
+        absolute.as_str(),
+    ] {
+        let output = run_in(
+            &work,
+            &[
+                "--data-dir",
+                data,
+                "--scenario-dir",
+                scenario_dir,
+                "analyze",
+                supplied,
+                "--format",
+                "json",
+            ],
+        );
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{supplied}: {}",
+            stderr(&output)
+        );
+    }
+}
+
+#[test]
+fn scenario_explanation_and_template_round_trip_without_analysis() {
+    let explain = run(&[
+        "--scenario-dir",
+        "scenarios/examples",
+        "scenario",
+        "explain",
+        "example_dual_target_paid_first_v2",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(explain.status.code(), Some(0), "{}", stderr(&explain));
+    let body: serde_json::Value =
+        serde_json::from_slice(&explain.stdout).expect("explanation JSON");
+    assert_eq!(body["document_type"], "scenario_explanation");
+    assert_eq!(body["compatibility_profile"], "v2");
+    assert_eq!(
+        body["compiled_strategy"]["funding_priority"][0],
+        "paid_single"
+    );
+    assert!(body.get("success_probability").is_none());
+    assert!(body.get("rng").is_none());
+
+    let template = run(&[
+        "scenario",
+        "template",
+        "--scenario-id",
+        "generated_v2",
+        "--ruleset",
+        "jp_2026_07_29_provisional_v2",
+        "--reward-schedule",
+        "jp_2026_07_29_empty_v2",
+        "--target-count",
+        "2",
+    ]);
+    assert_eq!(template.status.code(), Some(0), "{}", stderr(&template));
+    let value: serde_json::Value = serde_json::from_slice(&template.stdout).expect("template JSON");
+    assert_eq!(
+        value["strategy"]["max_total_recruitments"],
+        serde_json::json!(200)
+    );
+    let temp = TempDir::new().expect("tempdir");
+    let path = temp.path().join("generated_v2.json");
+    fs::write(&path, &template.stdout).expect("template file");
+    let validate = run(&["validate", path.to_str().expect("path"), "--format", "json"]);
+    assert_eq!(validate.status.code(), Some(0), "{}", stderr(&validate));
+}
+
+#[test]
+fn diagnostics_are_versioned_and_do_not_change_default_errors() {
+    let temp = TempDir::new().expect("tempdir");
+    let malformed = temp.path().join("malformed.json");
+    fs::write(
+        &malformed,
+        "{\n  \"schema_version\": 2,\n  \"document_type\": \"scenario\",\n",
+    )
+    .expect("malformed");
+    let output = run(&[
+        "validate",
+        malformed.to_str().expect("path"),
+        "--diagnostics",
+    ]);
+    assert_eq!(output.status.code(), Some(3));
+    assert!(output.stdout.is_empty());
+    let body: serde_json::Value = serde_json::from_slice(&output.stderr).expect("diagnostic JSON");
+    assert_eq!(body["diagnostics_schema_version"], 1);
+    assert_eq!(body["error"]["code"], "invalid_json");
+    assert!(body["error"]["line"].as_u64().is_some());
+    assert!(body["error"]["column"].as_u64().is_some());
+
+    let default = run(&["validate", malformed.to_str().expect("path")]);
+    assert_eq!(default.status.code(), Some(3));
+    assert!(default.stdout.is_empty());
+    assert!(stderr(&default).starts_with("error [validation:invalid_json]:"));
 }

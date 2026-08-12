@@ -1,52 +1,54 @@
 # Blue Archive Strategy Engine
 
-`ba-strategy` v0.1 is a local Rust 2024 probability engine for one or two
-ordered Blue Archive recruitment targets. It provides exhaustive branch
-analysis, OS-entropy-seeded Monte Carlo with reproducible explicit seeds,
-single-run traces, and exact versus simulation comparisons.
+`ba-strategy` 0.2.0 is a local Rust probability engine for one or two ordered
+Blue Archive recruitment targets. It supports exhaustive analysis, reproducible
+serial Monte Carlo, trace/replay, and exact-versus-simulation comparison.
 
-The bundled mechanics are the explicit provisional model
-`jp_2026_07_29_provisional_v1`. They are not represented as independently
-verified or official Japanese-server mechanics. Runtime behavior comes only
-from the validated external ruleset in
-[`data/rulesets`](data/rulesets/jp_2026_07_29_provisional_v1.json); the solver
-does not keep a second threshold or cost table.
+This is an unofficial fan/research tool. It is not affiliated with, endorsed
+by, or a source of official information from Nexon, Yostar, Blue Archive, or
+their affiliates. The repository contains no copyrighted game assets.
+
+The shipped data is explicitly provisional. In particular,
+`jp_2026_07_29_provisional_v2` is a schema-v2 encoding of the bundled v1
+mechanics, not an independently verified or official statement of game rules.
 
 ## Build and run
 
 Rust 1.95.0, rustfmt, and Clippy are selected by
-[`rust-toolchain.toml`](rust-toolchain.toml). The root is a virtual workspace,
-and [`Cargo.lock`](Cargo.lock) is part of the application source.
+[`rust-toolchain.toml`](rust-toolchain.toml). Use the checked-in lockfile.
 
 ```text
 cargo build --workspace --locked
 
-cargo run -p ba-cli --bin ba-strategy -- \
-  validate data/rulesets/jp_2026_07_29_provisional_v1.json
+cargo run --locked -p ba-cli --bin ba-strategy -- \
+  catalog list all --format json
 
-cargo run -p ba-cli --bin ba-strategy -- \
-  analyze single_target_200 --format json
+cargo run --locked -p ba-cli --bin ba-strategy -- \
+  --scenario-dir scenarios/examples analyze example_single_target_v2 --format json
 
-cargo run -p ba-cli --bin ba-strategy -- \
-  simulate dual_shared_200 --runs 10000
-
-cargo run -p ba-cli --bin ba-strategy -- \
-  simulate ticket_atomic --runs 1 --seed 42 --trace --format json
-
-cargo run -p ba-cli --bin ba-strategy -- \
-  compare dual_shared_200 --runs 10000
+cargo run --locked -p ba-cli --bin ba-strategy -- \
+  scenario template --scenario-id generated_v2 \
+  --ruleset jp_2026_07_29_provisional_v2 \
+  --reward-schedule jp_2026_07_29_empty_v2 --target-count 2
 ```
 
-`--data-dir` defaults to `./data`. A scenario argument may be a path or the ID
-of a fixture under `scenarios/golden/` next to that data directory.
+Existing commands remain available: `validate`, `analyze`, `simulate`, and
+`compare`. New local-inspection commands are `catalog list`, `catalog inspect`,
+`scenario explain`, and `scenario template`. JSON catalog, inspection, and
+explanation outputs include an explicit output schema version. Template output
+is valid schema-v2 JSON on stdout and defaults to ticket-first funding with a
+200-recruitment horizon.
 
-`simulate` and `compare` obtain one master seed from the operating system when
-`--seed` is omitted. The resolved seed is included in successful output, so the
-same run can be reproduced later with `--seed <reported-seed>`. Entropy failures
-are fatal; the CLI never falls back to a timestamp, process ID, or fixed seed.
+`--data-dir` defaults to `./data`. With `--scenario-dir <PATH>`, a bare name
+such as `foo` or `foo.json` resolves to `<PATH>/foo.json`; `./foo.json`,
+`../foo.json`, nested paths, and absolute paths remain explicit paths. Without
+`--scenario-dir`, the legacy golden-scenario resolver is retained.
 
-Successful output goes to stdout. Errors go to stderr, with no authoritative
-result on stdout:
+`validate --diagnostics` emits a diagnostics-schema-v1 error envelope on
+failure, including a stable class/code/message and, when available, a pointer,
+line/column, and corrective hint. Normal validation output and normal error
+formatting remain unchanged. Successful output is written to stdout; failures
+are written to stderr with no authoritative stdout result.
 
 | Exit | Meaning |
 |---:|---|
@@ -57,96 +59,70 @@ result on stdout:
 | 5 | Engine guard, arithmetic, transition, or probability invariant |
 | 70 | Unexpected typed internal failure |
 
-## Model semantics
+## Inputs and compatibility
 
-The shipped v1 ruleset declares:
+`data/` is shipped provisional runtime data; `scenarios/examples/` contains
+authoring examples using only shipped data; `scenarios/golden/` contains frozen
+regression scenarios; and `tests/fixtures/` is synthetic/adversarial test data.
+The `synthetic_non_v1_*` fixtures are deliberately non-gameplay mechanics and
+are never runtime catalog data or release-facing examples.
 
-- paid single cost and action size;
-- ticket-funded action size;
-- ordinary pickup probability;
-- maximum pre-recruitment charge;
-- hit reset and miss increment;
-- ordered threshold probability overrides.
+Schema-v1 behavior and result wire shapes remain frozen. A v1 scenario may
+reference only v1 rulesets and reward schedules and produces semantics/result
+schema 1. A v2 scenario may reference either version, subject to reward
+compatibility, and produces semantics/result schema 2. Details are in
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) and
+[`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md).
 
-Schema-v1 validates the provisional fixture values, but transitions,
-strategies, affordability, horizon fit, and metric reconstruction all read the
-compiled ruleset. Charge belongs to charge groups rather than banners, so two
-banners can share a counter or use independent counters.
+V2 results distinguish behavior fingerprints from document fingerprints.
+Changing only v2 provenance changes document identity/provenance output but
+does not change mechanics, strategy decisions, exact or Monte Carlo behavior,
+or per-run seed derivation. See [`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md).
 
-A paid or ticket action is atomic. Its banner is locked for every primitive
-draw, it cannot stop after an early pickup, and policy runs again only after
-the action completes. Tickets earned during an action are deferred until that
-completion boundary. V1 tickets are universal and never expire.
+## Security model
 
-The strategy `sequential_targets_prefer_tickets` selects the first unowned
-ordered target, prefers a complete affordable ticket action, then a complete
-affordable paid action. A configured horizon is a domain rule: an action must
-fit in full. Solver limits are safety guards and never affect policy
-feasibility.
+On Linux and Android, a user-selected ambient root (`--data-dir`,
+`--scenario-dir`, or an explicit document parent) may be followed once and is
+then pinned. Descendants are resolved descriptor-relatively with no symlink
+following. Rulesets and rewards load as one checked data-root generation, so a
+concurrent observable replacement fails closed with
+`catalog_generation_changed` rather than returning a mixed catalog. Other
+platforms fail closed for secure loading. This is a filesystem consistency
+boundary, not cryptographic integrity against a sufficiently privileged actor.
+See [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
-## What “exact” means
+## Model and limits
 
-Exact analysis exhaustively propagates every modeled nonzero branch in fixed
-order and never probability-prunes. Equivalent future states are aggregated
-in deterministic `BTreeMap` frontiers with compensated `f64` probability
-accumulation. “Exact” therefore means exhaustive enumeration, not rational or
-arbitrary-precision arithmetic.
+Actions are atomic: a locked banner continues for every primitive draw even
+after an early pickup, and policy is reevaluated only at the action boundary.
+Schema v1 retains the legacy ticket-first strategy and nullable positive
+horizon. Schema v2 requires an explicit positive horizon and an exact
+permutation of `ticket_ten` and `paid_single` as funding priority. See
+[`docs/STRATEGIES.md`](docs/STRATEGIES.md).
 
-First-success time is not future-relevant state. Its probability mass is
-recorded when ownership first completes and retained in a separate PMF while
-world states merge. Aggregate fields are explicitly named `expected_*`.
-Concrete trace fields instead describe the one realized path.
+Document limits are 1 MiB, JSON depth 64, 512 inspected immediate directory
+entries, and 256 retained JSON candidates. Exact analysis enumerates all
+modeled nonzero branches without probability pruning. Guard calibration and
+environment-specific benchmark observations are recorded in
+[`docs/CALIBRATION.md`](docs/CALIBRATION.md).
 
-The finite initial resource inventory plus the finite non-pyroxene milestone
-schedule bounds every schema-v1 run. Exact guard calibration and headroom are
-recorded in [`docs/CALIBRATION.md`](docs/CALIBRATION.md).
-
-Concrete execution is also fail-closed: v0.1 defaults reject more than
-1,000,000 Monte Carlo runs, more than 1,048,576 primitive transitions in one
-run, more than 100,000,000 primitive transitions across one simulation call,
-or more than 100,000 primitive transitions in a materialized trace/replay.
-These are engine work limits, not strategy horizons.
-
-## Reproducibility and input hardening
-
-Every source is read once into a complete buffer of at most 1 MiB. A recursive
-token scan rejects duplicate decoded keys at any object depth and nesting over
-64 before strict typed parsing rejects unknown fields and trailing data.
-Catalogs inspect at most 512 immediate directory entries and retain at most 256
-`.json` regular-file candidates per directory, failing at the first excess.
-One malformed, unsupported, oversized, unreadable, duplicate-ID, symlink, or
-otherwise invalid candidate rejects the complete catalog; nothing is
-truncated or partially published.
-
-The v0.1 secure file-open implementation is enabled on Linux and Android.
-Other targets fail closed with a path-policy error instead of falling back to
-a symlink-following or potentially blocking open.
-
-Validated rulesets, reward schedules, and scenarios receive versioned
-canonical semantic SHA-256 fingerprints. Formatting, source paths, mtimes, and
-machine/build state are excluded. Monte Carlo uses independent per-run
-ChaCha8 streams derived from those raw fingerprints, the resolved master seed,
-and the zero-based run index. CDFs are reconstructed from checked integer sample
-counts rather than accumulated floating fractions. It reports Wilson intervals
-for probability support points and approximate 95% mean intervals plus standard
-errors for numeric expectations; a one-observation mean interval is `null`. See
-[`docs/PROTOCOLS.md`](docs/PROTOCOLS.md).
-
-Input shape and cross-document rules are documented in
-[`docs/SCHEMA_V1.md`](docs/SCHEMA_V1.md).
-
-## Workspace boundaries
+## Workspace and releases
 
 ```text
 ba-cli -> ba-engine -> ba-core
 ```
 
-- `ba-core`: strict input, validation, catalogs, fingerprints, state, strategy,
-  and the pure RNG-free action/transition kernel.
-- `ba-engine`: exhaustive propagation, aggregate metrics, Monte Carlo,
-  confidence intervals, trace/replay, comparison, and provenance DTOs.
-- `ba-cli`: argument handling, catalog resolution, rendering, and exit mapping.
+- `ba-core`: strict input, secure catalogs, validation, fingerprints, strategy,
+  and the pure transition kernel.
+- `ba-engine`: exact propagation, Monte Carlo, trace/replay, comparison, and
+  result projections.
+- `ba-cli`: argument parsing, resolution, command execution, rendering, and
+  error mapping.
 
-There is no async runtime, frontend, server, database, scraper, calendar,
-character database, valuation layer, optimizer, MDP, policy DSL, plugin
-framework, parallel Monte Carlo, or support for more than two targets in v0.1.
+The project is not published to crates.io and this implementation does not tag,
+push, publish, or create releases. Release readiness and its least-privilege
+boundaries are described in [`docs/RELEASING.md`](docs/RELEASING.md).
+
+Contributing, security reporting, and the dual MIT/Apache-2.0 terms are in
+[`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md),
+[`LICENSE-MIT`](LICENSE-MIT), and [`LICENSE-APACHE`](LICENSE-APACHE).

@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "document_type": "scenario",
+  "scenario_id": "v2_funding_paid_first",
+  "ruleset_id": "jp_2026_07_29_provisional_v2",
+  "reward_schedule_id": "jp_2026_07_29_empty_v2",
+  "students": [
+    {
+      "student_id": "target"
+    }
+  ],
+  "banners": [
+    {
+      "banner_id": "banner",
+      "featured_student_id": "target",
+      "charge_group_id": "group"
+    }
+  ],
+  "initial_charges": [
+    {
+      "charge_group_id": "group",
+      "pre_recruitment_charge": 199
+    }
+  ],
+  "initial_resources": {
+    "pyroxene": 120,
+    "limited_ten_recruitment_tickets": 1,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0
+  },
+  "initial_owned_targets": [],
+  "strategy": {
+    "strategy_schema_version": 1,
+    "strategy_id": "paid_first",
+    "kind": "sequential_targets",
+    "funding_priority": [
+      "paid_single",
+      "ticket_ten"
+    ],
+    "max_total_recruitments": 10
+  },
+  "targets": [
+    {
+      "student_id": "target",
+      "banner_id": "banner"
+    }
+  ]
+}

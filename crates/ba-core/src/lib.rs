@@ -1,11 +1,14 @@
 #![forbid(unsafe_code)]
 
 pub mod catalog;
+pub mod document;
 pub mod error;
 pub mod fingerprint;
+mod fs_secure;
 pub mod id;
 pub mod kernel;
 pub mod model;
+pub mod ownership;
 pub mod ratio;
 pub mod resources;
 pub mod schema;
@@ -13,8 +16,9 @@ pub mod strategy;
 pub mod strict_json;
 
 pub use catalog::{
-    BundleFingerprints, Catalog, SourcePaths, ValidatedScenarioBundle, ValidationReport,
-    load_bundle, validate_document,
+    BundleCompatibilityProfile, BundleFingerprints, Catalog, SourcePaths, ValidatedScenarioBundle,
+    ValidationReport, compile_buffered_bundle, load_buffered_bundle, load_bundle,
+    validate_document,
 };
 pub use error::{
     CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES,
@@ -32,11 +36,14 @@ pub use kernel::{
     reconstruct_funding, terminal_resources,
 };
 pub use model::{
-    Banner, CompiledRuleset, Milestone, Reward, RewardSchedule, RulesetMechanics,
-    StrategyConfiguration, StrategyConstraints, Target, ValidatedScenario, resource_kind_name,
+    Banner, CompiledRuleset, CompiledStrategy, FundingKind, Milestone, Provenance,
+    ProvenanceSource, Reward, RewardSchedule, RulesetMechanics, StrategyConfiguration,
+    StrategyConstraints, Target, ValidatedScenario, resource_kind_name,
 };
+pub use ownership::OwnershipMask;
 pub use ratio::ProbabilityRatio;
 pub use resources::{ResourceKind, Resources};
+pub use schema::{DocumentKind, VerificationStatus};
 pub use strategy::{
     DecisionView, SequentialTargetsPreferTickets, Strategy, StrategyDecision, decide,
 };

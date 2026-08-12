@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [dependencies]
 ba-core = { path = "../ba-core" }
@@ -16,6 +17,10 @@ rand_chacha.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
+
+[[bench]]
+name = "engine"
+harness = false
 
 [lints]
 workspace = true

@@ -1,7 +1,7 @@
 use crate::catalog::ValidatedScenarioBundle;
 use crate::kernel::{ActionFundingKind, RequestedAction, TerminalReason, WorldStateKey};
-use crate::model::{Target, ValidatedScenario};
-use crate::{CompiledRuleset, CoreError, Resources};
+use crate::model::{CompiledStrategy, FundingKind, Target, ValidatedScenario};
+use crate::{CompiledRuleset, CoreError, OwnershipMask, Resources};
 
 #[derive(Debug)]
 pub struct DecisionView<'a> {
@@ -22,10 +22,8 @@ impl<'a> DecisionView<'a> {
         state: &'a WorldStateKey,
     ) -> Result<Self, CoreError> {
         let configured_horizon = bundle
-            .scenario()
-            .strategy()
-            .constraints
-            .max_total_recruitments
+            .compiled_strategy()
+            .max_total_recruitments()
             .map(std::num::NonZeroU64::get);
         let remaining_horizon = configured_horizon
             .map(|horizon| {
@@ -78,58 +76,64 @@ pub struct SequentialTargetsPreferTickets;
 
 impl Strategy for SequentialTargetsPreferTickets {
     fn decide(&self, view: &DecisionView<'_>) -> Result<StrategyDecision, CoreError> {
-        if view.all_targets_owned() {
-            return Ok(StrategyDecision::Stop(TerminalReason::TargetsAcquired));
-        }
-        if view.remaining_horizon == Some(0) {
-            return Ok(StrategyDecision::Stop(
-                TerminalReason::StrategyHorizonReached,
-            ));
-        }
+        decide_sequential(view, [FundingKind::TicketTen, FundingKind::PaidSingle])
+    }
+}
 
-        let target_index = (0..view.ordered_targets.len())
-            .find(|index| {
-                let shift = u32::try_from(*index).unwrap_or(u32::MAX);
-                let bit = 1_u8.checked_shl(shift).unwrap_or(0);
-                view.owned_target_mask & bit == 0
-            })
+fn decide_sequential(
+    view: &DecisionView<'_>,
+    funding_priority: [FundingKind; 2],
+) -> Result<StrategyDecision, CoreError> {
+    if view.all_targets_owned() {
+        return Ok(StrategyDecision::Stop(TerminalReason::TargetsAcquired));
+    }
+    if view.remaining_horizon == Some(0) {
+        return Ok(StrategyDecision::Stop(
+            TerminalReason::StrategyHorizonReached,
+        ));
+    }
+
+    let ownership = OwnershipMask::from_raw(view.owned_target_mask, view.ordered_targets.len())?;
+    let target_index = (0..view.ordered_targets.len())
+        .find(|index| ownership.contains(*index).is_ok_and(|owned| !owned))
+        .ok_or_else(|| CoreError::InternalInvariant {
+            message: "incomplete ownership mask has no unowned ordered target".to_owned(),
+        })?;
+    let target =
+        view.ordered_targets
+            .get(target_index)
             .ok_or_else(|| CoreError::InternalInvariant {
-                message: "incomplete ownership mask has no unowned ordered target".to_owned(),
+                message: "selected target index is out of range".to_owned(),
             })?;
-        let target =
-            view.ordered_targets
-                .get(target_index)
-                .ok_or_else(|| CoreError::InternalInvariant {
-                    message: "selected target index is out of range".to_owned(),
-                })?;
 
-        let ticket_affordable = view.resources.limited_ten_recruitment_tickets > 0;
-        let paid_affordable = view.resources.pyroxene >= view.ruleset.paid_single_cost();
-        let ticket_fits = fits(view.remaining_horizon, view.ruleset.ticket_action_size());
-        let paid_fits = fits(
-            view.remaining_horizon,
-            view.ruleset.paid_single_action_size(),
-        );
+    let ticket_affordable = view.resources.limited_ten_recruitment_tickets > 0;
+    let paid_affordable = view.resources.pyroxene >= view.ruleset.paid_single_cost();
+    let ticket_fits = fits(view.remaining_horizon, view.ruleset.ticket_action_size());
+    let paid_fits = fits(
+        view.remaining_horizon,
+        view.ruleset.paid_single_action_size(),
+    );
 
-        if ticket_affordable && ticket_fits {
+    for funding in funding_priority {
+        let (affordable, fits, action_funding) = match funding {
+            FundingKind::TicketTen => {
+                (ticket_affordable, ticket_fits, ActionFundingKind::TicketTen)
+            }
+            FundingKind::PaidSingle => (paid_affordable, paid_fits, ActionFundingKind::PaidSingle),
+        };
+        if affordable && fits {
             return Ok(StrategyDecision::Act(RequestedAction {
                 banner_index: target.banner_index,
-                funding: ActionFundingKind::TicketTen,
+                funding: action_funding,
             }));
         }
-        if paid_affordable && paid_fits {
-            return Ok(StrategyDecision::Act(RequestedAction {
-                banner_index: target.banner_index,
-                funding: ActionFundingKind::PaidSingle,
-            }));
-        }
-        if ticket_affordable || paid_affordable {
-            Ok(StrategyDecision::Stop(
-                TerminalReason::StrategyHorizonReached,
-            ))
-        } else {
-            Ok(StrategyDecision::Stop(TerminalReason::ResourcesExhausted))
-        }
+    }
+    if ticket_affordable || paid_affordable {
+        Ok(StrategyDecision::Stop(
+            TerminalReason::StrategyHorizonReached,
+        ))
+    } else {
+        Ok(StrategyDecision::Stop(TerminalReason::ResourcesExhausted))
     }
 }
 
@@ -138,7 +142,12 @@ pub fn decide(
     state: &WorldStateKey,
 ) -> Result<StrategyDecision, CoreError> {
     let view = DecisionView::new(bundle, state)?;
-    SequentialTargetsPreferTickets.decide(&view)
+    match bundle.compiled_strategy() {
+        CompiledStrategy::LegacySequentialV1 { .. } => SequentialTargetsPreferTickets.decide(&view),
+        CompiledStrategy::SequentialTargetsV2 {
+            funding_priority, ..
+        } => decide_sequential(&view, *funding_priority),
+    }
 }
 
 fn fits(remaining: Option<u64>, action_size: u64) -> bool {

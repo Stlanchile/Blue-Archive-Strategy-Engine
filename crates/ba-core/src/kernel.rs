@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::catalog::ValidatedScenarioBundle;
 use crate::id::{BannerId, StudentId};
 use crate::model::{Milestone, Reward};
-use crate::{CoreError, ProbabilityRatio, ResourceKind, Resources};
+use crate::{CoreError, OwnershipMask, ProbabilityRatio, ResourceKind, Resources};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 pub struct WorldStateKey {
@@ -201,12 +201,7 @@ pub fn begin_action(
             (bundle.ruleset().ticket_action_size(), 0_u64, 1_u64)
         }
     };
-    if let Some(horizon) = bundle
-        .scenario()
-        .strategy()
-        .constraints
-        .max_total_recruitments
-    {
+    if let Some(horizon) = bundle.compiled_strategy().max_total_recruitments() {
         let completion = state
             .cumulative_primitive_recruitments
             .checked_add(primitive_draws)
@@ -292,16 +287,12 @@ pub fn apply_primitive_transition(
                 .ok_or_else(|| CoreError::InvalidTransition {
                     message: "banner featured student is not a target".to_owned(),
                 })?;
-            let shift = u32::try_from(target_index).map_err(|_| CoreError::ArithmeticOverflow {
-                context: "converting target ownership bit index",
-            })?;
-            let bit = 1_u8
-                .checked_shl(shift)
-                .ok_or(CoreError::ArithmeticOverflow {
-                    context: "constructing target ownership bit",
-                })?;
-            target_newly_owned = next.world.owned_target_mask & bit == 0;
-            next.world.owned_target_mask |= bit;
+            let mut ownership = OwnershipMask::from_raw(
+                next.world.owned_target_mask,
+                bundle.scenario().targets().len(),
+            )?;
+            target_newly_owned = ownership.insert(target_index)?;
+            next.world.owned_target_mask = ownership.raw();
             *charge = bundle.ruleset().hit_reset_charge();
         }
         RecruitOutcome::Miss => {

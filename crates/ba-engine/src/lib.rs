@@ -16,14 +16,16 @@ pub use options::{
     SimulationLimits,
 };
 pub use result::{
-    AnalysisContext, AnalysisProvenance, ComparisonResult, ConfidenceInterval,
-    ENGINE_SEMANTICS_VERSION, EstimateDiagnostics, ExactAnalysisResult, ExpectedResources,
+    AnalysisContext, AnalysisProvenance, ComparisonResult, CompiledStrategyContext,
+    ConfidenceInterval, ENGINE_SEMANTICS_VERSION, ENGINE_SEMANTICS_VERSION_V1,
+    ENGINE_SEMANTICS_VERSION_V2, EstimateDiagnostics, ExactAnalysisResult, ExpectedResources,
     FirstSuccessProbability, MilestoneReachProbability, MonteCarloAnalysisResult,
     MonteCarloEstimationMetadata, MonteCarloProbabilityIntervals, MonteCarloSampleCounts,
     OwnedTargetProbabilityInterval, OwnedTargetTerminalProbability,
-    ProbabilityConservationDiagnostics, RESULT_SCHEMA_VERSION, RNG_ALGORITHM,
-    RecruitmentCountProbabilityInterval, ResourceEstimateDiagnostics, RngProvenance, RunTraceEvent,
-    RunTraceResult, STREAM_DERIVATION_VERSION, SolverDiagnostics, TerminalReasonProbability,
+    ProbabilityConservationDiagnostics, RESULT_SCHEMA_VERSION, RESULT_SCHEMA_VERSION_V1,
+    RESULT_SCHEMA_VERSION_V2, RNG_ALGORITHM, RecruitmentCountProbabilityInterval,
+    ResourceEstimateDiagnostics, RngProvenance, RunTraceEvent, RunTraceResult,
+    STREAM_DERIVATION_VERSION, SolverDiagnostics, TerminalReasonProbability,
     TerminalReasonProbabilityInterval,
 };
 pub use simulation::{

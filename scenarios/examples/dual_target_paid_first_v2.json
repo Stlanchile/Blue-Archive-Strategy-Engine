@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "document_type": "scenario",
+  "scenario_id": "example_dual_target_paid_first_v2",
+  "ruleset_id": "jp_2026_07_29_provisional_v2",
+  "reward_schedule_id": "jp_2026_07_29_empty_v2",
+  "students": [
+    {
+      "student_id": "target_1"
+    },
+    {
+      "student_id": "target_2"
+    }
+  ],
+  "banners": [
+    {
+      "banner_id": "banner_1",
+      "featured_student_id": "target_1",
+      "charge_group_id": "charge_group_1"
+    },
+    {
+      "banner_id": "banner_2",
+      "featured_student_id": "target_2",
+      "charge_group_id": "charge_group_2"
+    }
+  ],
+  "initial_charges": [
+    {
+      "charge_group_id": "charge_group_1",
+      "pre_recruitment_charge": 0
+    },
+    {
+      "charge_group_id": "charge_group_2",
+      "pre_recruitment_charge": 0
+    }
+  ],
+  "initial_resources": {
+    "pyroxene": 24000,
+    "limited_ten_recruitment_tickets": 1,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0
+  },
+  "initial_owned_targets": [],
+  "strategy": {
+    "strategy_schema_version": 1,
+    "strategy_id": "sequential",
+    "kind": "sequential_targets",
+    "funding_priority": [
+      "paid_single",
+      "ticket_ten"
+    ],
+    "max_total_recruitments": 200
+  },
+  "targets": [
+    {
+      "student_id": "target_1",
+      "banner_id": "banner_1"
+    },
+    {
+      "student_id": "target_2",
+      "banner_id": "banner_2"
+    }
+  ]
+}

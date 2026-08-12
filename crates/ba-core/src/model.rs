@@ -9,13 +9,16 @@ use crate::id::{
     BannerId, ChargeGroupId, RewardScheduleId, RulesetId, ScenarioId, StrategyId, StudentId,
 };
 use crate::schema::{
-    REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, RawRewardScheduleV1, RawRulesetV1,
-    RawScenarioV1, RawStrategyKind, SCENARIO_DOCUMENT_TYPE, SCHEMA_VERSION_V1,
+    REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, RawFundingKind, RawProvenance,
+    RawRewardScheduleV1, RawRewardScheduleV2, RawRulesetV1, RawRulesetV2, RawScenarioV1,
+    RawScenarioV2, RawStrategyKind, RawStrategyKindV2, SCENARIO_DOCUMENT_TYPE, SCHEMA_VERSION_V1,
+    SCHEMA_VERSION_V2, VerificationStatus,
 };
-use crate::{CoreError, ProbabilityRatio, ResourceKind, Resources};
+use crate::{CoreError, OwnershipMask, ProbabilityRatio, ResourceKind, Resources};
 
 #[derive(Debug, Clone)]
 pub struct CompiledRuleset {
+    schema_version: u64,
     id: RulesetId,
     paid_single_cost: NonZeroU64,
     paid_single_action_size: NonZeroU64,
@@ -25,6 +28,7 @@ pub struct CompiledRuleset {
     hit_reset_charge: u64,
     miss_increment: NonZeroU64,
     threshold_overrides: Vec<(u64, ProbabilityRatio)>,
+    provenance: Option<Provenance>,
 }
 
 #[derive(Debug, Clone)]
@@ -37,6 +41,86 @@ pub struct RulesetMechanics {
     pub hit_reset_charge: u64,
     pub miss_increment: u64,
     pub threshold_overrides: Vec<(u64, ProbabilityRatio)>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ProvenanceSource {
+    pub label: String,
+    pub reference: String,
+    pub retrieved_on: Option<String>,
+    pub content_sha256: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Provenance {
+    pub verification_status: VerificationStatus,
+    pub sources: Vec<ProvenanceSource>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FundingKind {
+    TicketTen,
+    PaidSingle,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum CompiledStrategy {
+    #[serde(rename = "legacy_sequential_v1")]
+    LegacySequentialV1 {
+        strategy_id: StrategyId,
+        legacy_horizon: Option<NonZeroU64>,
+    },
+    #[serde(rename = "sequential_targets")]
+    SequentialTargetsV2 {
+        strategy_schema_version: u64,
+        strategy_id: StrategyId,
+        funding_priority: [FundingKind; 2],
+        max_total_recruitments: NonZeroU64,
+    },
+}
+
+impl CompiledStrategy {
+    #[must_use]
+    pub const fn strategy_id(&self) -> &StrategyId {
+        match self {
+            Self::LegacySequentialV1 { strategy_id, .. }
+            | Self::SequentialTargetsV2 { strategy_id, .. } => strategy_id,
+        }
+    }
+
+    #[must_use]
+    pub const fn max_total_recruitments(&self) -> Option<NonZeroU64> {
+        match self {
+            Self::LegacySequentialV1 { legacy_horizon, .. } => *legacy_horizon,
+            Self::SequentialTargetsV2 {
+                max_total_recruitments,
+                ..
+            } => Some(*max_total_recruitments),
+        }
+    }
+
+    #[must_use]
+    pub const fn funding_priority(&self) -> [FundingKind; 2] {
+        match self {
+            Self::LegacySequentialV1 { .. } => [FundingKind::TicketTen, FundingKind::PaidSingle],
+            Self::SequentialTargetsV2 {
+                funding_priority, ..
+            } => *funding_priority,
+        }
+    }
+
+    #[must_use]
+    pub const fn schema_version(&self) -> u64 {
+        match self {
+            Self::LegacySequentialV1 { .. } => 0,
+            Self::SequentialTargetsV2 {
+                strategy_schema_version,
+                ..
+            } => *strategy_schema_version,
+        }
+    }
 }
 
 impl CompiledRuleset {
@@ -80,7 +164,57 @@ impl CompiledRuleset {
             .map_err(|error| CoreError::validation(path, error.to_string()))
     }
 
+    pub fn from_raw_v2(raw: RawRulesetV2, path: Option<&Path>) -> Result<Self, CoreError> {
+        validate_header_version(
+            raw.schema_version,
+            &raw.document_type,
+            RULESET_DOCUMENT_TYPE,
+            SCHEMA_VERSION_V2,
+            path,
+        )?;
+        let id = RulesetId::new(raw.ruleset_id)
+            .map_err(|error| CoreError::validation(path, error.to_string()))?;
+        let ordinary = ProbabilityRatio::new(
+            raw.ordinary_pickup_probability.numerator,
+            raw.ordinary_pickup_probability.denominator,
+        )
+        .map_err(|error| CoreError::validation(path, error.to_string()))?;
+        let mut overrides = Vec::with_capacity(raw.threshold_overrides.len());
+        for item in raw.threshold_overrides {
+            overrides.push((
+                item.pre_charge,
+                ProbabilityRatio::new(
+                    item.pickup_probability.numerator,
+                    item.pickup_probability.denominator,
+                )
+                .map_err(|error| CoreError::validation(path, error.to_string()))?,
+            ));
+        }
+        let provenance = validate_provenance(raw.provenance, path)?;
+        let mechanics = RulesetMechanics {
+            paid_single_cost: raw.paid_single_cost,
+            paid_single_action_size: raw.paid_single_action_size,
+            ticket_action_size: raw.ticket_action_size,
+            ordinary_pickup_probability: ordinary,
+            maximum_pre_recruitment_charge: raw.maximum_pre_recruitment_charge,
+            hit_reset_charge: raw.hit_reset_charge,
+            miss_increment: raw.miss_increment,
+            threshold_overrides: overrides,
+        };
+        Self::compile_parts(id, mechanics, SCHEMA_VERSION_V2, Some(provenance))
+            .map_err(|error| CoreError::validation(path, error.to_string()))
+    }
+
     pub fn from_parts(id: RulesetId, mechanics: RulesetMechanics) -> Result<Self, CoreError> {
+        Self::compile_parts(id, mechanics, SCHEMA_VERSION_V1, None)
+    }
+
+    fn compile_parts(
+        id: RulesetId,
+        mechanics: RulesetMechanics,
+        schema_version: u64,
+        provenance: Option<Provenance>,
+    ) -> Result<Self, CoreError> {
         let paid_single_cost = NonZeroU64::new(mechanics.paid_single_cost)
             .ok_or_else(|| CoreError::validation(None, "paid_single_cost must be positive"))?;
         let paid_single_action_size = NonZeroU64::new(mechanics.paid_single_action_size)
@@ -122,6 +256,7 @@ impl CompiledRuleset {
             &mechanics.threshold_overrides,
         )?;
         Ok(Self {
+            schema_version,
             id,
             paid_single_cost,
             paid_single_action_size,
@@ -131,7 +266,13 @@ impl CompiledRuleset {
             hit_reset_charge: mechanics.hit_reset_charge,
             miss_increment,
             threshold_overrides: mechanics.threshold_overrides,
+            provenance,
         })
+    }
+
+    #[must_use]
+    pub const fn schema_version(&self) -> u64 {
+        self.schema_version
     }
 
     #[must_use]
@@ -188,7 +329,54 @@ impl CompiledRuleset {
         self.ordinary_pickup_probability
     }
 
+    #[must_use]
+    pub const fn provenance(&self) -> Option<&Provenance> {
+        self.provenance.as_ref()
+    }
+
     pub fn semantic_node(&self) -> CanonicalNode {
+        if self.schema_version == SCHEMA_VERSION_V1 {
+            return object([
+                (
+                    "document_type",
+                    CanonicalNode::String(RULESET_DOCUMENT_TYPE.to_owned()),
+                ),
+                (
+                    "hit_reset_charge",
+                    CanonicalNode::Integer(self.hit_reset_charge),
+                ),
+                (
+                    "maximum_pre_recruitment_charge",
+                    CanonicalNode::Integer(self.maximum_pre_recruitment_charge),
+                ),
+                (
+                    "miss_increment",
+                    CanonicalNode::Integer(self.miss_increment.get()),
+                ),
+                (
+                    "ordinary_pickup_probability",
+                    ratio_node(self.ordinary_pickup_probability),
+                ),
+                (
+                    "paid_single_action_size",
+                    CanonicalNode::Integer(self.paid_single_action_size.get()),
+                ),
+                (
+                    "paid_single_cost",
+                    CanonicalNode::Integer(self.paid_single_cost.get()),
+                ),
+                ("ruleset_id", CanonicalNode::String(self.id.to_string())),
+                ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
+                (
+                    "threshold_overrides",
+                    threshold_overrides_node(&self.threshold_overrides),
+                ),
+                (
+                    "ticket_action_size",
+                    CanonicalNode::Integer(self.ticket_action_size.get()),
+                ),
+            ]);
+        }
         object([
             (
                 "document_type",
@@ -219,20 +407,57 @@ impl CompiledRuleset {
                 CanonicalNode::Integer(self.paid_single_cost.get()),
             ),
             ("ruleset_id", CanonicalNode::String(self.id.to_string())),
-            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
+            (
+                "provenance",
+                self.provenance
+                    .as_ref()
+                    .map_or(CanonicalNode::Null, provenance_node),
+            ),
+            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V2)),
             (
                 "threshold_overrides",
-                CanonicalNode::Array(
-                    self.threshold_overrides
-                        .iter()
-                        .map(|(charge, ratio)| {
-                            object([
-                                ("pickup_probability", ratio_node(*ratio)),
-                                ("pre_charge", CanonicalNode::Integer(*charge)),
-                            ])
-                        })
-                        .collect(),
-                ),
+                threshold_overrides_node(&self.threshold_overrides),
+            ),
+            (
+                "ticket_action_size",
+                CanonicalNode::Integer(self.ticket_action_size.get()),
+            ),
+        ])
+    }
+
+    pub fn behavior_node(&self) -> CanonicalNode {
+        if self.schema_version == SCHEMA_VERSION_V1 {
+            return self.semantic_node();
+        }
+        object([
+            ("behavior_schema_version", CanonicalNode::Integer(2)),
+            (
+                "hit_reset_charge",
+                CanonicalNode::Integer(self.hit_reset_charge),
+            ),
+            (
+                "maximum_pre_recruitment_charge",
+                CanonicalNode::Integer(self.maximum_pre_recruitment_charge),
+            ),
+            (
+                "miss_increment",
+                CanonicalNode::Integer(self.miss_increment.get()),
+            ),
+            (
+                "ordinary_pickup_probability",
+                ratio_node(self.ordinary_pickup_probability),
+            ),
+            (
+                "paid_single_action_size",
+                CanonicalNode::Integer(self.paid_single_action_size.get()),
+            ),
+            (
+                "paid_single_cost",
+                CanonicalNode::Integer(self.paid_single_cost.get()),
+            ),
+            (
+                "threshold_overrides",
+                threshold_overrides_node(&self.threshold_overrides),
             ),
             (
                 "ticket_action_size",
@@ -243,6 +468,14 @@ impl CompiledRuleset {
 
     pub fn fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
         SemanticFingerprint::from_node(&self.semantic_node())
+    }
+
+    pub fn behavior_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
+        SemanticFingerprint::from_node(&self.behavior_node())
+    }
+
+    pub fn document_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
+        self.fingerprint()
     }
 }
 
@@ -329,11 +562,13 @@ pub struct Milestone {
 
 #[derive(Debug, Clone)]
 pub struct RewardSchedule {
+    schema_version: u64,
     id: RewardScheduleId,
     compatible_ruleset_ids: Vec<RulesetId>,
     milestones: Vec<Milestone>,
     cumulative_resources: Vec<Resources>,
     total_ticket_rewards: u64,
+    provenance: Option<Provenance>,
 }
 
 impl RewardSchedule {
@@ -344,11 +579,48 @@ impl RewardSchedule {
             REWARD_SCHEDULE_DOCUMENT_TYPE,
             path,
         )?;
-        let id = RewardScheduleId::new(raw.reward_schedule_id)
+        Self::from_raw_parts(
+            raw.reward_schedule_id,
+            raw.compatible_ruleset_ids,
+            raw.milestones,
+            SCHEMA_VERSION_V1,
+            None,
+            path,
+        )
+    }
+
+    pub fn from_raw_v2(raw: RawRewardScheduleV2, path: Option<&Path>) -> Result<Self, CoreError> {
+        validate_header_version(
+            raw.schema_version,
+            &raw.document_type,
+            REWARD_SCHEDULE_DOCUMENT_TYPE,
+            SCHEMA_VERSION_V2,
+            path,
+        )?;
+        let provenance = validate_provenance(raw.provenance, path)?;
+        Self::from_raw_parts(
+            raw.reward_schedule_id,
+            raw.compatible_ruleset_ids,
+            raw.milestones.into_iter().map(Into::into).collect(),
+            SCHEMA_VERSION_V2,
+            Some(provenance),
+            path,
+        )
+    }
+
+    fn from_raw_parts(
+        raw_id: String,
+        raw_compatible_ruleset_ids: Vec<String>,
+        raw_milestones: Vec<crate::schema::RawMilestone>,
+        schema_version: u64,
+        provenance: Option<Provenance>,
+        path: Option<&Path>,
+    ) -> Result<Self, CoreError> {
+        let id = RewardScheduleId::new(raw_id)
             .map_err(|error| CoreError::validation(path, error.to_string()))?;
-        let mut compatible_ruleset_ids = Vec::with_capacity(raw.compatible_ruleset_ids.len());
+        let mut compatible_ruleset_ids = Vec::with_capacity(raw_compatible_ruleset_ids.len());
         let mut compatible_set = BTreeSet::new();
-        for value in raw.compatible_ruleset_ids {
+        for value in raw_compatible_ruleset_ids {
             let value = RulesetId::new(value)
                 .map_err(|error| CoreError::validation(path, error.to_string()))?;
             if !compatible_set.insert(value.clone()) {
@@ -367,11 +639,11 @@ impl RewardSchedule {
         }
         compatible_ruleset_ids.sort();
 
-        let mut milestones = Vec::with_capacity(raw.milestones.len());
-        let mut cumulative_resources = Vec::with_capacity(raw.milestones.len());
+        let mut milestones = Vec::with_capacity(raw_milestones.len());
+        let mut cumulative_resources = Vec::with_capacity(raw_milestones.len());
         let mut resources_through_milestone = Resources::default();
         let mut previous_count = None;
-        for raw_milestone in raw.milestones {
+        for raw_milestone in raw_milestones {
             if raw_milestone.count == 0
                 || previous_count.is_some_and(|value| raw_milestone.count <= value)
             {
@@ -446,12 +718,19 @@ impl RewardSchedule {
             .unwrap_or_default()
             .limited_ten_recruitment_tickets;
         Ok(Self {
+            schema_version,
             id,
             compatible_ruleset_ids,
             milestones,
             cumulative_resources,
             total_ticket_rewards,
+            provenance,
         })
+    }
+
+    #[must_use]
+    pub const fn schema_version(&self) -> u64 {
+        self.schema_version
     }
 
     #[must_use]
@@ -472,6 +751,11 @@ impl RewardSchedule {
     #[must_use]
     pub const fn total_ticket_rewards(&self) -> u64 {
         self.total_ticket_rewards
+    }
+
+    #[must_use]
+    pub const fn provenance(&self) -> Option<&Provenance> {
+        self.provenance.as_ref()
     }
 
     #[must_use]
@@ -504,52 +788,63 @@ impl RewardSchedule {
             .map(|id| CanonicalNode::String(id.to_string()))
             .collect::<Vec<_>>();
         compatible.sort();
+        let milestones = reward_milestones_node(&self.milestones);
+        if self.schema_version == SCHEMA_VERSION_V1 {
+            return object([
+                ("compatible_ruleset_ids", CanonicalNode::Array(compatible)),
+                (
+                    "document_type",
+                    CanonicalNode::String(REWARD_SCHEDULE_DOCUMENT_TYPE.to_owned()),
+                ),
+                ("milestones", milestones),
+                (
+                    "reward_schedule_id",
+                    CanonicalNode::String(self.id.to_string()),
+                ),
+                ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
+            ]);
+        }
         object([
             ("compatible_ruleset_ids", CanonicalNode::Array(compatible)),
             (
                 "document_type",
                 CanonicalNode::String(REWARD_SCHEDULE_DOCUMENT_TYPE.to_owned()),
             ),
+            ("milestones", milestones),
             (
-                "milestones",
-                CanonicalNode::Array(
-                    self.milestones
-                        .iter()
-                        .map(|milestone| {
-                            let mut rewards = milestone
-                                .rewards
-                                .iter()
-                                .map(|reward| {
-                                    object([
-                                        ("quantity", CanonicalNode::Integer(reward.quantity)),
-                                        (
-                                            "resource",
-                                            CanonicalNode::String(
-                                                resource_kind_name(reward.resource).to_owned(),
-                                            ),
-                                        ),
-                                    ])
-                                })
-                                .collect::<Vec<_>>();
-                            rewards.sort();
-                            object([
-                                ("count", CanonicalNode::Integer(milestone.count)),
-                                ("rewards", CanonicalNode::Array(rewards)),
-                            ])
-                        })
-                        .collect(),
-                ),
+                "provenance",
+                self.provenance
+                    .as_ref()
+                    .map_or(CanonicalNode::Null, provenance_node),
             ),
             (
                 "reward_schedule_id",
                 CanonicalNode::String(self.id.to_string()),
             ),
-            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
+            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V2)),
+        ])
+    }
+
+    pub fn behavior_node(&self) -> CanonicalNode {
+        if self.schema_version == SCHEMA_VERSION_V1 {
+            return self.semantic_node();
+        }
+        object([
+            ("behavior_schema_version", CanonicalNode::Integer(2)),
+            ("milestones", reward_milestones_node(&self.milestones)),
         ])
     }
 
     pub fn fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
         SemanticFingerprint::from_node(&self.semantic_node())
+    }
+
+    pub fn behavior_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
+        SemanticFingerprint::from_node(&self.behavior_node())
+    }
+
+    pub fn document_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
+        self.fingerprint()
     }
 }
 
@@ -582,6 +877,7 @@ pub struct StrategyConfiguration {
 
 #[derive(Debug, Clone)]
 pub struct ValidatedScenario {
+    schema_version: u64,
     id: ScenarioId,
     ruleset_id: RulesetId,
     reward_schedule_id: RewardScheduleId,
@@ -593,6 +889,7 @@ pub struct ValidatedScenario {
     initial_owned_mask: u8,
     initial_owned_targets: Vec<StudentId>,
     strategy: StrategyConfiguration,
+    compiled_strategy: CompiledStrategy,
     targets: Vec<Target>,
     termination_bound: u64,
 }
@@ -799,7 +1096,7 @@ impl ValidatedScenario {
             })?);
         }
 
-        let mut initial_owned_mask = 0_u8;
+        let mut initial_owned_mask = OwnershipMask::empty();
         let mut owned_set = BTreeSet::new();
         for raw_owned in raw.initial_owned_targets {
             let owned = StudentId::new(raw_owned)
@@ -819,15 +1116,7 @@ impl ValidatedScenario {
                         format!("initially owned student {owned} is not a target"),
                     )
                 })?;
-            initial_owned_mask |= 1_u8
-                .checked_shl(
-                    u32::try_from(index).map_err(|_| CoreError::ArithmeticOverflow {
-                        context: "converting target mask index",
-                    })?,
-                )
-                .ok_or(CoreError::ArithmeticOverflow {
-                    context: "constructing initial ownership mask",
-                })?;
+            initial_owned_mask.insert(index)?;
         }
         let initial_owned_targets = owned_set.into_iter().collect::<Vec<_>>();
 
@@ -843,11 +1132,15 @@ impl ValidatedScenario {
             crate::schema::NullablePositive::Present(value) => value,
         };
         let strategy = StrategyConfiguration {
-            strategy_id,
+            strategy_id: strategy_id.clone(),
             kind: raw.strategy.kind,
             constraints: StrategyConstraints {
                 max_total_recruitments,
             },
+        };
+        let compiled_strategy = CompiledStrategy::LegacySequentialV1 {
+            strategy_id,
+            legacy_horizon: max_total_recruitments,
         };
         if strategy.kind != RawStrategyKind::SequentialTargetsPreferTickets {
             return Err(CoreError::validation(path, "unsupported strategy kind"));
@@ -878,6 +1171,7 @@ impl ValidatedScenario {
         })?;
 
         Ok(Self {
+            schema_version: SCHEMA_VERSION_V1,
             id,
             ruleset_id,
             reward_schedule_id,
@@ -886,12 +1180,89 @@ impl ValidatedScenario {
             charge_groups,
             initial_charges,
             initial_resources: raw.initial_resources,
-            initial_owned_mask,
+            initial_owned_mask: initial_owned_mask.raw(),
             initial_owned_targets,
             strategy,
+            compiled_strategy,
             targets,
             termination_bound,
         })
+    }
+
+    pub fn from_raw_v2(
+        raw: RawScenarioV2,
+        ruleset: &CompiledRuleset,
+        rewards: &RewardSchedule,
+        path: Option<&Path>,
+    ) -> Result<Self, CoreError> {
+        validate_header_version(
+            raw.schema_version,
+            &raw.document_type,
+            SCENARIO_DOCUMENT_TYPE,
+            SCHEMA_VERSION_V2,
+            path,
+        )?;
+        if raw.strategy.strategy_schema_version != 1 {
+            return Err(CoreError::validation(
+                path,
+                format!(
+                    "unsupported strategy_schema_version {}",
+                    raw.strategy.strategy_schema_version
+                ),
+            ));
+        }
+        if raw.strategy.kind != RawStrategyKindV2::SequentialTargets {
+            return Err(CoreError::validation(path, "unsupported strategy kind"));
+        }
+        let funding_priority = match raw.strategy.funding_priority.as_slice() {
+            [RawFundingKind::TicketTen, RawFundingKind::PaidSingle] => {
+                [FundingKind::TicketTen, FundingKind::PaidSingle]
+            }
+            [RawFundingKind::PaidSingle, RawFundingKind::TicketTen] => {
+                [FundingKind::PaidSingle, FundingKind::TicketTen]
+            }
+            _ => {
+                return Err(CoreError::validation(
+                    path,
+                    "funding_priority must be an exact permutation of ticket_ten and paid_single",
+                ));
+            }
+        };
+        let strategy_schema_version = raw.strategy.strategy_schema_version;
+        let strategy_id_raw = raw.strategy.strategy_id;
+        let horizon = raw.strategy.max_total_recruitments;
+        let converted = RawScenarioV1 {
+            schema_version: SCHEMA_VERSION_V1,
+            document_type: SCENARIO_DOCUMENT_TYPE.to_owned(),
+            scenario_id: raw.scenario_id,
+            ruleset_id: raw.ruleset_id,
+            reward_schedule_id: raw.reward_schedule_id,
+            students: raw.students,
+            banners: raw.banners,
+            initial_charges: raw.initial_charges,
+            initial_resources: raw.initial_resources,
+            initial_owned_targets: raw.initial_owned_targets,
+            strategy: crate::schema::RawStrategy {
+                strategy_id: strategy_id_raw,
+                kind: RawStrategyKind::SequentialTargetsPreferTickets,
+                max_total_recruitments: crate::schema::NullablePositive::Present(Some(horizon)),
+            },
+            targets: raw.targets,
+        };
+        let mut scenario = Self::from_raw(converted, ruleset, rewards, path)?;
+        scenario.schema_version = SCHEMA_VERSION_V2;
+        scenario.compiled_strategy = CompiledStrategy::SequentialTargetsV2 {
+            strategy_schema_version,
+            strategy_id: scenario.strategy.strategy_id.clone(),
+            funding_priority,
+            max_total_recruitments: horizon,
+        };
+        Ok(scenario)
+    }
+
+    #[must_use]
+    pub const fn schema_version(&self) -> u64 {
+        self.schema_version
     }
 
     #[must_use]
@@ -950,6 +1321,11 @@ impl ValidatedScenario {
     }
 
     #[must_use]
+    pub const fn compiled_strategy(&self) -> &CompiledStrategy {
+        &self.compiled_strategy
+    }
+
+    #[must_use]
     pub fn targets(&self) -> &[Target] {
         &self.targets
     }
@@ -961,11 +1337,7 @@ impl ValidatedScenario {
 
     #[must_use]
     pub fn all_targets_mask(&self) -> u8 {
-        match self.targets.len() {
-            1 => 0b01,
-            2 => 0b11,
-            _ => 0,
-        }
+        OwnershipMask::all(self.targets.len()).map_or(0, OwnershipMask::raw)
     }
 
     #[must_use]
@@ -1051,29 +1423,11 @@ impl ValidatedScenario {
                 CanonicalNode::String(self.ruleset_id.to_string()),
             ),
             ("scenario_id", CanonicalNode::String(self.id.to_string())),
-            ("schema_version", CanonicalNode::Integer(SCHEMA_VERSION_V1)),
             (
-                "strategy",
-                object([
-                    (
-                        "kind",
-                        CanonicalNode::String("sequential_targets_prefer_tickets".to_owned()),
-                    ),
-                    (
-                        "max_total_recruitments",
-                        self.strategy
-                            .constraints
-                            .max_total_recruitments
-                            .map_or(CanonicalNode::Null, |value| {
-                                CanonicalNode::Integer(value.get())
-                            }),
-                    ),
-                    (
-                        "strategy_id",
-                        CanonicalNode::String(self.strategy.strategy_id.to_string()),
-                    ),
-                ]),
+                "schema_version",
+                CanonicalNode::Integer(self.schema_version),
             ),
+            ("strategy", strategy_node(&self.compiled_strategy)),
             ("students", CanonicalNode::Array(students)),
             ("targets", CanonicalNode::Array(targets)),
         ])
@@ -1081,6 +1435,14 @@ impl ValidatedScenario {
 
     pub fn fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
         SemanticFingerprint::from_node(&self.semantic_node())
+    }
+
+    pub fn behavior_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
+        self.fingerprint()
+    }
+
+    pub fn document_fingerprint(&self) -> Result<SemanticFingerprint, CoreError> {
+        self.fingerprint()
     }
 }
 
@@ -1099,6 +1461,270 @@ fn validate_header(
         ))
     } else {
         Ok(())
+    }
+}
+
+fn validate_header_version(
+    version: u64,
+    actual_type: &str,
+    expected_type: &str,
+    expected_version: u64,
+    path: Option<&Path>,
+) -> Result<(), CoreError> {
+    if version != expected_version || actual_type != expected_type {
+        Err(CoreError::validation(
+            path,
+            format!(
+                "typed document header mismatch: expected schema_version={expected_version} and document_type={expected_type}"
+            ),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_provenance(raw: RawProvenance, path: Option<&Path>) -> Result<Provenance, CoreError> {
+    if raw.verification_status != VerificationStatus::Provisional && raw.sources.is_empty() {
+        return Err(CoreError::validation(
+            path,
+            "source_backed and verified provenance require at least one source",
+        ));
+    }
+    let mut sources = Vec::with_capacity(raw.sources.len());
+    for source in raw.sources {
+        if source.label.len() > 256 {
+            return Err(CoreError::validation(
+                path,
+                "provenance source label exceeds 256 UTF-8 bytes",
+            ));
+        }
+        if source.reference.len() > 2_048 {
+            return Err(CoreError::validation(
+                path,
+                "provenance source reference exceeds 2048 UTF-8 bytes",
+            ));
+        }
+        if source
+            .retrieved_on
+            .as_deref()
+            .is_some_and(|value| !is_gregorian_date(value))
+        {
+            return Err(CoreError::validation(
+                path,
+                "provenance retrieved_on must be a valid Gregorian YYYY-MM-DD date",
+            ));
+        }
+        if source.content_sha256.as_deref().is_some_and(|value| {
+            value.len() != 64
+                || !value
+                    .as_bytes()
+                    .iter()
+                    .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(byte))
+        }) {
+            return Err(CoreError::validation(
+                path,
+                "provenance content_sha256 must be 64 lowercase hexadecimal characters",
+            ));
+        }
+        sources.push(ProvenanceSource {
+            label: source.label,
+            reference: source.reference,
+            retrieved_on: source.retrieved_on,
+            content_sha256: source.content_sha256,
+        });
+    }
+    Ok(Provenance {
+        verification_status: raw.verification_status,
+        sources,
+    })
+}
+
+fn is_gregorian_date(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    if bytes.len() != 10
+        || bytes[4] != b'-'
+        || bytes[7] != b'-'
+        || bytes
+            .iter()
+            .enumerate()
+            .any(|(index, byte)| index != 4 && index != 7 && !byte.is_ascii_digit())
+    {
+        return false;
+    }
+    let parse = |start: usize, end: usize| -> Option<u32> { value.get(start..end)?.parse().ok() };
+    let Some(year) = parse(0, 4) else {
+        return false;
+    };
+    let Some(month) = parse(5, 7) else {
+        return false;
+    };
+    let Some(day) = parse(8, 10) else {
+        return false;
+    };
+    if year == 0 || !(1..=12).contains(&month) {
+        return false;
+    }
+    let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+    let maximum_day = match month {
+        2 if leap => 29,
+        2 => 28,
+        4 | 6 | 9 | 11 => 30,
+        _ => 31,
+    };
+    (1..=maximum_day).contains(&day)
+}
+
+fn provenance_node(provenance: &Provenance) -> CanonicalNode {
+    CanonicalNode::Object(
+        [
+            (
+                "sources".to_owned(),
+                CanonicalNode::Array(
+                    provenance
+                        .sources
+                        .iter()
+                        .map(|source| {
+                            object([
+                                (
+                                    "content_sha256",
+                                    source
+                                        .content_sha256
+                                        .as_ref()
+                                        .map_or(CanonicalNode::Null, |value| {
+                                            CanonicalNode::String(value.clone())
+                                        }),
+                                ),
+                                ("label", CanonicalNode::String(source.label.clone())),
+                                ("reference", CanonicalNode::String(source.reference.clone())),
+                                (
+                                    "retrieved_on",
+                                    source
+                                        .retrieved_on
+                                        .as_ref()
+                                        .map_or(CanonicalNode::Null, |value| {
+                                            CanonicalNode::String(value.clone())
+                                        }),
+                                ),
+                            ])
+                        })
+                        .collect(),
+                ),
+            ),
+            (
+                "verification_status".to_owned(),
+                CanonicalNode::String(provenance.verification_status.as_str().to_owned()),
+            ),
+        ]
+        .into_iter()
+        .collect(),
+    )
+}
+
+fn threshold_overrides_node(overrides: &[(u64, ProbabilityRatio)]) -> CanonicalNode {
+    CanonicalNode::Array(
+        overrides
+            .iter()
+            .map(|(charge, ratio)| {
+                object([
+                    ("pickup_probability", ratio_node(*ratio)),
+                    ("pre_charge", CanonicalNode::Integer(*charge)),
+                ])
+            })
+            .collect(),
+    )
+}
+
+fn reward_milestones_node(milestones: &[Milestone]) -> CanonicalNode {
+    CanonicalNode::Array(
+        milestones
+            .iter()
+            .map(|milestone| {
+                let mut rewards = milestone
+                    .rewards
+                    .iter()
+                    .map(|reward| {
+                        object([
+                            ("quantity", CanonicalNode::Integer(reward.quantity)),
+                            (
+                                "resource",
+                                CanonicalNode::String(
+                                    resource_kind_name(reward.resource).to_owned(),
+                                ),
+                            ),
+                        ])
+                    })
+                    .collect::<Vec<_>>();
+                rewards.sort();
+                object([
+                    ("count", CanonicalNode::Integer(milestone.count)),
+                    ("rewards", CanonicalNode::Array(rewards)),
+                ])
+            })
+            .collect(),
+    )
+}
+
+fn strategy_node(strategy: &CompiledStrategy) -> CanonicalNode {
+    match strategy {
+        CompiledStrategy::LegacySequentialV1 {
+            strategy_id,
+            legacy_horizon,
+        } => object([
+            (
+                "kind",
+                CanonicalNode::String("sequential_targets_prefer_tickets".to_owned()),
+            ),
+            (
+                "max_total_recruitments",
+                legacy_horizon.map_or(CanonicalNode::Null, |value| {
+                    CanonicalNode::Integer(value.get())
+                }),
+            ),
+            (
+                "strategy_id",
+                CanonicalNode::String(strategy_id.to_string()),
+            ),
+        ]),
+        CompiledStrategy::SequentialTargetsV2 {
+            strategy_schema_version,
+            strategy_id,
+            funding_priority,
+            max_total_recruitments,
+        } => object([
+            (
+                "funding_priority",
+                CanonicalNode::Array(
+                    funding_priority
+                        .iter()
+                        .map(|kind| {
+                            CanonicalNode::String(
+                                match kind {
+                                    FundingKind::TicketTen => "ticket_ten",
+                                    FundingKind::PaidSingle => "paid_single",
+                                }
+                                .to_owned(),
+                            )
+                        })
+                        .collect(),
+                ),
+            ),
+            (
+                "kind",
+                CanonicalNode::String("sequential_targets".to_owned()),
+            ),
+            (
+                "max_total_recruitments",
+                CanonicalNode::Integer(max_total_recruitments.get()),
+            ),
+            (
+                "strategy_id",
+                CanonicalNode::String(strategy_id.to_string()),
+            ),
+            (
+                "strategy_schema_version",
+                CanonicalNode::Integer(*strategy_schema_version),
+            ),
+        ]),
     }
 }
 

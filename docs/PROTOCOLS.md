@@ -36,6 +36,12 @@ The shipped minimal bundle vectors are frozen in
 The stream derivation version is `mc-run-stream-v1`. Run indices are processed
 serially in ascending zero-based order.
 
+At the CLI boundary, `--seed <u64>` supplies the master seed explicitly. When
+the option is omitted, the CLI obtains one `u64` from the operating system's
+cryptographically secure entropy source. Failure to acquire entropy aborts the
+command without simulation. The resolved master seed is always present in RNG
+provenance, allowing an entropy-seeded result to be reproduced explicitly.
+
 ```text
 SHA-256(
   UTF8("ba-strategy/mc-run-stream/v1\0")
@@ -52,6 +58,10 @@ stream that does not depend on earlier run lengths or scheduler behavior.
 Deterministic one-branch distributions consume no RNG. Non-deterministic
 rational probabilities use rejection sampling over unbiased bounded `u64`
 values.
+
+Monte Carlo PMFs and CDFs are derived from checked integer sample counts. In
+particular, a CDF divides the cumulative integer count once at each support
+point instead of repeatedly adding rounded floating-point fractions.
 
 Reports identify:
 

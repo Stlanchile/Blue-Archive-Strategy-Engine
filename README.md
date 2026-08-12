@@ -2,8 +2,8 @@
 
 `ba-strategy` v0.1 is a local Rust 2024 probability engine for one or two
 ordered Blue Archive recruitment targets. It provides exhaustive branch
-analysis, deterministic seeded Monte Carlo, single-run traces, and exact versus
-simulation comparisons.
+analysis, OS-entropy-seeded Monte Carlo with reproducible explicit seeds,
+single-run traces, and exact versus simulation comparisons.
 
 The bundled mechanics are the explicit provisional model
 `jp_2026_07_29_provisional_v1`. They are not represented as independently
@@ -28,17 +28,22 @@ cargo run -p ba-cli --bin ba-strategy -- \
   analyze single_target_200 --format json
 
 cargo run -p ba-cli --bin ba-strategy -- \
-  simulate dual_shared_200 --runs 10000 --seed 42
+  simulate dual_shared_200 --runs 10000
 
 cargo run -p ba-cli --bin ba-strategy -- \
   simulate ticket_atomic --runs 1 --seed 42 --trace --format json
 
 cargo run -p ba-cli --bin ba-strategy -- \
-  compare dual_shared_200 --runs 10000 --seed 42
+  compare dual_shared_200 --runs 10000
 ```
 
 `--data-dir` defaults to `./data`. A scenario argument may be a path or the ID
 of a fixture under `scenarios/golden/` next to that data directory.
+
+`simulate` and `compare` obtain one master seed from the operating system when
+`--seed` is omitted. The resolved seed is included in successful output, so the
+same run can be reproduced later with `--seed <reported-seed>`. Entropy failures
+are fatal; the CLI never falls back to a timestamp, process ID, or fixed seed.
 
 Successful output goes to stdout. Errors go to stderr, with no authoritative
 result on stdout:
@@ -48,7 +53,7 @@ result on stdout:
 | 0 | Success, including normal domain terminal outcomes |
 | 2 | Command-line usage |
 | 3 | JSON, schema, or domain validation |
-| 4 | Catalog/filesystem I/O or rejection limit |
+| 4 | Catalog/filesystem/entropy I/O or rejection limit |
 | 5 | Engine guard, arithmetic, transition, or probability invariant |
 | 70 | Unexpected typed internal failure |
 
@@ -107,7 +112,8 @@ These are engine work limits, not strategy horizons.
 Every source is read once into a complete buffer of at most 1 MiB. A recursive
 token scan rejects duplicate decoded keys at any object depth and nesting over
 64 before strict typed parsing rejects unknown fields and trailing data.
-Catalogs inspect at most 256 immediate `.json` regular files per directory.
+Catalogs inspect at most 512 immediate directory entries and retain at most 256
+`.json` regular-file candidates per directory, failing at the first excess.
 One malformed, unsupported, oversized, unreadable, duplicate-ID, symlink, or
 otherwise invalid candidate rejects the complete catalog; nothing is
 truncated or partially published.
@@ -119,10 +125,11 @@ a symlink-following or potentially blocking open.
 Validated rulesets, reward schedules, and scenarios receive versioned
 canonical semantic SHA-256 fingerprints. Formatting, source paths, mtimes, and
 machine/build state are excluded. Monte Carlo uses independent per-run
-ChaCha8 streams derived from those raw fingerprints, the master seed, and the
-zero-based run index. It reports Wilson intervals for probability support
-points and approximate 95% mean intervals plus standard errors for numeric
-expectations; a one-observation mean interval is `null`. See
+ChaCha8 streams derived from those raw fingerprints, the resolved master seed,
+and the zero-based run index. CDFs are reconstructed from checked integer sample
+counts rather than accumulated floating fractions. It reports Wilson intervals
+for probability support points and approximate 95% mean intervals plus standard
+errors for numeric expectations; a one-observation mean interval is `null`. See
 [`docs/PROTOCOLS.md`](docs/PROTOCOLS.md).
 
 Input shape and cross-document rules are documented in

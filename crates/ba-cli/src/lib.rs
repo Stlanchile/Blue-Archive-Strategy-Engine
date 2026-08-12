@@ -13,7 +13,9 @@ use ba_engine::{
     ExactAnalysisResult, ExactSolverOptions, MonteCarloAnalysisResult, RunTraceResult,
     analyze_exact_detailed, compare, simulate_monte_carlo, simulate_trace,
 };
+use clap::error::ErrorKind;
 use clap::{Parser, Subcommand, ValueEnum};
+use rand_core::{OsRng, TryRngCore};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, ValueEnum)]
@@ -51,25 +53,27 @@ enum Command {
         #[arg(long, value_enum, default_value_t)]
         format: OutputFormat,
     },
-    /// Run deterministic per-index seeded Monte Carlo.
+    /// Run Monte Carlo with an OS-random seed unless --seed is supplied.
     Simulate {
         scenario: PathBuf,
         #[arg(long)]
         runs: NonZeroU64,
+        /// Reproduce a run with this master seed instead of using OS entropy.
         #[arg(long)]
-        seed: u64,
+        seed: Option<u64>,
         #[arg(long)]
         trace: bool,
         #[arg(long, value_enum, default_value_t)]
         format: OutputFormat,
     },
-    /// Compare exhaustive analysis with deterministic Monte Carlo.
+    /// Compare exact analysis with OS-seeded or explicitly seeded Monte Carlo.
     Compare {
         scenario: PathBuf,
         #[arg(long)]
         runs: NonZeroU64,
+        /// Reproduce a run with this master seed instead of using OS entropy.
         #[arg(long)]
-        seed: u64,
+        seed: Option<u64>,
         #[arg(long, value_enum, default_value_t)]
         format: OutputFormat,
     },
@@ -80,6 +84,7 @@ enum AppError {
     Core(CoreError),
     Engine(EngineError),
     Exact(ExactAnalysisFailure),
+    Entropy(String),
     Usage(String),
     Internal(String),
 }
@@ -128,6 +133,18 @@ where
     let cli = match Cli::try_parse_from(raw) {
         Ok(value) => value,
         Err(error) => {
+            if matches!(
+                error.kind(),
+                ErrorKind::DisplayHelp | ErrorKind::DisplayVersion
+            ) {
+                let rendered = error.render().to_string();
+                return if stdout.write_all(rendered.as_bytes()).is_ok() {
+                    0
+                } else {
+                    let _ = stderr.write_all(b"unexpected failure: could not write stdout\n");
+                    70
+                };
+            }
             let message = error.to_string();
             let body = ErrorBody {
                 class: "cli_usage",
@@ -208,12 +225,13 @@ fn execute(cli: Cli) -> (OutputFormat, Result<String, AppError>) {
             let result = load_bundle(&cli.data_dir, path)
                 .map_err(AppError::from)
                 .and_then(|bundle| {
+                    if trace && runs.get() != 1 {
+                        return Err(AppError::Usage(
+                            "simulate --trace requires --runs 1".to_owned(),
+                        ));
+                    }
+                    let seed = resolve_master_seed(seed)?;
                     if trace {
-                        if runs.get() != 1 {
-                            return Err(AppError::Usage(
-                                "simulate --trace requires --runs 1".to_owned(),
-                            ));
-                        }
                         simulate_trace(&bundle, seed)
                             .map(|value| SimulationOutput::Trace(Box::new(value)))
                             .map_err(AppError::from)
@@ -238,7 +256,10 @@ fn execute(cli: Cli) -> (OutputFormat, Result<String, AppError>) {
             let path = resolve_scenario(&cli.data_dir, &scenario);
             let result = load_bundle(&cli.data_dir, path)
                 .map_err(AppError::from)
-                .and_then(|bundle| compare(&bundle, runs, seed).map_err(AppError::from))
+                .and_then(|bundle| {
+                    let seed = resolve_master_seed(seed)?;
+                    compare(&bundle, runs, seed).map_err(AppError::from)
+                })
                 .and_then(|value| render_comparison(&value, format));
             (format, result)
         }
@@ -266,6 +287,24 @@ fn resolve_scenario(data_dir: &Path, supplied: &Path) -> PathBuf {
         .join("scenarios")
         .join("golden")
         .join(format!("{name}.json"))
+}
+
+fn resolve_master_seed(seed: Option<u64>) -> Result<u64, AppError> {
+    resolve_master_seed_with(seed, || {
+        OsRng
+            .try_next_u64()
+            .map_err(|error| format!("operating-system entropy is unavailable: {error}"))
+    })
+}
+
+fn resolve_master_seed_with(
+    seed: Option<u64>,
+    entropy: impl FnOnce() -> Result<u64, String>,
+) -> Result<u64, AppError> {
+    match seed {
+        Some(seed) => Ok(seed),
+        None => entropy().map_err(AppError::Entropy),
+    }
 }
 
 fn render_validation(value: &ValidationReport, format: OutputFormat) -> Result<String, AppError> {
@@ -316,8 +355,12 @@ fn render_trace(value: &RunTraceResult, format: OutputFormat) -> Result<String, 
     match format {
         OutputFormat::Json => render_json(value),
         OutputFormat::Text => Ok(format!(
-            "Engine: trace\nScenario: {}\nTerminal reason: {:?}\nTerminal primitive recruitments: {}\nFirst-success recruitment count: {}\nPaid pyroxene spent: {}\nTicket-funded primitive recruitments: {}\n",
+            "Engine: trace\nScenario: {}\nMaster seed: {}\nTerminal reason: {:?}\nTerminal primitive recruitments: {}\nFirst-success recruitment count: {}\nPaid pyroxene spent: {}\nTicket-funded primitive recruitments: {}\n",
             value.provenance.scenario_id,
+            value
+                .rng
+                .as_ref()
+                .map_or_else(|| "none".to_owned(), |rng| rng.master_seed.to_string()),
             value.terminal_reason,
             value.terminal_primitive_recruitments,
             value
@@ -333,8 +376,9 @@ fn render_comparison(value: &ComparisonResult, format: OutputFormat) -> Result<S
     match format {
         OutputFormat::Json => render_json(value),
         OutputFormat::Text => Ok(format!(
-            "Engine: comparison\nScenario: {}\nExact success probability: {:.15}\nMonte Carlo success probability: {:.15}\nDifference: {:.15}\nExact value inside Monte Carlo 95% interval: {}\n",
+            "Engine: comparison\nScenario: {}\nMaster seed: {}\nExact success probability: {:.15}\nMonte Carlo success probability: {:.15}\nDifference: {:.15}\nExact value inside Monte Carlo 95% interval: {}\n",
             value.exact.provenance.scenario_id,
+            value.monte_carlo.rng.master_seed,
             value.exact.success_probability,
             value.monte_carlo.success_probability,
             value.success_probability_difference,
@@ -420,6 +464,16 @@ fn classify_error(error: AppError) -> (i32, ErrorBody) {
                 },
             )
         }
+        AppError::Entropy(message) => (
+            4,
+            ErrorBody {
+                class: "entropy_io",
+                code: "entropy_unavailable",
+                message,
+                provenance: None,
+                effective_exact_options: None,
+            },
+        ),
         AppError::Usage(message) => (
             2,
             ErrorBody {
@@ -478,5 +532,26 @@ fn engine_error_code(error: &EngineError) -> &'static str {
         EngineError::InvalidAction { .. } => "invalid_action",
         EngineError::InvalidTransition { .. } => "invalid_transition",
         EngineError::InternalInvariantViolation { .. } => "internal_invariant",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{AppError, resolve_master_seed_with};
+
+    #[test]
+    fn explicit_seed_does_not_consult_entropy() {
+        let seed =
+            resolve_master_seed_with(Some(42), || Err("entropy callback must not run".to_owned()))
+                .expect("explicit seed");
+        assert_eq!(seed, 42);
+    }
+
+    #[test]
+    fn entropy_failure_is_fail_closed() {
+        assert!(matches!(
+            resolve_master_seed_with(None, || Err("unavailable".to_owned())),
+            Err(AppError::Entropy(message)) if message == "unavailable"
+        ));
     }
 }

@@ -59,6 +59,7 @@ dependencies = [
  "ba-core",
  "ba-engine",
  "clap",
+ "rand_core",
  "serde",
  "serde_json",
  "tempfile",

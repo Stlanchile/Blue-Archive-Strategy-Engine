@@ -63,6 +63,7 @@ fn trace_uses_concrete_labels_and_requires_one_run() {
     ]);
     assert_eq!(trace.status.code(), Some(0));
     let text = stdout(&trace);
+    assert!(text.contains("Master seed: 42"));
     assert!(text.contains("Paid pyroxene spent: 120"));
     assert!(!text.contains("Expected paid pyroxene spent"));
 
@@ -84,12 +85,55 @@ fn trace_uses_concrete_labels_and_requires_one_run() {
 }
 
 #[test]
+fn omitted_seed_uses_reported_entropy_and_can_be_replayed_explicitly() {
+    let random = run(&[
+        "simulate",
+        "charge_99_one",
+        "--runs",
+        "1",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(random.status.code(), Some(0));
+    assert!(stderr(&random).is_empty());
+    let body: serde_json::Value =
+        serde_json::from_slice(&random.stdout).expect("random simulation JSON");
+    let seed = body["rng"]["master_seed"]
+        .as_u64()
+        .expect("reported OS-generated master seed");
+
+    let replayed = run(&[
+        "simulate",
+        "charge_99_one",
+        "--runs",
+        "1",
+        "--seed",
+        &seed.to_string(),
+        "--format",
+        "json",
+    ]);
+    assert_eq!(replayed.status.code(), Some(0));
+    assert!(stderr(&replayed).is_empty());
+    assert_eq!(random.stdout, replayed.stdout);
+}
+
+#[test]
 fn usage_prepass_produces_json_errors() {
     let output = run(&["analyze", "--format=json"]);
     assert_eq!(output.status.code(), Some(2));
     assert!(output.stdout.is_empty());
     let body: serde_json::Value = serde_json::from_slice(&output.stderr).expect("usage JSON");
     assert_eq!(body["error"]["code"], "cli_usage");
+}
+
+#[test]
+fn help_and_version_are_successful_stdout_displays() {
+    for args in [&["--help"][..], &["--version"][..]] {
+        let output = run(args);
+        assert_eq!(output.status.code(), Some(0));
+        assert!(stderr(&output).is_empty());
+        assert!(!stdout(&output).is_empty());
+    }
 }
 
 #[test]

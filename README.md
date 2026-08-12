@@ -1,3 +1,5 @@
+**English** | [简体中文](README.zh-CN.md)
+
 # Blue Archive Strategy Engine
 
 `ba-strategy` 0.2.0 is a local Rust probability engine for one or two ordered

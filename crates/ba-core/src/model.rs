@@ -332,6 +332,7 @@ pub struct RewardSchedule {
     id: RewardScheduleId,
     compatible_ruleset_ids: Vec<RulesetId>,
     milestones: Vec<Milestone>,
+    cumulative_resources: Vec<Resources>,
     total_ticket_rewards: u64,
 }
 
@@ -367,8 +368,9 @@ impl RewardSchedule {
         compatible_ruleset_ids.sort();
 
         let mut milestones = Vec::with_capacity(raw.milestones.len());
+        let mut cumulative_resources = Vec::with_capacity(raw.milestones.len());
+        let mut resources_through_milestone = Resources::default();
         let mut previous_count = None;
-        let mut total_ticket_rewards = 0_u64;
         for raw_milestone in raw.milestones {
             if raw_milestone.count == 0
                 || previous_count.is_some_and(|value| raw_milestone.count <= value)
@@ -409,27 +411,45 @@ impl RewardSchedule {
                         ),
                     ));
                 }
-                if raw_reward.resource == ResourceKind::LimitedTenRecruitmentTickets {
-                    total_ticket_rewards = total_ticket_rewards
-                        .checked_add(raw_reward.quantity)
-                        .ok_or_else(|| {
-                            CoreError::validation(path, "milestone ticket reward sum exceeds u64")
-                        })?;
-                }
                 rewards.push(Reward {
                     resource: raw_reward.resource,
                     quantity: raw_reward.quantity,
                 });
             }
+            rewards.sort_by(|left, right| {
+                left.quantity.cmp(&right.quantity).then_with(|| {
+                    resource_kind_name(left.resource).cmp(resource_kind_name(right.resource))
+                })
+            });
+            for reward in &rewards {
+                resources_through_milestone
+                    .checked_add_kind(reward.resource, reward.quantity)
+                    .map_err(|_| {
+                        CoreError::validation(
+                            path,
+                            format!(
+                                "cumulative {} milestone rewards exceed u64",
+                                resource_kind_name(reward.resource)
+                            ),
+                        )
+                    })?;
+            }
             milestones.push(Milestone {
                 count: raw_milestone.count,
                 rewards,
             });
+            cumulative_resources.push(resources_through_milestone);
         }
+        let total_ticket_rewards = cumulative_resources
+            .last()
+            .copied()
+            .unwrap_or_default()
+            .limited_ten_recruitment_tickets;
         Ok(Self {
             id,
             compatible_ruleset_ids,
             milestones,
+            cumulative_resources,
             total_ticket_rewards,
         })
     }
@@ -463,17 +483,18 @@ impl RewardSchedule {
     }
 
     pub fn resources_earned_through(&self, count: u64) -> Result<Resources, CoreError> {
-        let mut resources = Resources::default();
-        for milestone in self
+        let reached = self
             .milestones
-            .iter()
-            .take_while(|milestone| milestone.count <= count)
-        {
-            for reward in &milestone.rewards {
-                resources.checked_add_kind(reward.resource, reward.quantity)?;
-            }
+            .partition_point(|milestone| milestone.count <= count);
+        if reached == 0 {
+            return Ok(Resources::default());
         }
-        Ok(resources)
+        self.cumulative_resources
+            .get(reached - 1)
+            .copied()
+            .ok_or_else(|| CoreError::InternalInvariant {
+                message: "reward prefix cache is inconsistent with validated milestones".to_owned(),
+            })
     }
 
     pub fn semantic_node(&self) -> CanonicalNode {

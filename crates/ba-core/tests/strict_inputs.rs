@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use ba_core::schema::{RawRulesetV1, RawScenarioV1};
 use ba_core::strict_json::BufferedDocument;
 use ba_core::{
-    Catalog, CoreError, CoreErrorClass, MAX_CATALOG_ENTRIES, MAX_DOCUMENT_BYTES, load_bundle,
-    validate_document,
+    Catalog, CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES,
+    MAX_DOCUMENT_BYTES, load_bundle, validate_document,
 };
 use tempfile::TempDir;
 
@@ -186,7 +186,9 @@ fn catalog_accepts_all_256_or_rejects_all_257_before_parsing() {
             valid_ruleset(&format!("ruleset_{index:03}")),
         );
     }
-    write(&rules_dir.join("notes.txt"), "ignored");
+    for index in MAX_CATALOG_ENTRIES..MAX_CATALOG_DIRECTORY_ENTRIES {
+        write(&rules_dir.join(format!("note_{index:03}.txt")), "ignored");
+    }
     let catalog = Catalog::load(accepted.path()).expect("256 candidates should be accepted");
     assert_eq!(catalog.rulesets().len(), MAX_CATALOG_ENTRIES);
     let ids = catalog
@@ -195,6 +197,15 @@ fn catalog_accepts_all_256_or_rejects_all_257_before_parsing() {
         .map(ToString::to_string)
         .collect::<Vec<_>>();
     assert!(ids.windows(2).all(|window| window[0] < window[1]));
+    write(&rules_dir.join("one_too_many.txt"), "rejected");
+    assert!(matches!(
+        Catalog::load(accepted.path()),
+        Err(CoreError::CatalogDirectoryEntryLimitExceeded {
+            observed: 513,
+            maximum: 512,
+            ..
+        })
+    ));
 
     let rejected = TempDir::new().expect("tempdir");
     let rules_dir = rejected.path().join("rulesets");
@@ -318,6 +329,42 @@ fn user_derived_overflow_is_rejected_as_domain_validation() {
     );
     let error = validate_document(workspace_path("data"), &rewards)
         .expect_err("ticket reward sum overflow must fail");
+    assert_eq!(error.class(), CoreErrorClass::Validation);
+
+    let non_ticket_rewards = temp.path().join("overflow_non_ticket_rewards.json");
+    write(
+        &non_ticket_rewards,
+        format!(
+            r#"{{
+  "schema_version":1,
+  "document_type":"reward_schedule",
+  "reward_schedule_id":"overflow_non_ticket",
+  "compatible_ruleset_ids":["jp_2026_07_29_provisional_v1"],
+  "milestones":[
+    {{"count":1,"rewards":[{{"resource":"eligma","quantity":{}}}]}},
+    {{"count":2,"rewards":[{{"resource":"eligma","quantity":1}}]}}
+  ]
+}}"#,
+            u64::MAX
+        ),
+    );
+    let error = validate_document(workspace_path("data"), &non_ticket_rewards)
+        .expect_err("every cumulative resource overflow must fail");
+    assert_eq!(error.class(), CoreErrorClass::Validation);
+    assert!(
+        error
+            .to_string()
+            .contains("cumulative eligma milestone rewards exceed u64")
+    );
+    let overflow_catalog = temp.path().join("overflow_catalog");
+    fs::create_dir_all(overflow_catalog.join("rulesets")).expect("overflow rules catalog");
+    fs::create_dir_all(overflow_catalog.join("rewards")).expect("overflow rewards catalog");
+    fs::copy(
+        &non_ticket_rewards,
+        overflow_catalog.join("rewards/overflow.json"),
+    )
+    .expect("copy overflowing reward schedule");
+    let error = Catalog::load(&overflow_catalog).expect_err("catalog must reject reward overflow");
     assert_eq!(error.class(), CoreErrorClass::Validation);
 
     let source = fs::read_to_string(workspace_path("scenarios/golden/single_target_200.json"))

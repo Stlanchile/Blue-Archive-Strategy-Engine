@@ -1,12 +1,17 @@
+mod common;
+
 use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 
-use ba_core::load_bundle;
+use ba_core::schema::{RawMilestone, RawReward};
+use ba_core::{ResourceKind, Resources, load_bundle};
 use ba_engine::{
     DEFAULT_MAX_MONTE_CARLO_RUNS, EngineError, ExactSolverOptions, SimulationLimits, analyze_exact,
     compare, derive_run_seed, replay, replay_with_limits, simulate_monte_carlo,
     simulate_monte_carlo_with_limits, simulate_trace, simulate_trace_with_limits,
 };
+
+use common::{half_probability_mechanics, synthetic_bundle};
 
 fn workspace_path(relative: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -56,6 +61,62 @@ fn repeated_simulation_is_byte_for_byte_deterministic() {
     assert_eq!(first.rng.rng_algorithm, "chacha8");
     assert_eq!(first.rng.stream_derivation_version, "mc-run-stream-v1");
     assert_eq!(first.rng.run_count, 512);
+}
+
+#[test]
+fn set_like_reward_order_has_canonical_trace_and_fingerprint() {
+    let milestone = |rewards| RawMilestone { count: 1, rewards };
+    let first = synthetic_bundle(
+        "canonical_rewards",
+        half_probability_mechanics(),
+        Resources {
+            pyroxene: 120,
+            ..Resources::default()
+        },
+        0,
+        Some(1),
+        vec![milestone(vec![
+            RawReward {
+                resource: ResourceKind::GiftBoxes,
+                quantity: 2,
+            },
+            RawReward {
+                resource: ResourceKind::Eligma,
+                quantity: 1,
+            },
+        ])],
+    );
+    let reversed = synthetic_bundle(
+        "canonical_rewards",
+        half_probability_mechanics(),
+        Resources {
+            pyroxene: 120,
+            ..Resources::default()
+        },
+        0,
+        Some(1),
+        vec![milestone(vec![
+            RawReward {
+                resource: ResourceKind::Eligma,
+                quantity: 1,
+            },
+            RawReward {
+                resource: ResourceKind::GiftBoxes,
+                quantity: 2,
+            },
+        ])],
+    );
+
+    assert_eq!(
+        first.fingerprints().reward_schedule,
+        reversed.fingerprints().reward_schedule
+    );
+    let first_trace = simulate_trace(&first, 77).expect("first trace");
+    let reversed_trace = simulate_trace(&reversed, 77).expect("reversed trace");
+    assert_eq!(
+        serde_json::to_vec(&first_trace).expect("serialize first"),
+        serde_json::to_vec(&reversed_trace).expect("serialize reversed")
+    );
 }
 
 #[test]

@@ -448,6 +448,9 @@ fn core_error_code(error: &CoreError) -> &'static str {
         CoreError::Io { .. } => "io_failure",
         CoreError::PathPolicy { .. } => "path_policy",
         CoreError::CatalogEntryLimitExceeded { .. } => "catalog_entry_limit_exceeded",
+        CoreError::CatalogDirectoryEntryLimitExceeded { .. } => {
+            "catalog_directory_entry_limit_exceeded"
+        }
         CoreError::DocumentSizeLimitExceeded { .. } => "document_size_limit_exceeded",
         CoreError::InvalidJson { .. } => "invalid_json",
         CoreError::UnsupportedDocument { .. } => "unsupported_document",

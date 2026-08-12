@@ -46,7 +46,9 @@ authority.
 A schedule declares `reward_schedule_id`, a nonempty unique
 `compatible_ruleset_ids` array, and a finite ordered `milestones` array.
 Milestone counts are positive and strictly increasing. Each contains nonempty,
-positive reward entries with no repeated resource kind.
+positive reward entries with no repeated resource kind. Reward entry order is
+set-like and canonicalized before runtime traces and fingerprints are produced.
+The cumulative quantity of every resource kind must fit in `u64`.
 
 V1 rejects pyroxene and recurring rewards. The supported passive resource
 kinds are:
@@ -117,9 +119,11 @@ conservation tolerance or solver-limit fields.
 non-symlink directories. Only immediate entries are inspected; loading never
 recurses.
 
-Non-JSON regular files are ignored. Every `.json` entry must be a non-symlink
-regular file. The complete candidate set is counted before sorting or parsing:
-256 candidates are accepted, while 257 fail with
-`CatalogEntryLimitExceeded`. Every candidate must validate, even when the
-scenario does not reference it. A catalog object becomes visible only after
-the entire candidate set succeeds.
+At most 512 immediate directory entries are inspected; the 513th fails with
+`CatalogDirectoryEntryLimitExceeded`. Within that scan budget, non-JSON entries
+are ignored. Every `.json` entry must be a non-symlink regular file. At most 256
+JSON candidates are retained: the 257th fails immediately with
+`CatalogEntryLimitExceeded`, before metadata inspection or parsing. Every
+accepted candidate must validate, even when the scenario does not reference it.
+A catalog object becomes visible only after the entire accepted candidate set
+succeeds.

@@ -2,10 +2,10 @@ use std::collections::BTreeMap;
 use std::num::NonZeroU64;
 
 use ba_core::{
-    RecruitOutcome, Resources, StrategyDecision, TerminalReason, ValidatedScenarioBundle,
-    WorldStateKey, apply_primitive_transition, begin_action, complete_action, decide,
-    initial_world, milestone_rewards_acquired, outcome_distribution, reconstruct_funding,
-    terminal_resources,
+    Milestone, RecruitOutcome, Resources, StrategyDecision, TerminalReason,
+    ValidatedScenarioBundle, WorldStateKey, apply_primitive_transition, begin_action,
+    complete_action, decide, initial_world, milestone_rewards_acquired, outcome_distribution,
+    reconstruct_funding, terminal_resources,
 };
 use rand_chacha::ChaCha8Rng;
 use rand_core::{RngCore, SeedableRng};
@@ -205,12 +205,7 @@ pub fn simulate_monte_carlo_with_limits(
     let mut terminal_reason_counts = BTreeMap::<TerminalReason, u64>::new();
     let mut owned_counts = BTreeMap::<u8, u64>::new();
     let mut first_success_counts = BTreeMap::<u64, u64>::new();
-    let mut milestone_counts = bundle
-        .reward_schedule()
-        .milestones()
-        .iter()
-        .map(|milestone| (milestone.count, 0_u64))
-        .collect::<BTreeMap<_, _>>();
+    let mut terminal_count_counts = BTreeMap::<u64, u64>::new();
     let mut total_terminal_count = 0_u128;
     let mut successful_terminal_count = 0_u128;
     let mut total_first_success_count = 0_u128;
@@ -278,6 +273,15 @@ pub fn simulate_monte_carlo_with_limits(
             .ok_or(EngineError::ArithmeticOverflow {
                 context: "counting Monte Carlo ownership masks",
             })?;
+        let terminal_count_entry = terminal_count_counts
+            .entry(run.terminal.cumulative_primitive_recruitments)
+            .or_default();
+        *terminal_count_entry =
+            terminal_count_entry
+                .checked_add(1)
+                .ok_or(EngineError::ArithmeticOverflow {
+                    context: "counting Monte Carlo terminal recruitment counts",
+                })?;
         if run.terminal_reason == TerminalReason::TargetsAcquired {
             let first =
                 run.first_success
@@ -311,15 +315,6 @@ pub fn simulate_monte_carlo_with_limits(
                     context: "summing first-success counts",
                 })?;
         }
-        for (count, reached) in &mut milestone_counts {
-            if *count <= run.terminal.cumulative_primitive_recruitments {
-                *reached = reached
-                    .checked_add(1)
-                    .ok_or(EngineError::ArithmeticOverflow {
-                        context: "counting milestone reach samples",
-                    })?;
-            }
-        }
         total_terminal_count = total_terminal_count
             .checked_add(u128::from(run.terminal.cumulative_primitive_recruitments))
             .ok_or(EngineError::ArithmeticOverflow {
@@ -345,6 +340,10 @@ pub fn simulate_monte_carlo_with_limits(
     }
 
     let divisor = run_count as f64;
+    let milestone_counts = milestone_reach_counts(
+        bundle.reward_schedule().milestones(),
+        &terminal_count_counts,
+    )?;
     let success_probability = successes as f64 / divisor;
     let owned_target_terminal_probabilities = owned_counts
         .iter()
@@ -412,34 +411,25 @@ pub fn simulate_monte_carlo_with_limits(
             },
         )
         .collect::<Vec<_>>();
-    let mut running = 0.0;
-    let mut running_count = 0_u64;
-    let first_success_cdf = first_success_counts
+    let first_success_cumulative_counts =
+        first_success_cumulative_counts(&first_success_counts, run_count)?;
+    let first_success_cdf = first_success_cumulative_counts
         .iter()
-        .map(|(recruitment_count, count)| {
-            running += *count as f64 / divisor;
-            FirstSuccessProbability {
-                recruitment_count: *recruitment_count,
-                probability: running,
-            }
+        .map(|(recruitment_count, count)| FirstSuccessProbability {
+            recruitment_count: *recruitment_count,
+            probability: *count as f64 / divisor,
         })
         .collect::<Vec<_>>();
-    let first_success_cdf_intervals = first_success_counts
+    let first_success_cdf_intervals = first_success_cumulative_counts
         .iter()
-        .map(|(recruitment_count, count)| -> Result<_, EngineError> {
-            running_count =
-                running_count
-                    .checked_add(*count)
-                    .ok_or(EngineError::ArithmeticOverflow {
-                        context: "summing first-success CDF samples",
-                    })?;
-            Ok(RecruitmentCountProbabilityInterval {
+        .map(
+            |(recruitment_count, count)| RecruitmentCountProbabilityInterval {
                 recruitment_count: *recruitment_count,
-                sample_count: running_count,
-                confidence_interval_95: wilson_interval(running_count, run_count),
-            })
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+                sample_count: *count,
+                confidence_interval_95: wilson_interval(*count, run_count),
+            },
+        )
+        .collect::<Vec<_>>();
 
     Ok(MonteCarloAnalysisResult {
         engine_kind: "monte_carlo",
@@ -770,6 +760,57 @@ fn wilson_interval(successes: u64, runs: u64) -> ConfidenceInterval {
     }
 }
 
+fn milestone_reach_counts(
+    milestones: &[Milestone],
+    terminal_count_counts: &BTreeMap<u64, u64>,
+) -> Result<Vec<(u64, u64)>, EngineError> {
+    let mut terminal_counts = terminal_count_counts.iter().rev().peekable();
+    let mut running_count = 0_u64;
+    let mut reversed = Vec::with_capacity(milestones.len());
+
+    for milestone in milestones.iter().rev() {
+        while terminal_counts
+            .peek()
+            .is_some_and(|(count, _)| **count >= milestone.count)
+        {
+            if let Some((_, count)) = terminal_counts.next() {
+                running_count =
+                    running_count
+                        .checked_add(*count)
+                        .ok_or(EngineError::ArithmeticOverflow {
+                            context: "summing milestone reach samples",
+                        })?;
+            }
+        }
+        reversed.push((milestone.count, running_count));
+    }
+    reversed.reverse();
+    Ok(reversed)
+}
+
+fn first_success_cumulative_counts(
+    first_success_counts: &BTreeMap<u64, u64>,
+    run_count: u64,
+) -> Result<Vec<(u64, u64)>, EngineError> {
+    let mut running_count = 0_u64;
+    let mut cumulative = Vec::with_capacity(first_success_counts.len());
+    for (recruitment_count, count) in first_success_counts {
+        running_count =
+            running_count
+                .checked_add(*count)
+                .ok_or(EngineError::ArithmeticOverflow {
+                    context: "summing first-success CDF samples",
+                })?;
+        if running_count > run_count {
+            return Err(EngineError::InternalInvariantViolation {
+                message: "first-success samples exceed the Monte Carlo run count".to_owned(),
+            });
+        }
+        cumulative.push((*recruitment_count, running_count));
+    }
+    Ok(cumulative)
+}
+
 fn rng_provenance(master_seed: u64, run_count: u64) -> RngProvenance {
     RngProvenance {
         rng_algorithm: RNG_ALGORITHM,
@@ -806,12 +847,14 @@ fn checked_u128_add(current: u128, value: u64) -> Result<u128, EngineError> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::VecDeque;
+    use std::collections::{BTreeMap, VecDeque};
 
-    use ba_core::{OutcomeBranch, ProbabilityRatio, RecruitOutcome};
+    use ba_core::{Milestone, OutcomeBranch, ProbabilityRatio, RecruitOutcome};
     use rand_core::RngCore;
 
-    use super::{sample_outcome, uniform_below};
+    use super::{
+        first_success_cumulative_counts, milestone_reach_counts, sample_outcome, uniform_below,
+    };
 
     struct CountingRng {
         values: VecDeque<u64>,
@@ -862,5 +905,49 @@ mod tests {
         };
         assert_eq!(uniform_below(&mut rng, 10).expect("sample"), 6);
         assert_eq!(rng.calls, 2);
+    }
+
+    #[test]
+    fn bounded_u64_sampling_handles_the_largest_ratio_denominator() {
+        let mut rng = CountingRng {
+            values: VecDeque::from([0, 1, u64::MAX]),
+            calls: 0,
+        };
+        assert_eq!(uniform_below(&mut rng, u64::MAX).expect("first sample"), 1);
+        assert_eq!(uniform_below(&mut rng, u64::MAX).expect("second sample"), 0);
+        assert_eq!(rng.calls, 3);
+    }
+
+    #[test]
+    fn cumulative_probability_counts_are_exact_and_bounded() {
+        let counts = (1..=9).map(|count| (count, 1)).collect::<BTreeMap<_, _>>();
+        let cumulative =
+            first_success_cumulative_counts(&counts, 9).expect("valid cumulative counts");
+        assert!(
+            cumulative
+                .windows(2)
+                .all(|window| window[0].1 <= window[1].1)
+        );
+        assert_eq!(cumulative.last(), Some(&(9, 9)));
+        assert_eq!(
+            cumulative.last().map(|(_, count)| *count as f64 / 9.0),
+            Some(1.0)
+        );
+    }
+
+    #[test]
+    fn milestone_reach_counts_use_terminal_frequency_survival() {
+        let milestones = [5, 10, 15, 25]
+            .into_iter()
+            .map(|count| Milestone {
+                count,
+                rewards: Vec::new(),
+            })
+            .collect::<Vec<_>>();
+        let terminal_counts = BTreeMap::from([(0, 2), (10, 3), (20, 5)]);
+        assert_eq!(
+            milestone_reach_counts(&milestones, &terminal_counts).expect("reach counts"),
+            vec![(5, 8), (10, 8), (15, 5), (25, 0)]
+        );
     }
 }

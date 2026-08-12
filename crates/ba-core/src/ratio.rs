@@ -90,6 +90,17 @@ mod tests {
         assert_eq!(ratio.numerator(), 1);
         assert_eq!(ratio.denominator(), 2);
         assert_eq!(ratio.complement(), ratio);
+        assert_eq!(
+            ProbabilityRatio::new(0, u64::MAX).unwrap(),
+            ProbabilityRatio::new(0, 1).unwrap()
+        );
+        assert_eq!(
+            ProbabilityRatio::new(u64::MAX, u64::MAX).unwrap(),
+            ProbabilityRatio::new(1, 1).unwrap()
+        );
+        let near_one = ProbabilityRatio::new(u64::MAX - 1, u64::MAX).unwrap();
+        assert_eq!(near_one.complement().numerator(), 1);
+        assert_eq!(near_one.complement().denominator(), u64::MAX);
         assert!(ProbabilityRatio::new(2, 1).is_err());
         assert!(ProbabilityRatio::new(0, 0).is_err());
     }

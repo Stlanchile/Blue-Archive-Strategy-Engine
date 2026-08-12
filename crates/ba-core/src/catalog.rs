@@ -6,7 +6,7 @@ use std::sync::Arc;
 use serde::Serialize;
 
 use crate::CoreError;
-use crate::error::MAX_CATALOG_ENTRIES;
+use crate::error::{MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES};
 use crate::fingerprint::SemanticFingerprint;
 use crate::id::{RewardScheduleId, RulesetId};
 use crate::model::{CompiledRuleset, RewardSchedule, ValidatedScenario};
@@ -312,14 +312,31 @@ fn catalog_candidates(directory: &Path) -> Result<Vec<PathBuf>, CoreError> {
         source,
     })?;
     let mut candidates = Vec::new();
+    let mut inspected_entries = 0_usize;
     for item in reader {
         let item = item.map_err(|source| CoreError::Io {
             path: directory.to_path_buf(),
             source,
         })?;
+        inspected_entries += 1;
+        if inspected_entries > MAX_CATALOG_DIRECTORY_ENTRIES {
+            return Err(CoreError::CatalogDirectoryEntryLimitExceeded {
+                directory: directory.to_path_buf(),
+                observed: inspected_entries,
+                maximum: MAX_CATALOG_DIRECTORY_ENTRIES,
+            });
+        }
         let path = item.path();
         if path.extension() != Some(OsStr::new("json")) {
             continue;
+        }
+        let observed = candidates.len() + 1;
+        if observed > MAX_CATALOG_ENTRIES {
+            return Err(CoreError::CatalogEntryLimitExceeded {
+                directory: directory.to_path_buf(),
+                observed,
+                maximum: MAX_CATALOG_ENTRIES,
+            });
         }
         let entry_metadata = std::fs::symlink_metadata(&path).map_err(|source| CoreError::Io {
             path: path.clone(),
@@ -332,14 +349,6 @@ fn catalog_candidates(directory: &Path) -> Result<Vec<PathBuf>, CoreError> {
             });
         }
         candidates.push(path);
-    }
-    let observed = candidates.len();
-    if observed > MAX_CATALOG_ENTRIES {
-        return Err(CoreError::CatalogEntryLimitExceeded {
-            directory: directory.to_path_buf(),
-            observed,
-            maximum: MAX_CATALOG_ENTRIES,
-        });
     }
     candidates.sort();
     Ok(candidates)

@@ -439,21 +439,11 @@ pub fn terminal_resources(
     terminal: &WorldStateKey,
 ) -> Result<Resources, CoreError> {
     let mut resources = bundle.scenario().initial_resources();
-    for milestone in bundle
-        .reward_schedule()
-        .milestones()
-        .iter()
-        .take_while(|milestone| milestone.count <= terminal.cumulative_primitive_recruitments)
-    {
-        for reward in &milestone.rewards {
-            if !matches!(
-                reward.resource,
-                ResourceKind::Pyroxene | ResourceKind::LimitedTenRecruitmentTickets
-            ) {
-                resources.checked_add_kind(reward.resource, reward.quantity)?;
-            }
-        }
-    }
+    resources.checked_add(
+        bundle
+            .reward_schedule()
+            .resources_earned_through(terminal.cumulative_primitive_recruitments)?,
+    )?;
     resources.pyroxene = terminal.remaining_pyroxene;
     resources.limited_ten_recruitment_tickets = terminal.available_ticket_count;
     Ok(resources)

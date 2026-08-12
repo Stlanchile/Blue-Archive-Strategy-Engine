@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 pub const MAX_CATALOG_ENTRIES: usize = 256;
+pub const MAX_CATALOG_DIRECTORY_ENTRIES: usize = 512;
 pub const MAX_DOCUMENT_BYTES: u64 = 1_048_576;
 pub const MAX_JSON_DEPTH: usize = 64;
 
@@ -20,6 +21,15 @@ pub enum CoreError {
 
     #[error("catalog entry limit exceeded in {directory}: observed {observed}, maximum {maximum}")]
     CatalogEntryLimitExceeded {
+        directory: PathBuf,
+        observed: usize,
+        maximum: usize,
+    },
+
+    #[error(
+        "catalog directory entry limit exceeded in {directory}: observed at least {observed}, maximum {maximum}"
+    )]
+    CatalogDirectoryEntryLimitExceeded {
         directory: PathBuf,
         observed: usize,
         maximum: usize,
@@ -91,6 +101,7 @@ impl CoreError {
             Self::Io { .. }
             | Self::PathPolicy { .. }
             | Self::CatalogEntryLimitExceeded { .. }
+            | Self::CatalogDirectoryEntryLimitExceeded { .. }
             | Self::DocumentSizeLimitExceeded { .. } => CoreErrorClass::CatalogIo,
             Self::InvalidJson { .. }
             | Self::UnsupportedDocument { .. }

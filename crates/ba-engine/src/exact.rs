@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use ba_core::{
-    StrategyDecision, TerminalReason, ValidatedScenarioBundle, WorldStateKey,
+    Milestone, StrategyDecision, TerminalReason, ValidatedScenarioBundle, WorldStateKey,
     apply_primitive_transition, begin_action, complete_action, decide, initial_world,
     milestone_rewards_acquired, outcome_distribution, reconstruct_funding, terminal_resources,
 };
@@ -206,15 +206,15 @@ fn build_result(
     let mut expected_ticket_draws = 0.0;
     let mut expected_residual = ExpectedResources::default();
     let mut expected_rewards = ExpectedResources::default();
-    let mut milestone_masses = bundle
-        .reward_schedule()
-        .milestones()
-        .iter()
-        .map(|milestone| (milestone.count, CompensatedMass::default()))
-        .collect::<BTreeMap<_, _>>();
+    let mut terminal_count_masses = BTreeMap::<u64, CompensatedMass>::new();
 
     for ((state, reason), mass) in &terminal {
         let weight = mass.value();
+        add_mass(
+            &mut terminal_count_masses,
+            state.cumulative_primitive_recruitments,
+            weight,
+        )?;
         terminal_reason_masses
             .entry(*reason)
             .or_default()
@@ -236,11 +236,6 @@ fn build_result(
             milestone_rewards_acquired(bundle, state.cumulative_primitive_recruitments)?,
             weight,
         );
-        for (count, reach_mass) in &mut milestone_masses {
-            if *count <= state.cumulative_primitive_recruitments {
-                reach_mass.add(weight)?;
-            }
-        }
     }
 
     let success = success_probability.value();
@@ -285,13 +280,10 @@ fn build_result(
             probability: mass.value(),
         })
         .collect();
-    let milestone_reach_probabilities = milestone_masses
-        .into_iter()
-        .map(|(recruitment_count, mass)| MilestoneReachProbability {
-            recruitment_count,
-            probability: mass.value(),
-        })
-        .collect();
+    let milestone_reach_probabilities = milestone_reach_probabilities(
+        bundle.reward_schedule().milestones(),
+        &terminal_count_masses,
+    )?;
 
     Ok(ExactAnalysisResult {
         engine_kind: "exact",
@@ -326,6 +318,32 @@ fn build_result(
             transition_expansions: diagnostics.transition_expansions,
         },
     })
+}
+
+fn milestone_reach_probabilities(
+    milestones: &[Milestone],
+    terminal_count_masses: &BTreeMap<u64, CompensatedMass>,
+) -> Result<Vec<MilestoneReachProbability>, EngineError> {
+    let mut terminal_counts = terminal_count_masses.iter().rev().peekable();
+    let mut running_mass = CompensatedMass::default();
+    let mut reversed = Vec::with_capacity(milestones.len());
+
+    for milestone in milestones.iter().rev() {
+        while terminal_counts
+            .peek()
+            .is_some_and(|(count, _)| **count >= milestone.count)
+        {
+            if let Some((_, mass)) = terminal_counts.next() {
+                running_mass.add(mass.value())?;
+            }
+        }
+        reversed.push(MilestoneReachProbability {
+            recruitment_count: milestone.count,
+            probability: running_mass.value(),
+        });
+    }
+    reversed.reverse();
+    Ok(reversed)
 }
 
 fn validate_local_distribution(

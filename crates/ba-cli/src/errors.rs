@@ -271,9 +271,11 @@ fn core_location(error: &CoreError) -> Option<(Option<u64>, Option<u64>)> {
 fn core_hint(error: &CoreError) -> Option<&'static str> {
     match error {
         CoreError::InvalidJson { .. } => Some("correct the JSON value at the reported location"),
-        CoreError::UnsupportedDocument { .. } => {
-            Some("use schema_version 2 with a supported document_type")
-        }
+        CoreError::UnsupportedDocument { schema_version, .. } => match schema_version {
+            Some(2) => Some("use schema_version 2 with a supported document_type"),
+            Some(3) => Some("use schema_version 3 with a supported document_type"),
+            _ => Some("use schema_version 2 or 3 with a supported document_type"),
+        },
         CoreError::PathPolicy { .. } => {
             Some("use a regular JSON file below the selected pinned directory")
         }

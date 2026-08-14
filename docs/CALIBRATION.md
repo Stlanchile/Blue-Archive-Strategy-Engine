@@ -13,9 +13,14 @@ without probability pruning or altered mechanics.
 | `initial_success` | 0 | 0 | 0 | 0 |
 | `single_target_200` | 2 | 1 | 600 | 399 |
 | `ticket_atomic` | 10 | 9 | 57 | 91 |
+| `v3_three_target_exact_small` | 1 | 1 | 7 | 3 |
+| `v3_four_target_exact_small` | 1 | 1 | 9 | 4 |
+| `v3_atomic_cross_target` | 21 | 19 | 121 | 296 |
 
-The observed maxima are frontier 201, processed states 66,813, and expansions
-72,549. The frozen default safety guards are:
+These v3 goldens are deliberately small proofs of three/four-target and atomic
+cross-target behavior; they are not performance claims for realistic long
+horizons. The observed table maxima remain frontier 201, processed states
+66,813, and expansions 72,549. The frozen default safety guards are:
 
 ```text
 max_active_states = 65,536
@@ -54,7 +59,26 @@ load materially affect them.
 | Near-guard exact success | 16.644478 ms |
 | Over-guard exact failure | 16.160215 ms |
 
+Additional v0.3 observations from the same class of optimized local benchmark
+run:
+
+| Operation | Observed elapsed time |
+|---|---:|
+| Mixed shipped v2/v3 catalog load | 263.939 us |
+| Shipped provisional v3 ruleset read and validation | 41.404 us |
+| V3 categorical compilation | 1.686 us |
+| `v3_three_target_exact_small` exact | 27.531 us |
+| `v3_four_target_exact_small` exact | 17.242 us |
+| `v3_atomic_cross_target` exact | 134.272 us |
+| V3 fixed-seed serial Monte Carlo, 10,000 runs | 19.555357 ms |
+| Large-initial-count repeat interval accumulation | 326 ns |
+
 The synthetic operation stages `tests/fixtures/schema_v2/` into a temporary
 catalog; fictional mechanics are not installed in `data/`. The Monte Carlo
 benchmark is intentionally serial. No Rayon, parallel Monte Carlo, or
 wall-clock pass/fail threshold is introduced.
+
+V3 calibration additionally exercises categorical compilation/sampling,
+repeat lookup and interval accumulation, mixed-profile catalog loading,
+three/four-target exact propagation, and fixed-seed serial simulation. These
+measurements do not justify raising a guard when a larger scenario is rejected.

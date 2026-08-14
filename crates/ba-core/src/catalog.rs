@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -10,8 +10,13 @@ use crate::fingerprint::SemanticFingerprint;
 use crate::fs_secure::{DirectoryEntrySnapshot, PinnedDirectory, is_json_candidate};
 use crate::id::{RewardScheduleId, RulesetId};
 use crate::model::{CompiledRuleset, CompiledStrategy, RewardSchedule, ValidatedScenario};
+use crate::model_v3::{CompiledRulesetV3, CompiledStrategyV3, ValidatedScenarioV3};
+use crate::profile::{DOCUMENT_SCHEMA_VERSION_V2, DOCUMENT_SCHEMA_VERSION_V3, DocumentProfile};
+use crate::provenance_v3::ProvenanceStatusV3;
+use crate::reward_schedule_v3::RewardScheduleV3;
 use crate::schema::{
-    DocumentKind, RawRewardScheduleV2, RawRulesetV2, RawScenarioV2, VerificationStatus,
+    DocumentKind, RawRewardScheduleV2, RawRewardScheduleV3, RawRulesetV2, RawRulesetV3,
+    RawScenarioV2, RawScenarioV3, VerificationStatus,
 };
 use crate::strict_json::BufferedDocument;
 
@@ -19,8 +24,12 @@ use crate::strict_json::BufferedDocument;
 pub struct Catalog {
     rulesets: BTreeMap<RulesetId, Arc<CompiledRuleset>>,
     reward_schedules: BTreeMap<RewardScheduleId, Arc<RewardSchedule>>,
+    rulesets_v3: BTreeMap<RulesetId, Arc<CompiledRulesetV3>>,
+    reward_schedules_v3: BTreeMap<RewardScheduleId, Arc<RewardScheduleV3>>,
     ruleset_paths: BTreeMap<RulesetId, PathBuf>,
     reward_paths: BTreeMap<RewardScheduleId, PathBuf>,
+    ruleset_paths_v3: BTreeMap<RulesetId, PathBuf>,
+    reward_paths_v3: BTreeMap<RewardScheduleId, PathBuf>,
 }
 
 impl Catalog {
@@ -48,7 +57,10 @@ impl Catalog {
         let rewards_snapshot = rewards_directory.enumerate_catalog()?;
         observer(CatalogLoadStage::EntrySnapshotsCaptured);
         let mut rulesets = BTreeMap::new();
+        let mut rulesets_v3 = BTreeMap::new();
         let mut ruleset_paths = BTreeMap::new();
+        let mut ruleset_paths_v3 = BTreeMap::new();
+        let mut all_ruleset_ids = BTreeSet::new();
         for candidate in rules_snapshot
             .iter()
             .filter(|value| is_json_candidate(value))
@@ -62,21 +74,44 @@ impl Catalog {
                     "rulesets catalog contains a non-ruleset document",
                 ));
             }
-            let raw: RawRulesetV2 = document.parse_typed()?;
-            let ruleset = Arc::new(CompiledRuleset::from_raw(raw, Some(&path))?);
-            let id = ruleset.id().clone();
-            if rulesets.insert(id.clone(), ruleset).is_some() {
+            let (id, profile) = match document.dispatch().schema_version {
+                DOCUMENT_SCHEMA_VERSION_V2 => {
+                    let raw: RawRulesetV2 = document.parse_typed()?;
+                    let ruleset = Arc::new(CompiledRuleset::from_raw(raw, Some(&path))?);
+                    let id = ruleset.id().clone();
+                    rulesets.insert(id.clone(), ruleset);
+                    ruleset_paths.insert(id.clone(), path.clone());
+                    (id, DocumentProfile::V2)
+                }
+                DOCUMENT_SCHEMA_VERSION_V3 => {
+                    let raw: RawRulesetV3 = document.parse_typed()?;
+                    let ruleset = Arc::new(CompiledRulesetV3::from_raw(raw, Some(&path))?);
+                    let id = ruleset.id().clone();
+                    rulesets_v3.insert(id.clone(), ruleset);
+                    ruleset_paths_v3.insert(id.clone(), path.clone());
+                    (id, DocumentProfile::V3)
+                }
+                _ => {
+                    return Err(CoreError::InternalInvariant {
+                        message: "dispatch admitted an unsupported ruleset schema".to_owned(),
+                    });
+                }
+            };
+            if !all_ruleset_ids.insert(id.clone()) {
                 return Err(CoreError::validation(
                     Some(&path),
                     format!("duplicate catalog ruleset ID {id}"),
                 ));
             }
-            ruleset_paths.insert(id, path);
+            let _ = profile;
         }
         observer(CatalogLoadStage::RulesetsLoaded);
 
         let mut reward_schedules = BTreeMap::new();
+        let mut reward_schedules_v3 = BTreeMap::new();
         let mut reward_paths = BTreeMap::new();
+        let mut reward_paths_v3 = BTreeMap::new();
+        let mut all_reward_ids = BTreeSet::new();
         for candidate in rewards_snapshot
             .iter()
             .filter(|value| is_json_candidate(value))
@@ -90,16 +125,35 @@ impl Catalog {
                     "rewards catalog contains a non-reward-schedule document",
                 ));
             }
-            let raw: RawRewardScheduleV2 = document.parse_typed()?;
-            let rewards = Arc::new(RewardSchedule::from_raw(raw, Some(&path))?);
-            let id = rewards.id().clone();
-            if reward_schedules.insert(id.clone(), rewards).is_some() {
+            let id = match document.dispatch().schema_version {
+                DOCUMENT_SCHEMA_VERSION_V2 => {
+                    let raw: RawRewardScheduleV2 = document.parse_typed()?;
+                    let rewards = Arc::new(RewardSchedule::from_raw(raw, Some(&path))?);
+                    let id = rewards.id().clone();
+                    reward_schedules.insert(id.clone(), rewards);
+                    reward_paths.insert(id.clone(), path.clone());
+                    id
+                }
+                DOCUMENT_SCHEMA_VERSION_V3 => {
+                    let raw: RawRewardScheduleV3 = document.parse_typed()?;
+                    let rewards = Arc::new(RewardScheduleV3::from_raw(raw, Some(&path))?);
+                    let id = rewards.id().clone();
+                    reward_schedules_v3.insert(id.clone(), rewards);
+                    reward_paths_v3.insert(id.clone(), path.clone());
+                    id
+                }
+                _ => {
+                    return Err(CoreError::InternalInvariant {
+                        message: "dispatch admitted an unsupported reward schema".to_owned(),
+                    });
+                }
+            };
+            if !all_reward_ids.insert(id.clone()) {
                 return Err(CoreError::validation(
                     Some(&path),
                     format!("duplicate catalog reward schedule ID {id}"),
                 ));
             }
-            reward_paths.insert(id, path);
         }
         observer(CatalogLoadStage::RewardsLoaded);
 
@@ -115,8 +169,12 @@ impl Catalog {
         Ok(Self {
             rulesets,
             reward_schedules,
+            rulesets_v3,
+            reward_schedules_v3,
             ruleset_paths,
             reward_paths,
+            ruleset_paths_v3,
+            reward_paths_v3,
         })
     }
 
@@ -131,6 +189,16 @@ impl Catalog {
     }
 
     #[must_use]
+    pub fn rulesets_v3(&self) -> &BTreeMap<RulesetId, Arc<CompiledRulesetV3>> {
+        &self.rulesets_v3
+    }
+
+    #[must_use]
+    pub fn reward_schedules_v3(&self) -> &BTreeMap<RewardScheduleId, Arc<RewardScheduleV3>> {
+        &self.reward_schedules_v3
+    }
+
+    #[must_use]
     pub fn ruleset(&self, id: &RulesetId) -> Option<&CompiledRuleset> {
         self.rulesets.get(id).map(AsRef::as_ref)
     }
@@ -141,6 +209,16 @@ impl Catalog {
     }
 
     #[must_use]
+    pub fn ruleset_v3(&self, id: &RulesetId) -> Option<&CompiledRulesetV3> {
+        self.rulesets_v3.get(id).map(AsRef::as_ref)
+    }
+
+    #[must_use]
+    pub fn reward_schedule_v3(&self, id: &RewardScheduleId) -> Option<&RewardScheduleV3> {
+        self.reward_schedules_v3.get(id).map(AsRef::as_ref)
+    }
+
+    #[must_use]
     pub fn ruleset_path(&self, id: &RulesetId) -> Option<&Path> {
         self.ruleset_paths.get(id).map(PathBuf::as_path)
     }
@@ -148,6 +226,21 @@ impl Catalog {
     #[must_use]
     pub fn reward_schedule_path(&self, id: &RewardScheduleId) -> Option<&Path> {
         self.reward_paths.get(id).map(PathBuf::as_path)
+    }
+
+    #[must_use]
+    pub fn ruleset_path_v3(&self, id: &RulesetId) -> Option<&Path> {
+        self.ruleset_paths_v3.get(id).map(PathBuf::as_path)
+    }
+
+    #[must_use]
+    pub fn reward_schedule_path_v3(&self, id: &RewardScheduleId) -> Option<&Path> {
+        self.reward_paths_v3.get(id).map(PathBuf::as_path)
+    }
+
+    #[must_use]
+    pub fn contains_v3(&self) -> bool {
+        !self.rulesets_v3.is_empty() || !self.reward_schedules_v3.is_empty()
     }
 }
 
@@ -282,6 +375,148 @@ impl ValidatedScenarioBundle {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ValidatedScenarioBundleV3 {
+    scenario: Arc<ValidatedScenarioV3>,
+    ruleset: Arc<CompiledRulesetV3>,
+    reward_schedule: Arc<RewardScheduleV3>,
+    fingerprints: BundleFingerprints,
+    source_paths: SourcePaths,
+}
+
+impl ValidatedScenarioBundleV3 {
+    pub fn from_programmatic(
+        raw_scenario: RawScenarioV3,
+        ruleset: CompiledRulesetV3,
+        reward_schedule: RewardScheduleV3,
+    ) -> Result<Self, CoreError> {
+        let scenario =
+            ValidatedScenarioV3::from_raw(raw_scenario, &ruleset, &reward_schedule, None)?;
+        let fingerprints = BundleFingerprints {
+            scenario: scenario.behavior_fingerprint()?,
+            ruleset: ruleset.behavior_fingerprint()?,
+            reward_schedule: reward_schedule.behavior_fingerprint()?,
+            scenario_document: scenario.document_fingerprint()?,
+            ruleset_document: ruleset.document_fingerprint()?,
+            reward_schedule_document: reward_schedule.document_fingerprint()?,
+        };
+        Ok(Self {
+            scenario: Arc::new(scenario),
+            ruleset: Arc::new(ruleset),
+            reward_schedule: Arc::new(reward_schedule),
+            fingerprints,
+            source_paths: SourcePaths {
+                scenario: PathBuf::from("<programmatic-scenario-v3>"),
+                ruleset: PathBuf::from("<programmatic-ruleset-v3>"),
+                reward_schedule: PathBuf::from("<programmatic-reward-schedule-v3>"),
+            },
+        })
+    }
+
+    #[must_use]
+    pub fn scenario(&self) -> &ValidatedScenarioV3 {
+        &self.scenario
+    }
+
+    #[must_use]
+    pub fn ruleset(&self) -> &CompiledRulesetV3 {
+        &self.ruleset
+    }
+
+    #[must_use]
+    pub fn reward_schedule(&self) -> &RewardScheduleV3 {
+        &self.reward_schedule
+    }
+
+    #[must_use]
+    pub const fn fingerprints(&self) -> &BundleFingerprints {
+        &self.fingerprints
+    }
+
+    #[must_use]
+    pub const fn source_paths(&self) -> &SourcePaths {
+        &self.source_paths
+    }
+
+    #[must_use]
+    pub fn compiled_strategy(&self) -> &CompiledStrategyV3 {
+        self.scenario.compiled_strategy()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum AnyValidatedScenarioBundle {
+    V2(ValidatedScenarioBundle),
+    V3(ValidatedScenarioBundleV3),
+}
+
+impl AnyValidatedScenarioBundle {
+    #[must_use]
+    pub const fn profile(&self) -> DocumentProfile {
+        match self {
+            Self::V2(_) => DocumentProfile::V2,
+            Self::V3(_) => DocumentProfile::V3,
+        }
+    }
+
+    #[must_use]
+    pub const fn as_v2(&self) -> Option<&ValidatedScenarioBundle> {
+        match self {
+            Self::V2(bundle) => Some(bundle),
+            Self::V3(_) => None,
+        }
+    }
+
+    #[must_use]
+    pub const fn as_v3(&self) -> Option<&ValidatedScenarioBundleV3> {
+        match self {
+            Self::V2(_) => None,
+            Self::V3(bundle) => Some(bundle),
+        }
+    }
+}
+
+pub fn load_any_bundle(
+    data_dir: impl AsRef<Path>,
+    scenario_path: impl AsRef<Path>,
+) -> Result<AnyValidatedScenarioBundle, CoreError> {
+    let scenario_document = BufferedDocument::read(scenario_path)?;
+    load_any_buffered_bundle(data_dir, &scenario_document)
+}
+
+pub fn load_any_buffered_bundle(
+    data_dir: impl AsRef<Path>,
+    scenario_document: &BufferedDocument,
+) -> Result<AnyValidatedScenarioBundle, CoreError> {
+    let catalog = Catalog::load(data_dir)?;
+    compile_any_buffered_bundle(&catalog, scenario_document)
+}
+
+pub fn compile_any_buffered_bundle(
+    catalog: &Catalog,
+    scenario_document: &BufferedDocument,
+) -> Result<AnyValidatedScenarioBundle, CoreError> {
+    if scenario_document.dispatch().kind != DocumentKind::Scenario {
+        return Err(CoreError::validation(
+            Some(scenario_document.path()),
+            "analysis input must be a scenario document",
+        ));
+    }
+    match scenario_document.dispatch().schema_version {
+        DOCUMENT_SCHEMA_VERSION_V2 => {
+            let parsed = parse_scenario_document(scenario_document)?;
+            compile_parsed_scenario(catalog, parsed).map(AnyValidatedScenarioBundle::V2)
+        }
+        DOCUMENT_SCHEMA_VERSION_V3 => {
+            let parsed = parse_scenario_document_v3(scenario_document)?;
+            compile_parsed_scenario_v3(catalog, parsed).map(AnyValidatedScenarioBundle::V3)
+        }
+        _ => Err(CoreError::InternalInvariant {
+            message: "dispatch admitted an unsupported scenario schema".to_owned(),
+        }),
+    }
+}
+
 pub fn load_bundle(
     data_dir: impl AsRef<Path>,
     scenario_path: impl AsRef<Path>,
@@ -353,6 +588,14 @@ fn compile_parsed_scenario(
         .get(&ruleset_lookup)
         .cloned()
         .ok_or_else(|| {
+            if catalog.rulesets_v3.contains_key(&ruleset_lookup) {
+                return CoreError::validation(
+                    Some(&scenario_path),
+                    format!(
+                        "schema-v2 scenario references schema-v3 ruleset {ruleset_lookup}; mixed-profile bundles are unsupported"
+                    ),
+                );
+            }
             CoreError::validation(
                 Some(&scenario_path),
                 format!("referenced ruleset {ruleset_lookup} is absent from the complete catalog"),
@@ -363,6 +606,14 @@ fn compile_parsed_scenario(
         .get(&reward_lookup)
         .cloned()
         .ok_or_else(|| {
+            if catalog.reward_schedules_v3.contains_key(&reward_lookup) {
+                return CoreError::validation(
+                    Some(&scenario_path),
+                    format!(
+                        "schema-v2 scenario references schema-v3 reward schedule {reward_lookup}; mixed-profile bundles are unsupported"
+                    ),
+                );
+            }
             CoreError::validation(
                 Some(&scenario_path),
                 format!(
@@ -407,6 +658,117 @@ fn compile_parsed_scenario(
     })
 }
 
+struct ParsedScenarioDocumentV3 {
+    path: PathBuf,
+    raw: RawScenarioV3,
+    ruleset_lookup: RulesetId,
+    reward_lookup: RewardScheduleId,
+}
+
+fn parse_scenario_document_v3(
+    scenario_document: &BufferedDocument,
+) -> Result<ParsedScenarioDocumentV3, CoreError> {
+    let path = scenario_document.path();
+    let raw: RawScenarioV3 = scenario_document.parse_typed()?;
+    let ruleset_lookup = RulesetId::new(raw.ruleset_id.clone())
+        .map_err(|error| CoreError::validation(Some(path), error.to_string()))?;
+    let reward_lookup = RewardScheduleId::new(raw.reward_schedule_id.clone())
+        .map_err(|error| CoreError::validation(Some(path), error.to_string()))?;
+    Ok(ParsedScenarioDocumentV3 {
+        path: path.to_path_buf(),
+        raw,
+        ruleset_lookup,
+        reward_lookup,
+    })
+}
+
+fn compile_parsed_scenario_v3(
+    catalog: &Catalog,
+    parsed: ParsedScenarioDocumentV3,
+) -> Result<ValidatedScenarioBundleV3, CoreError> {
+    let ParsedScenarioDocumentV3 {
+        path: scenario_path,
+        raw,
+        ruleset_lookup,
+        reward_lookup,
+    } = parsed;
+    let ruleset = catalog
+        .rulesets_v3
+        .get(&ruleset_lookup)
+        .cloned()
+        .ok_or_else(|| {
+            if catalog.rulesets.contains_key(&ruleset_lookup) {
+                return CoreError::validation(
+                    Some(&scenario_path),
+                    format!(
+                        "schema-v3 scenario references schema-v2 ruleset {ruleset_lookup}; mixed-profile bundles are unsupported"
+                    ),
+                );
+            }
+            CoreError::validation(
+                Some(&scenario_path),
+                format!("referenced ruleset {ruleset_lookup} is absent from the complete catalog"),
+            )
+        })?;
+    let reward_schedule = catalog
+        .reward_schedules_v3
+        .get(&reward_lookup)
+        .cloned()
+        .ok_or_else(|| {
+            if catalog.reward_schedules.contains_key(&reward_lookup) {
+                return CoreError::validation(
+                    Some(&scenario_path),
+                    format!(
+                        "schema-v3 scenario references schema-v2 reward schedule {reward_lookup}; mixed-profile bundles are unsupported"
+                    ),
+                );
+            }
+            CoreError::validation(
+                Some(&scenario_path),
+                format!(
+                    "referenced reward schedule {reward_lookup} is absent from the complete catalog"
+                ),
+            )
+        })?;
+    let scenario = Arc::new(ValidatedScenarioV3::from_raw(
+        raw,
+        &ruleset,
+        &reward_schedule,
+        Some(&scenario_path),
+    )?);
+    let fingerprints = BundleFingerprints {
+        scenario: scenario.behavior_fingerprint()?,
+        ruleset: ruleset.behavior_fingerprint()?,
+        reward_schedule: reward_schedule.behavior_fingerprint()?,
+        scenario_document: scenario.document_fingerprint()?,
+        ruleset_document: ruleset.document_fingerprint()?,
+        reward_schedule_document: reward_schedule.document_fingerprint()?,
+    };
+    let ruleset_path = catalog
+        .ruleset_paths_v3
+        .get(&ruleset_lookup)
+        .cloned()
+        .ok_or(CoreError::InternalInvariant {
+            message: "v3 ruleset catalog path missing after successful lookup".to_owned(),
+        })?;
+    let reward_path = catalog.reward_paths_v3.get(&reward_lookup).cloned().ok_or(
+        CoreError::InternalInvariant {
+            message: "v3 reward catalog path missing after successful lookup".to_owned(),
+        },
+    )?;
+    Ok(ValidatedScenarioBundleV3 {
+        scenario,
+        ruleset,
+        reward_schedule,
+        fingerprints,
+        source_paths: SourcePaths {
+            scenario: scenario_path,
+            ruleset: ruleset_path,
+            reward_schedule: reward_path,
+        },
+    })
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct ValidationReport {
     pub valid: bool,
@@ -417,6 +779,8 @@ pub struct ValidationReport {
     pub document_fingerprint: SemanticFingerprint,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verification_status: Option<VerificationStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub provenance_status: Option<ProvenanceStatusV3>,
 }
 
 pub fn validate_document(
@@ -425,8 +789,8 @@ pub fn validate_document(
 ) -> Result<ValidationReport, CoreError> {
     let path = document_path.as_ref();
     let document = BufferedDocument::read(path)?;
-    match document.dispatch().kind {
-        DocumentKind::Ruleset => {
+    match (document.dispatch().schema_version, document.dispatch().kind) {
+        (DOCUMENT_SCHEMA_VERSION_V2, DocumentKind::Ruleset) => {
             let raw: RawRulesetV2 = document.parse_typed()?;
             let value = CompiledRuleset::from_raw(raw, Some(path))?;
             Ok(ValidationReport {
@@ -437,9 +801,10 @@ pub fn validate_document(
                 behavior_fingerprint: value.behavior_fingerprint()?,
                 document_fingerprint: value.document_fingerprint()?,
                 verification_status: Some(value.provenance().verification_status),
+                provenance_status: None,
             })
         }
-        DocumentKind::RewardSchedule => {
+        (DOCUMENT_SCHEMA_VERSION_V2, DocumentKind::RewardSchedule) => {
             let raw: RawRewardScheduleV2 = document.parse_typed()?;
             let value = RewardSchedule::from_raw(raw, Some(path))?;
             Ok(ValidationReport {
@@ -450,9 +815,10 @@ pub fn validate_document(
                 behavior_fingerprint: value.behavior_fingerprint()?,
                 document_fingerprint: value.document_fingerprint()?,
                 verification_status: Some(value.provenance().verification_status),
+                provenance_status: None,
             })
         }
-        DocumentKind::Scenario => {
+        (DOCUMENT_SCHEMA_VERSION_V2, DocumentKind::Scenario) => {
             let bundle = load_buffered_bundle(data_dir, &document)?;
             Ok(ValidationReport {
                 valid: true,
@@ -462,8 +828,58 @@ pub fn validate_document(
                 behavior_fingerprint: bundle.fingerprints().scenario,
                 document_fingerprint: bundle.fingerprints().scenario_document,
                 verification_status: None,
+                provenance_status: None,
             })
         }
+        (DOCUMENT_SCHEMA_VERSION_V3, DocumentKind::Ruleset) => {
+            let raw: RawRulesetV3 = document.parse_typed()?;
+            let value = CompiledRulesetV3::from_raw(raw, Some(path))?;
+            Ok(ValidationReport {
+                valid: true,
+                schema_version: value.schema_version(),
+                document_type: DocumentKind::Ruleset.as_str().to_owned(),
+                id: value.id().to_string(),
+                behavior_fingerprint: value.behavior_fingerprint()?,
+                document_fingerprint: value.document_fingerprint()?,
+                verification_status: None,
+                provenance_status: Some(value.provenance().provenance_status),
+            })
+        }
+        (DOCUMENT_SCHEMA_VERSION_V3, DocumentKind::RewardSchedule) => {
+            let raw: RawRewardScheduleV3 = document.parse_typed()?;
+            let value = RewardScheduleV3::from_raw(raw, Some(path))?;
+            Ok(ValidationReport {
+                valid: true,
+                schema_version: value.schema_version(),
+                document_type: DocumentKind::RewardSchedule.as_str().to_owned(),
+                id: value.id().to_string(),
+                behavior_fingerprint: value.behavior_fingerprint()?,
+                document_fingerprint: value.document_fingerprint()?,
+                verification_status: None,
+                provenance_status: Some(value.provenance().provenance_status),
+            })
+        }
+        (DOCUMENT_SCHEMA_VERSION_V3, DocumentKind::Scenario) => {
+            let bundle = load_any_buffered_bundle(data_dir, &document)?;
+            let Some(bundle) = bundle.as_v3() else {
+                return Err(CoreError::InternalInvariant {
+                    message: "v3 scenario validation produced a v2 bundle".to_owned(),
+                });
+            };
+            Ok(ValidationReport {
+                valid: true,
+                schema_version: bundle.scenario().schema_version(),
+                document_type: DocumentKind::Scenario.as_str().to_owned(),
+                id: bundle.scenario().id().to_string(),
+                behavior_fingerprint: bundle.fingerprints().scenario,
+                document_fingerprint: bundle.fingerprints().scenario_document,
+                verification_status: None,
+                provenance_status: None,
+            })
+        }
+        _ => Err(CoreError::InternalInvariant {
+            message: "dispatch admitted an unsupported document pair".to_owned(),
+        }),
     }
 }
 

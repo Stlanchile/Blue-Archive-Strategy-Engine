@@ -1,0 +1,36 @@
+{
+  "schema_version": 3,
+  "document_type": "ruleset",
+  "ruleset_id": "jp_2026_07_29_provisional_v3",
+  "provenance": {
+    "provenance_status": "provisional",
+    "sources": [],
+    "claim_bindings": []
+  },
+  "paid_single_cost": 120,
+  "paid_single_action_size": 1,
+  "ticket_action_size": 10,
+  "ordinary_featured_target_probability": {
+    "numerator": 7,
+    "denominator": 1000
+  },
+  "maximum_pre_recruitment_charge": 199,
+  "featured_hit_reset_charge": 0,
+  "non_featured_increment": 1,
+  "threshold_overrides": [
+    {
+      "pre_charge": 99,
+      "featured_target_probability": {
+        "numerator": 1,
+        "denominator": 2
+      }
+    },
+    {
+      "pre_charge": 199,
+      "featured_target_probability": {
+        "numerator": 1,
+        "denominator": 1
+      }
+    }
+  ]
+}

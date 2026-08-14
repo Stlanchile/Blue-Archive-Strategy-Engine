@@ -1,5 +1,10 @@
 # Schema v2
 
+Schema v2 is the frozen compatibility profile. Schema v3 is additive and
+documented separately in [`SCHEMA_V3.md`](SCHEMA_V3.md). A v2 scenario cannot
+reference v3 catalog data, and the internal eleven-resource/categorical
+representations are not v2 deserialization authority.
+
 Schema v2 defines provenance-aware rulesets and reward schedules, explicit
 compiled strategies, and result schema 2 for the one/two-target finite model.
 All documents use `schema_version: 2` and their

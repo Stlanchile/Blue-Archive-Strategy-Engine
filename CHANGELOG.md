@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.0
+
+- Added homogeneous schema v3 bundles with one through four ordered targets,
+  scenario-authored cross-target probabilities, shared/independent charge
+  groups, and initial/additional/absolute campaign counts.
+- Added exact categorical propagation, deterministic serial ChaCha8 sampling,
+  v3 trace/replay, target/prefix/terminal-set metrics, and result schema 3 while
+  preserving the frozen schema-v2 paths and stream vectors.
+- Added eleven-resource v3 ledgers and direct interval arithmetic for finite
+  plus indefinitely repeating reward schedules under a finite scenario horizon.
+- Added structural v3 provenance with only `provisional` and `source_backed`
+  states, claim-level first-party coverage checks, and explicit scenario
+  authority reporting.
+- Added profile-aware catalog inspection/listing, schema-selectable templates,
+  small three/four-target exact goldens, cross-profile exact oracles, mixed
+  secure-catalog tests, and v3 release-archive smoke coverage.
+- Kept shipped v3 mechanics provisional because the required first-party
+  evidence for every numeric and limited-ticket claim is not yet complete.
+- Parallel Monte Carlo, worker-count flags, automatic exact fallback, calendar
+  modeling, tags, pushes, publication, and release creation remain deferred.
+
 ## 0.2.0
 
 - Established schema v2 as the sole document and result profile, with

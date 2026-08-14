@@ -6,9 +6,9 @@ use serde::de::{DeserializeSeed, MapAccess, SeqAccess, Visitor};
 
 use crate::CoreError;
 use crate::error::MAX_JSON_DEPTH;
+use crate::profile::{DOCUMENT_SCHEMA_VERSION_V2, DOCUMENT_SCHEMA_VERSION_V3};
 use crate::schema::{
     DocumentKind, REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, SCENARIO_DOCUMENT_TYPE,
-    SCHEMA_VERSION,
 };
 
 pub use crate::document::BufferedDocument;
@@ -42,8 +42,11 @@ pub(crate) fn scan_dispatch(path: &Path, bytes: &[u8]) -> Result<DocumentDispatc
         _ => None,
     };
     match (capture.schema_version, kind) {
-        (Some(SCHEMA_VERSION), Some(kind)) => Ok(DocumentDispatch {
-            schema_version: SCHEMA_VERSION,
+        (
+            Some(schema_version @ (DOCUMENT_SCHEMA_VERSION_V2 | DOCUMENT_SCHEMA_VERSION_V3)),
+            Some(kind),
+        ) => Ok(DocumentDispatch {
+            schema_version,
             kind,
         }),
         _ => Err(CoreError::UnsupportedDocument {

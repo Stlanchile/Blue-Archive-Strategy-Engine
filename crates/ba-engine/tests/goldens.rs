@@ -70,3 +70,24 @@ fn approved_boundary_fixtures() {
     assert!((atomic.expected_terminal_primitive_recruitments - 10.0).abs() <= 1.0e-12);
     assert!((atomic.expected_ticket_funded_primitive_recruitments - 10.0).abs() <= 1.0e-12);
 }
+
+#[test]
+fn v2_fingerprints_remain_frozen_under_v3_catalog_additions() {
+    let bundle = load_bundle(
+        workspace_path("data"),
+        workspace_path("scenarios/golden/single_target_200.json"),
+    )
+    .expect("bundle");
+    assert_eq!(
+        bundle.fingerprints().scenario.to_hex(),
+        "95eb5b476e17e148909fefd24da3ab00e0e15c4cbc8fdd5ed26758bc4fdb66af"
+    );
+    assert_eq!(
+        bundle.fingerprints().ruleset.to_hex(),
+        "db0af908e4436e396e9a55e7e0bd39aa8ae30d8a148c34abb07c24cb347fb6ad"
+    );
+    assert_eq!(
+        bundle.fingerprints().reward_schedule.to_hex(),
+        "41387171a8507e76f595d0571b3d21028c166cb487bc49e64f3c072c09e6b10e"
+    );
+}

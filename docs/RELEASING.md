@@ -1,8 +1,9 @@
 # Release readiness
 
-Version 0.2.0 is prepared for a controlled Linux x86_64 CLI release. It is not
-a crates.io publication workflow and local implementation work must not create
-a tag, push, publish a package, or create a GitHub release.
+Version 0.3.0 is prepared for controlled Linux x86_64 CLI release verification.
+It is not yet approved as a formal source-backed gameplay-data release. This is
+not a crates.io publication workflow, and local implementation work must not
+create a tag, push, publish a package, or create a GitHub release.
 
 ## Preconditions
 
@@ -14,6 +15,9 @@ a tag, push, publish a package, or create a GitHub release.
   terms. Re-open this assessment if history or imported material changes.
 - Require a fresh online `cargo audit --deny warnings`; advisory/network failure
   is not a clean audit.
+- Require first-party claim-level evidence before adding or approving
+  source-backed v3 ruleset/campaign data. The current shipped v3 data remains
+  provisional because this gate is incomplete.
 - CI installs the reviewed `cargo-audit 0.22.2` with its published lockfile
   before running that online audit.
 - Keep all crates `publish = false`, use the reviewed lockfile, and run locked
@@ -46,7 +50,7 @@ Reviewed action pins:
 | `actions/upload-artifact` | 4.6.2 | `ea165f8d65b6e75b540449e92b4886f43607fa02` |
 | `actions/download-artifact` | 4.3.0 | `d3f86a106a0bac45b974a628896c90dbdf5c8093` |
 
-The runtime archive must include `ba-strategy`, `data/`,
+The runtime archive must include `ba-strategy`, v2 and v3 `data/`,
 `scenarios/golden/`, `scenarios/examples/`, core user-facing docs, README,
 CHANGELOG, SECURITY, and both licenses. It must exclude `tests/fixtures/`.
 Normalize archive ordering, modes, ownership, and timestamps before checksums.
@@ -54,3 +58,7 @@ Normalize archive ordering, modes, ownership, and timestamps before checksums.
 Protect `v*` tags and the release environment, restrict tag creation, and
 require reviewers for publication. A verification failure makes publication
 impossible.
+
+Packaging verification is not publication. It must not create a tag, push,
+publish crates, create a GitHub release, or describe an incomplete source/audit
+gate as complete.

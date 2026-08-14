@@ -255,9 +255,10 @@ fn catalog_listing_and_inspection_are_deterministic_and_exclude_test_fixtures() 
     assert!(first.stderr.is_empty());
     assert_eq!(first.stdout, second.stdout);
     let body: serde_json::Value = serde_json::from_slice(&first.stdout).expect("catalog JSON");
-    assert_eq!(body["output_schema_version"], 1);
+    assert_eq!(body["output_schema_version"], 2);
     let rendered = stdout(&first);
     assert!(rendered.contains("jp_2026_07_29_provisional_v2"));
+    assert!(rendered.contains("jp_2026_07_29_provisional_v3"));
     assert!(rendered.contains("jp_2026_07_29_empty_v2"));
     assert!(!rendered.contains("synthetic_custom"));
 
@@ -278,7 +279,7 @@ fn catalog_listing_and_inspection_are_deterministic_and_exclude_test_fixtures() 
     assert_eq!(text.status.code(), Some(0), "{}", stderr(&text));
     let rendered = stdout(&text);
     assert!(!rendered.trim_start().starts_with('{'));
-    assert!(rendered.contains("output_schema_version: 1"));
+    assert!(rendered.contains("output_schema_version: 2"));
     assert!(rendered.contains("jp_2026_07_29_provisional_v2"));
 }
 

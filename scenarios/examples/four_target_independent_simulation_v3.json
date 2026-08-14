@@ -1,0 +1,203 @@
+{
+  "schema_version": 3,
+  "document_type": "scenario",
+  "scenario_id": "example_four_target_independent_simulation_v3",
+  "ruleset_id": "jp_2026_07_29_provisional_v3",
+  "reward_schedule_id": "jp_2026_07_29_empty_v3",
+  "authority": {
+    "scenario": "user_authored",
+    "banner_topology": "user_authored",
+    "target_order": "user_authored",
+    "initial_state": "user_authored",
+    "cross_target_probabilities": "user_authored",
+    "strategy": "user_authored"
+  },
+  "initial_recruitment_count": 0,
+  "students": [
+    {"student_id": "target_a"},
+    {"student_id": "target_b"},
+    {"student_id": "target_c"},
+    {"student_id": "target_d"}
+  ],
+  "banners": [
+    {
+      "banner_id": "banner_a",
+      "featured_student_id": "target_a",
+      "charge_group_id": "group_a"
+    },
+    {
+      "banner_id": "banner_b",
+      "featured_student_id": "target_b",
+      "charge_group_id": "group_b"
+    },
+    {
+      "banner_id": "banner_c",
+      "featured_student_id": "target_c",
+      "charge_group_id": "group_c"
+    },
+    {
+      "banner_id": "banner_d",
+      "featured_student_id": "target_d",
+      "charge_group_id": "group_d"
+    }
+  ],
+  "initial_charges": [
+    {"charge_group_id": "group_a", "pre_recruitment_charge": 0},
+    {"charge_group_id": "group_b", "pre_recruitment_charge": 0},
+    {"charge_group_id": "group_c", "pre_recruitment_charge": 0},
+    {"charge_group_id": "group_d", "pre_recruitment_charge": 0}
+  ],
+  "initial_resources": {
+    "pyroxene": 48000,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0,
+    "keystone_fragments": 0,
+    "secret_tech_notes": 0,
+    "superior_bd_selectors": 0,
+    "high_grade_gift_boxes": 0
+  },
+  "initial_owned_targets": [],
+  "targets": [
+    {"student_id": "target_a", "banner_id": "banner_a"},
+    {"student_id": "target_b", "banner_id": "banner_b"},
+    {"student_id": "target_c", "banner_id": "banner_c"},
+    {"student_id": "target_d", "banner_id": "banner_d"}
+  ],
+  "cross_target_probability_tables": [
+    {
+      "banner_id": "banner_a",
+      "ordinary": {
+        "denominator": 1000,
+        "other_target_weights": [
+          {"target_id": "target_b", "weight": 0},
+          {"target_id": "target_c", "weight": 0},
+          {"target_id": "target_d", "weight": 0}
+        ]
+      },
+      "threshold_overrides": [
+        {
+          "pre_charge": 99,
+          "denominator": 2,
+          "other_target_weights": [
+            {"target_id": "target_b", "weight": 0},
+            {"target_id": "target_c", "weight": 0},
+            {"target_id": "target_d", "weight": 0}
+          ]
+        },
+        {
+          "pre_charge": 199,
+          "denominator": 1,
+          "other_target_weights": [
+            {"target_id": "target_b", "weight": 0},
+            {"target_id": "target_c", "weight": 0},
+            {"target_id": "target_d", "weight": 0}
+          ]
+        }
+      ]
+    },
+    {
+      "banner_id": "banner_b",
+      "ordinary": {
+        "denominator": 1000,
+        "other_target_weights": [
+          {"target_id": "target_a", "weight": 0},
+          {"target_id": "target_c", "weight": 0},
+          {"target_id": "target_d", "weight": 0}
+        ]
+      },
+      "threshold_overrides": [
+        {
+          "pre_charge": 99,
+          "denominator": 2,
+          "other_target_weights": [
+            {"target_id": "target_a", "weight": 0},
+            {"target_id": "target_c", "weight": 0},
+            {"target_id": "target_d", "weight": 0}
+          ]
+        },
+        {
+          "pre_charge": 199,
+          "denominator": 1,
+          "other_target_weights": [
+            {"target_id": "target_a", "weight": 0},
+            {"target_id": "target_c", "weight": 0},
+            {"target_id": "target_d", "weight": 0}
+          ]
+        }
+      ]
+    },
+    {
+      "banner_id": "banner_c",
+      "ordinary": {
+        "denominator": 1000,
+        "other_target_weights": [
+          {"target_id": "target_a", "weight": 0},
+          {"target_id": "target_b", "weight": 0},
+          {"target_id": "target_d", "weight": 0}
+        ]
+      },
+      "threshold_overrides": [
+        {
+          "pre_charge": 99,
+          "denominator": 2,
+          "other_target_weights": [
+            {"target_id": "target_a", "weight": 0},
+            {"target_id": "target_b", "weight": 0},
+            {"target_id": "target_d", "weight": 0}
+          ]
+        },
+        {
+          "pre_charge": 199,
+          "denominator": 1,
+          "other_target_weights": [
+            {"target_id": "target_a", "weight": 0},
+            {"target_id": "target_b", "weight": 0},
+            {"target_id": "target_d", "weight": 0}
+          ]
+        }
+      ]
+    },
+    {
+      "banner_id": "banner_d",
+      "ordinary": {
+        "denominator": 1000,
+        "other_target_weights": [
+          {"target_id": "target_a", "weight": 0},
+          {"target_id": "target_b", "weight": 0},
+          {"target_id": "target_c", "weight": 0}
+        ]
+      },
+      "threshold_overrides": [
+        {
+          "pre_charge": 99,
+          "denominator": 2,
+          "other_target_weights": [
+            {"target_id": "target_a", "weight": 0},
+            {"target_id": "target_b", "weight": 0},
+            {"target_id": "target_c", "weight": 0}
+          ]
+        },
+        {
+          "pre_charge": 199,
+          "denominator": 1,
+          "other_target_weights": [
+            {"target_id": "target_a", "weight": 0},
+            {"target_id": "target_b", "weight": 0},
+            {"target_id": "target_c", "weight": 0}
+          ]
+        }
+      ]
+    }
+  ],
+  "strategy": {
+    "strategy_schema_version": 2,
+    "strategy_id": "sequential_targets_v3",
+    "kind": "sequential_targets",
+    "funding_priority": ["paid_single", "ticket_ten"],
+    "max_additional_recruitments": 400
+  }
+}

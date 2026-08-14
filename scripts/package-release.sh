@@ -73,12 +73,16 @@ if [[ ! -x "$binary" ]]; then
 fi
 
 required_files=(
-    README.md CHANGELOG.md SECURITY.md LICENSE-MIT LICENSE-APACHE
-    docs/CALIBRATION.md docs/PROTOCOLS.md docs/SCHEMA_V2.md
+    README.md README.zh-CN.md CHANGELOG.md SECURITY.md LICENSE-MIT LICENSE-APACHE
+    docs/CALIBRATION.md docs/DATA_PROVENANCE.md docs/PROTOCOLS.md
+    docs/RELEASING.md docs/SCHEMA_V2.md docs/SCHEMA_V3.md
     docs/STRATEGIES.md docs/THREAT_MODEL.md
+    docs/adr/0001-deterministic-parallel-monte-carlo.md
     data/rulesets/jp_2026_07_29_provisional_v2.json
+    data/rulesets/jp_2026_07_29_provisional_v3.json
     data/rewards/jp_2026_07_29_campaign_v2.json
     data/rewards/jp_2026_07_29_empty_v2.json
+    data/rewards/jp_2026_07_29_empty_v3.json
 )
 for relative_path in "${required_files[@]}"; do
     [[ -f "$repo_root/$relative_path" ]] || {
@@ -104,17 +108,21 @@ cleanup() {
 trap cleanup EXIT
 
 stage="$stage_root/$base_name"
-mkdir -p -- "$stage/data/rulesets" "$stage/data/rewards" "$stage/scenarios" "$stage/docs"
+mkdir -p -- "$stage/data/rulesets" "$stage/data/rewards" "$stage/scenarios" \
+    "$stage/docs/adr"
 install -m 0755 -- "$binary" "$stage/ba-strategy"
 cp -- "$repo_root/data/rulesets/"*.json "$stage/data/rulesets/"
 cp -- "$repo_root/data/rewards/"*.json "$stage/data/rewards/"
 cp -R -- "$repo_root/scenarios/golden" "$stage/scenarios/golden"
 cp -R -- "$repo_root/scenarios/examples" "$stage/scenarios/examples"
-cp -- "$repo_root/README.md" "$repo_root/CHANGELOG.md" "$repo_root/SECURITY.md" \
-    "$repo_root/LICENSE-MIT" "$repo_root/LICENSE-APACHE" "$stage/"
+cp -- "$repo_root/README.md" "$repo_root/README.zh-CN.md" "$repo_root/CHANGELOG.md" \
+    "$repo_root/SECURITY.md" "$repo_root/LICENSE-MIT" "$repo_root/LICENSE-APACHE" "$stage/"
 cp -- "$repo_root/docs/CALIBRATION.md" \
-    "$repo_root/docs/PROTOCOLS.md" "$repo_root/docs/SCHEMA_V2.md" \
+    "$repo_root/docs/DATA_PROVENANCE.md" "$repo_root/docs/PROTOCOLS.md" \
+    "$repo_root/docs/RELEASING.md" "$repo_root/docs/SCHEMA_V2.md" \
+    "$repo_root/docs/SCHEMA_V3.md" \
     "$repo_root/docs/STRATEGIES.md" "$repo_root/docs/THREAT_MODEL.md" "$stage/docs/"
+cp -- "$repo_root/docs/adr/0001-deterministic-parallel-monte-carlo.md" "$stage/docs/adr/"
 
 find "$stage" -type d -exec chmod 0755 {} +
 find "$stage" -type f -exec chmod 0644 {} +

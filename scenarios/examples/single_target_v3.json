@@ -1,0 +1,85 @@
+{
+  "schema_version": 3,
+  "document_type": "scenario",
+  "scenario_id": "example_single_target_v3",
+  "ruleset_id": "jp_2026_07_29_provisional_v3",
+  "reward_schedule_id": "jp_2026_07_29_empty_v3",
+  "authority": {
+    "scenario": "user_authored",
+    "banner_topology": "user_authored",
+    "target_order": "user_authored",
+    "initial_state": "user_authored",
+    "cross_target_probabilities": "user_authored",
+    "strategy": "user_authored"
+  },
+  "initial_recruitment_count": 0,
+  "students": [
+    {
+      "student_id": "target_a"
+    }
+  ],
+  "banners": [
+    {
+      "banner_id": "banner_a",
+      "featured_student_id": "target_a",
+      "charge_group_id": "shared"
+    }
+  ],
+  "initial_charges": [
+    {
+      "charge_group_id": "shared",
+      "pre_recruitment_charge": 0
+    }
+  ],
+  "initial_resources": {
+    "pyroxene": 24000,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0,
+    "keystone_fragments": 0,
+    "secret_tech_notes": 0,
+    "superior_bd_selectors": 0,
+    "high_grade_gift_boxes": 0
+  },
+  "initial_owned_targets": [],
+  "targets": [
+    {
+      "student_id": "target_a",
+      "banner_id": "banner_a"
+    }
+  ],
+  "cross_target_probability_tables": [
+    {
+      "banner_id": "banner_a",
+      "ordinary": {
+        "denominator": 1000,
+        "other_target_weights": []
+      },
+      "threshold_overrides": [
+        {
+          "pre_charge": 99,
+          "denominator": 2,
+          "other_target_weights": []
+        },
+        {
+          "pre_charge": 199,
+          "denominator": 1,
+          "other_target_weights": []
+        }
+      ]
+    }
+  ],
+  "strategy": {
+    "strategy_schema_version": 2,
+    "strategy_id": "sequential_targets_v3",
+    "kind": "sequential_targets",
+    "funding_priority": [
+      "ticket_ten",
+      "paid_single"
+    ],
+    "max_additional_recruitments": 200
+  }
+}

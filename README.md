@@ -2,17 +2,22 @@
 
 # Blue Archive Strategy Engine
 
-`ba-strategy` 0.2.0 is a local Rust probability engine for one or two ordered
-Blue Archive recruitment targets. It supports exhaustive analysis, reproducible
-serial Monte Carlo, trace/replay, and exact-versus-simulation comparison.
+`ba-strategy` 0.3.0 is a local Rust probability engine for ordered Blue Archive
+recruitment targets. Frozen schema v2 supports one or two targets; schema v3
+supports one through four targets, cross-target acquisition, campaign progress,
+and finite or repeating recruitment-count rewards. Both profiles support
+exhaustive analysis, reproducible serial Monte Carlo, trace/replay, and
+exact-versus-simulation comparison.
 
 This is an unofficial fan/research tool. It is not affiliated with, endorsed
 by, or a source of official information from Nexon, Yostar, Blue Archive, or
 their affiliates. The repository contains no copyrighted game assets.
 
-The shipped data is explicitly provisional. In particular,
-`jp_2026_07_29_provisional_v2` is not an independently verified or official
-statement of game rules.
+The shipped v2 and v3 mechanics data is explicitly provisional. The repository
+does not currently ship a source-backed v3 campaign schedule: several required
+numeric and ticket-eligibility claims still lack complete first-party evidence.
+Provenance metadata is structural source coverage, never an aggregate claim
+that an analysis is factually verified.
 
 ## Build and run
 
@@ -32,14 +37,19 @@ cargo run --locked -p ba-cli --bin ba-strategy -- \
   scenario template --scenario-id generated_v2 \
   --ruleset jp_2026_07_29_provisional_v2 \
   --reward-schedule jp_2026_07_29_empty_v2 --target-count 2
+
+cargo run --locked -p ba-cli --bin ba-strategy -- \
+  scenario template --schema-version 3 --scenario-id generated_v3 \
+  --ruleset jp_2026_07_29_provisional_v3 \
+  --reward-schedule jp_2026_07_29_empty_v3 --target-count 4
 ```
 
 Existing commands remain available: `validate`, `analyze`, `simulate`, and
 `compare`. New local-inspection commands are `catalog list`, `catalog inspect`,
 `scenario explain`, and `scenario template`. JSON catalog, inspection, and
 explanation outputs include an explicit output schema version. Template output
-is valid schema-v2 JSON on stdout and defaults to ticket-first funding with a
-200-recruitment horizon.
+defaults to schema v2 byte-compatible behavior; `--schema-version 3` emits all
+v3 authority, probability-table, progress, and eleven-resource fields.
 
 `--data-dir` defaults to `./data`. With `--scenario-dir <PATH>`, a bare name
 such as `foo` or `foo.json` resolves to `<PATH>/foo.json`; `./foo.json`,
@@ -69,10 +79,13 @@ regression scenarios; and `tests/fixtures/` is synthetic/adversarial test data.
 The `synthetic_custom_*` fixtures are deliberately non-gameplay mechanics and
 are never runtime catalog data or release-facing examples.
 
-All input documents use schema version 2. Schema version 1 was an unused
-development format and is not accepted. Successful analysis uses engine
-semantics 2 and result schema 2. Details are in
-[`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md).
+Homogeneous schema-v2 and schema-v3 bundles are accepted; mixed-profile bundles
+are rejected before execution. Schema version 1 was an unused development
+format and remains unsupported. V2 continues to use engine semantics/result
+schema 2. V3 uses engine semantics/result schema 3. See
+[`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md),
+[`docs/SCHEMA_V3.md`](docs/SCHEMA_V3.md), and
+[`docs/DATA_PROVENANCE.md`](docs/DATA_PROVENANCE.md).
 
 V2 results distinguish behavior fingerprints from document fingerprints.
 Changing only v2 provenance changes document identity/provenance output but
@@ -94,9 +107,13 @@ See [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 ## Model and limits
 
 Actions are atomic: a locked banner continues for every primitive draw even
-after an early pickup, and policy is reevaluated only at the action boundary.
-Every scenario requires an explicit positive horizon and an exact permutation
-of `ticket_ten` and `paid_single` as funding priority. See
+after an early target acquisition, and policy is reevaluated only at the action
+boundary. V3 acquisition of another configured target changes ownership but
+does not reset the active banner's featured charge. V3 distinguishes initial,
+additional, and absolute campaign counts and generates repeating rewards only
+through its finite additional horizon. Every scenario requires an explicit
+positive horizon and an exact permutation of `ticket_ten` and `paid_single`.
+See
 [`docs/STRATEGIES.md`](docs/STRATEGIES.md).
 
 Document limits are 1 MiB, JSON depth 64, 512 inspected immediate directory

@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "ba-cli"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ba-core",
  "ba-engine",
@@ -68,7 +68,7 @@ dependencies = [
 
 [[package]]
 name = "ba-core"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "rustix",
  "serde",
@@ -81,7 +81,7 @@ dependencies = [
 
 [[package]]
 name = "ba-engine"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ba-core",
  "rand_chacha",

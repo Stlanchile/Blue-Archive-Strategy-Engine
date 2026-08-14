@@ -4,8 +4,15 @@ use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use ba_core::{Catalog, load_bundle, validate_document};
-use ba_engine::{ExactSolverOptions, analyze_exact, simulate_monte_carlo};
+use ba_core::schema::RawRewardScheduleV3;
+use ba_core::{
+    AnyValidatedScenarioBundle, Catalog, CompiledOutcomeDistribution, ProbabilityRatio,
+    RewardScheduleV3, TargetIndex, load_any_bundle, load_bundle, validate_document,
+};
+use ba_engine::{
+    ExactSolverOptions, analyze_exact, analyze_exact_v3, simulate_monte_carlo,
+    simulate_monte_carlo_v3,
+};
 use tempfile::TempDir;
 
 fn workspace_path(relative: &str) -> PathBuf {
@@ -49,6 +56,25 @@ fn main() {
     measure("complete shipped catalog", || {
         Catalog::load(workspace_path("data")).expect("catalog")
     });
+    measure("v3 ruleset read and validation", || {
+        validate_document(
+            workspace_path("data"),
+            workspace_path("data/rulesets/jp_2026_07_29_provisional_v3.json"),
+        )
+        .expect("v3 ruleset validation")
+    });
+    measure("v3 categorical compilation", || {
+        CompiledOutcomeDistribution::compile(
+            ProbabilityRatio::new(7, 1000).expect("ratio"),
+            10_000,
+            &[
+                (TargetIndex::new(1, 4).expect("target"), 70),
+                (TargetIndex::new(2, 4).expect("target"), 0),
+                (TargetIndex::new(3, 4).expect("target"), 35),
+            ],
+        )
+        .expect("categorical")
+    });
 
     for scenario in ["single_target_200", "dual_shared_200", "campaign_dual_310"] {
         let bundle = load_bundle(
@@ -79,6 +105,66 @@ fn main() {
             42,
         )
         .expect("Monte Carlo")
+    });
+
+    for scenario in [
+        "v3_three_target_exact_small",
+        "v3_four_target_exact_small",
+        "v3_atomic_cross_target",
+    ] {
+        let bundle = match load_any_bundle(
+            workspace_path("data"),
+            workspace_path(&format!("scenarios/golden/{scenario}.json")),
+        )
+        .expect("v3 bundle")
+        {
+            AnyValidatedScenarioBundle::V3(bundle) => bundle,
+            AnyValidatedScenarioBundle::V2(_) => panic!("expected v3"),
+        };
+        let result = measure(&format!("{scenario} exact"), || {
+            analyze_exact_v3(&bundle, ExactSolverOptions::default()).expect("v3 exact")
+        });
+        println!(
+            "{scenario} deterministic counts: boundary={}, in-flight={}, processed={}, expansions={}",
+            result.solver_diagnostics.peak_boundary_frontier,
+            result.solver_diagnostics.peak_in_flight_frontier,
+            result.solver_diagnostics.processed_states,
+            result.solver_diagnostics.transition_expansions
+        );
+        if scenario == "v3_atomic_cross_target" {
+            measure("v3 serial Monte Carlo 10000", || {
+                simulate_monte_carlo_v3(&bundle, NonZeroU64::new(10_000).expect("runs"), 42)
+                    .expect("v3 Monte Carlo")
+            });
+        }
+    }
+
+    let repeat_raw: RawRewardScheduleV3 = serde_json::from_value(serde_json::json!({
+        "schema_version": 3,
+        "document_type": "reward_schedule",
+        "reward_schedule_id": "benchmark_repeat",
+        "provenance": {
+            "provenance_status": "provisional",
+            "sources": [],
+            "claim_bindings": []
+        },
+        "compatible_ruleset_ids": ["benchmark"],
+        "initial_milestones": [],
+        "repeating_cycle": {
+            "starts_after_count": 390,
+            "period": 200,
+            "milestones": [{
+                "offset": 20,
+                "rewards": [{"resource": "eligma", "quantity": 1}]
+            }]
+        }
+    }))
+    .expect("repeat raw");
+    let repeat = RewardScheduleV3::from_raw(repeat_raw, None).expect("repeat");
+    measure("v3 repeat interval accumulation", || {
+        repeat
+            .resources_earned_between(1_000_000, 2_000_000)
+            .expect("repeat interval")
     });
 
     let synthetic = stage_synthetic();

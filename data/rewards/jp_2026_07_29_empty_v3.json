@@ -1,0 +1,15 @@
+{
+  "schema_version": 3,
+  "document_type": "reward_schedule",
+  "reward_schedule_id": "jp_2026_07_29_empty_v3",
+  "provenance": {
+    "provenance_status": "provisional",
+    "sources": [],
+    "claim_bindings": []
+  },
+  "compatible_ruleset_ids": [
+    "jp_2026_07_29_provisional_v3"
+  ],
+  "initial_milestones": [],
+  "repeating_cycle": null
+}

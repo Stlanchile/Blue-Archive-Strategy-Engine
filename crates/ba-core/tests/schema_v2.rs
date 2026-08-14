@@ -190,7 +190,7 @@ fn duplicate_ids_are_rejected() {
 fn unknown_schema_and_document_type_pairs_are_typed_unsupported_documents() {
     let temp = TempDir::new().expect("tempdir");
     for (name, schema_version, document_type) in [
-        ("unknown_version", 3, "ruleset"),
+        ("unknown_version", 4, "ruleset"),
         ("unknown_kind", 2, "other"),
     ] {
         let path = temp.path().join(format!("{name}.json"));

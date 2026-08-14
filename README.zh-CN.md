@@ -2,16 +2,18 @@
 
 # Blue Archive Strategy Engine
 
-`ba-strategy` 0.2.0 是一款在本地运行的 Rust 概率分析引擎，用于分析按顺序指定的
-一到两个《蔚蓝档案》招募目标。它支持穷举分析、可复现的串行蒙特卡洛模拟、轨迹记录
-与重放，以及精确分析与模拟结果的对比。
+`ba-strategy` 0.3.0 是一款在本地运行的 Rust 概率分析引擎，用于分析按顺序指定的
+《蔚蓝档案》招募目标。冻结的 schema v2 支持一到两个目标；schema v3 支持一到四个
+目标、跨目标获得、招募周期中途进度，以及有限或循环的招募次数奖励。两个 profile
+均支持穷举分析、可复现的串行蒙特卡洛模拟、轨迹记录与重放，以及精确分析与模拟对比。
 
 本项目是一款非官方的爱好者/研究工具，与 Nexon、Yostar、《蔚蓝档案》及其关联方
 均无隶属关系，亦未获得其认可或背书，也不是官方信息来源。本仓库不包含受版权保护的
 游戏素材。
 
-随项目提供的数据均明确标记为暂定（provisional）数据。特别是，
-`jp_2026_07_29_provisional_v2` 既未经独立核验，也不是官方的游戏规则说明。
+随项目提供的 v2 与 v3 机制数据均明确标记为暂定（provisional）数据。目前没有随
+项目提供 source-backed 的 v3 活动奖励表：若干数值和招募券适用范围仍缺少完整的
+第一方证据。来源元数据仅表示结构化的来源覆盖，不代表分析结果已经得到事实核验。
 
 ## 构建与运行
 
@@ -32,14 +34,19 @@ cargo run --locked -p ba-cli --bin ba-strategy -- \
   scenario template --scenario-id generated_v2 \
   --ruleset jp_2026_07_29_provisional_v2 \
   --reward-schedule jp_2026_07_29_empty_v2 --target-count 2
+
+cargo run --locked -p ba-cli --bin ba-strategy -- \
+  scenario template --schema-version 3 --scenario-id generated_v3 \
+  --ruleset jp_2026_07_29_provisional_v3 \
+  --reward-schedule jp_2026_07_29_empty_v3 --target-count 4
 ```
 
 原有命令 `validate`、`analyze`、`simulate` 和 `compare` 均继续可用。新增的本地
 检查命令包括 `catalog list`、`catalog inspect`、`scenario explain` 和
 `scenario template`。`catalog list`、`catalog inspect` 和 `scenario explain`
-的 JSON 输出均包含明确的输出 schema 版本号。`scenario template` 会把合法的
-schema v2 JSON 写入 stdout，默认先使用 10次招募券，再使用付费单次招募，招募总
-次数上限为 200 次。
+的 JSON 输出均包含明确的输出 schema 版本号。`scenario template` 默认保持
+schema v2 的兼容输出；使用 `--schema-version 3` 时会显式输出 v3 的权限归属、
+概率表、进度字段与全部十一种资源。
 
 `--data-dir` 默认为 `./data`。指定 `--scenario-dir <PATH>` 后，`foo` 或
 `foo.json` 这样的单独名称会解析为 `<PATH>/foo.json`；带有 `./`、`../` 的路径、
@@ -67,9 +74,12 @@ stderr，stdout 不会留下任何可视为权威结果的输出。
 合成及对抗性测试数据。`synthetic_custom_*` 测试夹具刻意采用与实际游戏玩法无关的
 机制，绝不会作为运行时 `catalog` 数据或面向发布的示例。
 
-所有输入文档均使用 schema 2。Schema 1 仅作为未投入使用的开发格式存在，现已不再接受。
-成功的分析统一使用引擎语义版本 2 和结果 schema 2。详情请参阅
-[`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md)。
+只接受 profile 一致的 schema-v2 或 schema-v3 bundle；混合 profile 会在执行前被
+拒绝。Schema 1 是未投入使用的开发格式，仍不受支持。V2 使用引擎语义版本 2 与结果
+schema 2；V3 使用引擎语义版本 3 与结果 schema 3。详情请参阅
+[`docs/SCHEMA_V2.md`](docs/SCHEMA_V2.md)、
+[`docs/SCHEMA_V3.md`](docs/SCHEMA_V3.md) 与
+[`docs/DATA_PROVENANCE.md`](docs/DATA_PROVENANCE.md)。
 
 V2 结果区分行为指纹与文档指纹。若仅更改 v2 的来源元数据（provenance），文档身份
 和输出中的来源信息会随之改变；但机制、策略决策、精确分析和蒙特卡洛模拟的行为均
@@ -91,9 +101,11 @@ V2 结果区分行为指纹与文档指纹。若仅更改 v2 的来源元数据�
 ## 模型与限制
 
 每个动作都是原子的：一旦锁定招募卡池，该动作就会完成其中的全部基础招募，即使
-提前获得目标也不会中止；策略仅在动作边界重新评估。每个场景都必须显式指定正整数
-招募上限；`funding_priority` 必须且只能是 `ticket_ten` 与 `paid_single` 各出现
-一次的两种排列之一。请参阅
+提前获得目标也不会中止；策略仅在动作边界重新评估。在 v3 中，招募当前卡池时获得
+另一个已配置目标会更新其持有状态，但不会重置当前卡池的精选目标 charge。V3 还会
+区分初始、追加与绝对招募次数，并只在有限的追加招募上限内生成循环奖励。每个场景都
+必须显式指定正整数招募上限；`funding_priority` 必须且只能是 `ticket_ten` 与
+`paid_single` 各出现一次的两种排列之一。请参阅
 [`docs/STRATEGIES.md`](docs/STRATEGIES.md)。
 
 单份文档的大小上限为 1 MiB，JSON 最大深度为 64；最多检查 512 个目录直接子项，

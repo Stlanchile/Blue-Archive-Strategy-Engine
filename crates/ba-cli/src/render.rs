@@ -1,7 +1,10 @@
 use std::fmt::Write as _;
 
 use ba_core::ValidationReport;
-use ba_engine::{ComparisonResult, ExactAnalysisResult, MonteCarloAnalysisResult, RunTraceResult};
+use ba_engine::{
+    ComparisonResult, ComparisonResultV3, ExactAnalysisResult, ExactAnalysisResultV3,
+    MonteCarloAnalysisResult, MonteCarloAnalysisResultV3, RunTraceResult, RunTraceResultV3,
+};
 use serde::Serialize;
 
 use crate::args::OutputFormat;
@@ -93,6 +96,87 @@ pub(crate) fn comparison(
             value.monte_carlo.success_probability,
             value.success_probability_difference,
             if value.success_probability_within_monte_carlo_interval {
+                "yes"
+            } else {
+                "no"
+            },
+        )),
+    }
+}
+
+pub(crate) fn exact_v3(
+    value: &ExactAnalysisResultV3,
+    format: OutputFormat,
+) -> Result<String, AppError> {
+    match format {
+        OutputFormat::Json => render_json(value),
+        OutputFormat::Text => Ok(format!(
+            "Engine: exact\nScenario: {}\nAll-target success probability: {:.15}\nExpected additional primitive recruitments: {:.10}\nExpected first all-target completion count given success: {}\nExpected paid pyroxene spent: {:.10}\nExpected ticket-funded primitive recruitments: {:.10}\n",
+            value.provenance.scenario_id,
+            value.all_target_success_probability,
+            value.expected_additional_primitive_recruitments,
+            display_optional(value.expected_first_all_target_completion_count_given_success),
+            value.expected_paid_pyroxene_spent,
+            value.expected_ticket_funded_primitive_recruitments,
+        )),
+    }
+}
+
+pub(crate) fn monte_carlo_v3(
+    value: &MonteCarloAnalysisResultV3,
+    format: OutputFormat,
+) -> Result<String, AppError> {
+    match format {
+        OutputFormat::Json => render_json(value),
+        OutputFormat::Text => Ok(format!(
+            "Engine: Monte Carlo\nScenario: {}\nRuns: {}\nMaster seed: {}\nAll-target success probability estimate: {:.15}\nExpected additional primitive recruitments: {:.10}\nExpected paid pyroxene spent: {:.10}\nExpected ticket-funded primitive recruitments: {:.10}\n",
+            value.provenance.scenario_id,
+            value.rng.run_count,
+            value.rng.master_seed,
+            value.all_target_success_probability,
+            value.expected_additional_primitive_recruitments,
+            value.expected_paid_pyroxene_spent,
+            value.expected_ticket_funded_primitive_recruitments,
+        )),
+    }
+}
+
+pub(crate) fn trace_v3(value: &RunTraceResultV3, format: OutputFormat) -> Result<String, AppError> {
+    match format {
+        OutputFormat::Json => render_json(value),
+        OutputFormat::Text => Ok(format!(
+            "Engine: trace\nScenario: {}\nMaster seed: {}\nTerminal reason: {:?}\nTerminal additional primitive recruitments: {}\nTerminal absolute campaign recruitment count: {}\nFirst all-target completion additional count: {}\nPaid pyroxene spent: {}\nTicket-funded primitive recruitments: {}\n",
+            value.provenance.scenario_id,
+            value
+                .rng
+                .as_ref()
+                .map_or_else(|| "none".to_owned(), |rng| rng.master_seed.to_string()),
+            value.terminal_reason,
+            value.terminal_additional_primitive_recruitments,
+            value.terminal_absolute_campaign_recruitment_count,
+            value
+                .first_all_target_completion_additional_count
+                .map_or_else(|| "none".to_owned(), |count| count.to_string()),
+            value.paid_pyroxene_spent,
+            value.ticket_funded_primitive_recruitments,
+        )),
+    }
+}
+
+pub(crate) fn comparison_v3(
+    value: &ComparisonResultV3,
+    format: OutputFormat,
+) -> Result<String, AppError> {
+    match format {
+        OutputFormat::Json => render_json(value),
+        OutputFormat::Text => Ok(format!(
+            "Engine: comparison\nScenario: {}\nMaster seed: {}\nExact all-target success probability: {:.15}\nMonte Carlo all-target success probability: {:.15}\nDifference: {:.15}\nExact value inside Monte Carlo 95% interval: {}\n",
+            value.exact.provenance.scenario_id,
+            value.monte_carlo.rng.master_seed,
+            value.exact.all_target_success_probability,
+            value.monte_carlo.all_target_success_probability,
+            value.all_target_success.simulation_minus_exact,
+            if value.all_target_success.exact_within_monte_carlo_interval {
                 "yes"
             } else {
                 "no"

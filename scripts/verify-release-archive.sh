@@ -54,10 +54,15 @@ require_entry() {
 }
 
 for path in \
-    ba-strategy RELEASE-MANIFEST.sha256 README.md CHANGELOG.md SECURITY.md LICENSE-MIT LICENSE-APACHE \
-    docs/CALIBRATION.md docs/PROTOCOLS.md docs/SCHEMA_V2.md docs/STRATEGIES.md docs/THREAT_MODEL.md \
+    ba-strategy RELEASE-MANIFEST.sha256 README.md README.zh-CN.md CHANGELOG.md SECURITY.md \
+    LICENSE-MIT LICENSE-APACHE \
+    docs/CALIBRATION.md docs/DATA_PROVENANCE.md docs/PROTOCOLS.md docs/SCHEMA_V2.md \
+    docs/RELEASING.md docs/SCHEMA_V3.md docs/STRATEGIES.md docs/THREAT_MODEL.md \
+    docs/adr/0001-deterministic-parallel-monte-carlo.md \
     data/rulesets/jp_2026_07_29_provisional_v2.json \
-    data/rewards/jp_2026_07_29_campaign_v2.json data/rewards/jp_2026_07_29_empty_v2.json; do
+    data/rulesets/jp_2026_07_29_provisional_v3.json \
+    data/rewards/jp_2026_07_29_campaign_v2.json data/rewards/jp_2026_07_29_empty_v2.json \
+    data/rewards/jp_2026_07_29_empty_v3.json; do
     require_entry "$path"
 done
 
@@ -81,5 +86,7 @@ if [[ "$(uname -s)" == Linux ]]; then
         "$binary" --data-dir "$extract_root/$root/data" catalog list all --format json >/dev/null
         "$binary" --data-dir "$extract_root/$root/data" --scenario-dir "$extract_root/$root/scenarios/examples" \
             analyze single_target_v2 --format json >/dev/null
+        "$binary" --data-dir "$extract_root/$root/data" --scenario-dir "$extract_root/$root/scenarios/golden" \
+            analyze v3_three_target_exact_small --format json >/dev/null
     )
 fi

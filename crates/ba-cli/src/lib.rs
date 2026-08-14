@@ -9,7 +9,9 @@ mod resolve;
 use std::ffi::OsString;
 use std::io::Write;
 
-use args::{Cli, OutputFormat, requests_json};
+use args::{
+    Cli, OutputFormat, prepare_template_args_for_clap, requests_json, restore_template_target_count,
+};
 use clap::Parser;
 use clap::error::ErrorKind;
 use errors::{DiagnosticEnvelope, ErrorEnvelope, classify_error};
@@ -19,7 +21,7 @@ where
     I: IntoIterator<Item = T>,
     T: Into<OsString> + Clone,
 {
-    let raw = args.into_iter().map(Into::into).collect::<Vec<_>>();
+    let mut raw = args.into_iter().map(Into::into).collect::<Vec<_>>();
     let usage_json = requests_json(&raw);
     if raw
         .iter()
@@ -41,7 +43,8 @@ where
         let _ = stderr.write_all(rendered.as_bytes());
         return 2;
     }
-    let cli = match Cli::try_parse_from(raw) {
+    let template_target_count_override = prepare_template_args_for_clap(&mut raw);
+    let mut cli = match Cli::try_parse_from(raw) {
         Ok(value) => value,
         Err(error) => {
             if matches!(
@@ -71,6 +74,7 @@ where
             return 2;
         }
     };
+    restore_template_target_count(&mut cli, template_target_count_override);
 
     let (mode, result) = command::execute(cli);
     match result {

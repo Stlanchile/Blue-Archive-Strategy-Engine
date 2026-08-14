@@ -31,6 +31,10 @@ ef7399b9e14e5bc9393892927aff176ede3c1416d3af75cc0e44eaa6312a133d
 Shipped bundle vectors are frozen in `crates/ba-core/tests/strict_inputs.rs`.
 Schema v2 exposes separate behavior and document projections. Provenance is
 excluded from behavior fingerprints and included in document fingerprints.
+Schema v3 retains that separation. Its categorical behavior projection records
+the joint-GCD canonical denominator and ordered featured/other/residual weights;
+the document projection retains the authored probability scale and structural
+provenance.
 
 ## Monte Carlo streams
 
@@ -60,6 +64,12 @@ Deterministic one-branch distributions consume no RNG. Non-deterministic
 rational probabilities use rejection sampling over unbiased bounded `u64`
 values.
 
+V2 keeps its historical binary pickup/miss sampler and branch order. V3 samples
+one canonical categorical integer in `[0, denominator)` and chooses the first
+branch whose `upper_exclusive` endpoint is greater than the sample. This is
+engine semantics 3; it does not rename `mc-run-stream-v1`, which identifies
+seed derivation.
+
 Monte Carlo PMFs and CDFs are derived from checked integer sample counts. In
 particular, a CDF divides the cumulative integer count once at each support
 point instead of repeatedly adding rounded floating-point fractions.
@@ -75,9 +85,9 @@ run_index_contract = zero-based ascending indices 0..runs-1
 Fixed run-seed vectors and repeatability are tested in
 `crates/ba-engine/tests/simulation.rs`.
 
-## Result version
+## Result versions
 
-Successful results use engine semantics 2 and result schema 2. Their provenance
+Schema-v2 results use engine semantics 2 and result schema 2. Their provenance
 includes each input schema version, behavior/document fingerprint roles,
 declared ruleset/reward verification status and provenance, and
 compiled-strategy context:
@@ -94,6 +104,12 @@ ruleset/reward-schedule provenance
 A provenance-only mutation can therefore change complete serialized result
 bytes without changing any behavioral metric, event, state transition, or run
 seed.
+
+Schema-v3 results use engine semantics 3 and result schema 3. They add
+initial/additional/absolute counts, eleven resources, terminal owned sets,
+per-target and ordered-prefix probabilities, categorical trace outcomes, and
+explicit authority. They use `provenance_status` and have no aggregate
+analysis-verification field.
 
 Mechanics or strategy behavior changes require an engine semantics and package
 version change. Aggregate wire changes require a result schema change.

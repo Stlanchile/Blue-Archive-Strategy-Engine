@@ -1,6 +1,7 @@
 use super::{REWARD_SCHEDULE_DOCUMENT_TYPE, RULESET_DOCUMENT_TYPE, SCENARIO_DOCUMENT_TYPE};
+use crate::profile::DOCUMENT_SCHEMA_VERSION_V2;
 
-pub const SCHEMA_VERSION: u64 = 2;
+pub const SCHEMA_VERSION: u64 = DOCUMENT_SCHEMA_VERSION_V2;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DocumentKind {

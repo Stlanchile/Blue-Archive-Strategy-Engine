@@ -117,10 +117,11 @@ See
 [`docs/STRATEGIES.md`](docs/STRATEGIES.md).
 
 Document limits are 1 MiB, JSON depth 64, 512 inspected immediate directory
-entries, and 256 retained JSON candidates. Exact analysis enumerates all
-modeled nonzero branches without probability pruning. Guard calibration and
-environment-specific benchmark observations are recorded in
-[`docs/CALIBRATION.md`](docs/CALIBRATION.md).
+entries, 256 retained JSON candidates per catalog directory, and 16 MiB of
+JSON document bytes across one complete ruleset/reward catalog load. Exact
+analysis enumerates all modeled nonzero branches without probability pruning.
+Guard calibration and environment-specific benchmark observations are recorded
+in [`docs/CALIBRATION.md`](docs/CALIBRATION.md).
 
 ## Workspace and releases
 

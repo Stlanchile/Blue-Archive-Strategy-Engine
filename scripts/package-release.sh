@@ -42,6 +42,10 @@ done
     printf 'error: invalid release version: %s\n' "$version" >&2
     exit 2
 }
+[[ "$target" == "x86_64-unknown-linux-gnu" ]] || {
+    printf 'error: unsupported release target: %s\n' "$target" >&2
+    exit 2
+}
 [[ -z "$tag" || "$tag" == "v$version" ]] || {
     printf 'error: tag %s does not match version %s\n' "$tag" "$version" >&2
     exit 1
@@ -130,7 +134,7 @@ chmod 0755 -- "$stage/ba-strategy"
 
 (
     cd "$stage"
-    find . -type f ! -name RELEASE-MANIFEST.sha256 -print0 |
+    find . -type f ! -path ./RELEASE-MANIFEST.sha256 -print0 |
         sort -z |
         xargs -0 sha256sum > RELEASE-MANIFEST.sha256
 )

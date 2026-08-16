@@ -10,9 +10,9 @@ fails closed rather than using a weaker pathname fallback. See
 ## Reporting a vulnerability
 
 Do not open a public issue for a suspected vulnerability. Send a concise report
-to `admin@xhz.email` with affected version, reproduction steps, impact, and any
-suggested mitigation. Please allow time for acknowledgement and coordinated
-remediation before public disclosure.
+to `shirasu_hare@stu.abydos.ac` with affected version, reproduction steps,
+impact, and any suggested mitigation. Please allow time for acknowledgement and
+coordinated remediation before public disclosure.
 
 Reports about path traversal, symlink handling, descriptor races, unsafe file
 types, malformed JSON bypasses, resource exhaustion, result reproducibility,

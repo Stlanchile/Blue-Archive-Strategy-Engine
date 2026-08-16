@@ -6,6 +6,7 @@ use std::sync::Arc;
 use serde::Serialize;
 
 use crate::CoreError;
+use crate::error::MAX_CATALOG_DOCUMENT_BYTES;
 use crate::fingerprint::SemanticFingerprint;
 use crate::fs_secure::{DirectoryEntrySnapshot, PinnedDirectory, is_json_candidate};
 use crate::id::{RewardScheduleId, RulesetId};
@@ -61,13 +62,19 @@ impl Catalog {
         let mut ruleset_paths = BTreeMap::new();
         let mut ruleset_paths_v3 = BTreeMap::new();
         let mut all_ruleset_ids = BTreeSet::new();
+        let mut catalog_document_bytes = 0_u64;
         for candidate in rules_snapshot
             .iter()
             .filter(|value| is_json_candidate(value))
         {
             let path = rules_directory.display_path().join(candidate.name());
-            let document =
-                BufferedDocument::from_bytes(&path, rules_directory.read_candidate(candidate)?)?;
+            let document = read_catalog_document(
+                &root,
+                &rules_directory,
+                candidate,
+                &path,
+                &mut catalog_document_bytes,
+            )?;
             if document.dispatch().kind != DocumentKind::Ruleset {
                 return Err(CoreError::validation(
                     Some(&path),
@@ -117,8 +124,13 @@ impl Catalog {
             .filter(|value| is_json_candidate(value))
         {
             let path = rewards_directory.display_path().join(candidate.name());
-            let document =
-                BufferedDocument::from_bytes(&path, rewards_directory.read_candidate(candidate)?)?;
+            let document = read_catalog_document(
+                &root,
+                &rewards_directory,
+                candidate,
+                &path,
+                &mut catalog_document_bytes,
+            )?;
             if document.dispatch().kind != DocumentKind::RewardSchedule {
                 return Err(CoreError::validation(
                     Some(&path),
@@ -242,6 +254,42 @@ impl Catalog {
     pub fn contains_v3(&self) -> bool {
         !self.rulesets_v3.is_empty() || !self.reward_schedules_v3.is_empty()
     }
+}
+
+fn read_catalog_document(
+    root: &PinnedDirectory,
+    directory: &PinnedDirectory,
+    candidate: &DirectoryEntrySnapshot,
+    path: &Path,
+    consumed: &mut u64,
+) -> Result<BufferedDocument, CoreError> {
+    let bytes = directory.read_candidate(candidate)?;
+    let length = u64::try_from(bytes.len()).map_err(|_| CoreError::ArithmeticOverflow {
+        context: "converting catalog document length",
+    })?;
+    account_catalog_document_bytes(root.display_path(), consumed, length)?;
+    BufferedDocument::from_bytes(path, bytes)
+}
+
+fn account_catalog_document_bytes(
+    catalog: &Path,
+    consumed: &mut u64,
+    length: u64,
+) -> Result<(), CoreError> {
+    let observed = consumed
+        .checked_add(length)
+        .ok_or(CoreError::ArithmeticOverflow {
+            context: "accounting aggregate catalog document bytes",
+        })?;
+    if observed > MAX_CATALOG_DOCUMENT_BYTES {
+        return Err(CoreError::CatalogDocumentBytesLimitExceeded {
+            catalog: catalog.to_path_buf(),
+            observed,
+            maximum: MAX_CATALOG_DOCUMENT_BYTES,
+        });
+    }
+    *consumed = observed;
+    Ok(())
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -893,8 +941,9 @@ mod tests {
 
     use tempfile::TempDir;
 
-    use super::{Catalog, CatalogLoadStage};
+    use super::{Catalog, CatalogLoadStage, account_catalog_document_bytes};
     use crate::CoreError;
+    use crate::error::MAX_CATALOG_DOCUMENT_BYTES;
 
     fn workspace_path(relative: &str) -> PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -915,6 +964,26 @@ mod tests {
             root.join("rewards/rewards.json"),
         )
         .expect("rewards");
+    }
+
+    #[test]
+    fn aggregate_catalog_document_budget_is_shared_and_fail_closed() {
+        let catalog = Path::new("bounded-catalog");
+        let mut consumed = MAX_CATALOG_DOCUMENT_BYTES - 1;
+        account_catalog_document_bytes(catalog, &mut consumed, 1).expect("exact aggregate limit");
+        assert_eq!(consumed, MAX_CATALOG_DOCUMENT_BYTES);
+
+        let error = account_catalog_document_bytes(catalog, &mut consumed, 1)
+            .expect_err("one byte beyond aggregate limit");
+        assert!(matches!(
+            error,
+            CoreError::CatalogDocumentBytesLimitExceeded {
+                observed,
+                maximum: MAX_CATALOG_DOCUMENT_BYTES,
+                ..
+            } if observed == MAX_CATALOG_DOCUMENT_BYTES + 1
+        ));
+        assert_eq!(consumed, MAX_CATALOG_DOCUMENT_BYTES);
     }
 
     #[test]

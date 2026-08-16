@@ -27,6 +27,7 @@ use crate::result_v3::{
     TerminalOwnedSetProbabilityIntervalV3, TerminalOwnedSetProbabilityV3,
     TerminalReasonProbabilityV3, TerminalSetComparisonV3, expected_from_ledger_sums, ledger_values,
 };
+use crate::sampling::uniform_below;
 
 const STREAM_DOMAIN: &[u8] = b"ba-strategy/mc-run-stream/v1\0";
 
@@ -816,24 +817,6 @@ fn sample_outcome_v3(
                 .ok_or(EngineError::InternalInvariantViolation {
                     message: "v3 categorical sample exceeded every half-open endpoint".to_owned(),
                 })
-        }
-    }
-}
-
-fn uniform_below(rng: &mut impl RngCore, bound: u64) -> Result<u64, EngineError> {
-    if bound == 0 {
-        return Err(EngineError::InternalInvariantViolation {
-            message: "cannot sample a v3 category with zero bound".to_owned(),
-        });
-    }
-    if bound == 1 {
-        return Ok(0);
-    }
-    let threshold = bound.wrapping_neg() % bound;
-    loop {
-        let value = rng.next_u64();
-        if value >= threshold {
-            return Ok(value % bound);
         }
     }
 }

@@ -223,6 +223,9 @@ fn core_error_code(error: &CoreError) -> &'static str {
         CoreError::CatalogDirectoryEntryLimitExceeded { .. } => {
             "catalog_directory_entry_limit_exceeded"
         }
+        CoreError::CatalogDocumentBytesLimitExceeded { .. } => {
+            "catalog_document_bytes_limit_exceeded"
+        }
         CoreError::CatalogGenerationChanged { .. } => "catalog_generation_changed",
         CoreError::DocumentSizeLimitExceeded { .. } => "document_size_limit_exceeded",
         CoreError::InvalidJson { .. } => "invalid_json",
@@ -298,4 +301,36 @@ fn parse_line_column(message: &str) -> (Option<u64>, Option<u64>) {
         .next()
         .unwrap_or(column);
     (line.parse().ok(), column.parse().ok())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use ba_core::{CoreError, MAX_CATALOG_DOCUMENT_BYTES};
+
+    use super::{AppError, classify_error};
+
+    #[test]
+    fn aggregate_catalog_limit_has_stable_catalog_io_classification() {
+        let classified = classify_error(AppError::Core(
+            CoreError::CatalogDocumentBytesLimitExceeded {
+                catalog: PathBuf::from("catalog"),
+                observed: MAX_CATALOG_DOCUMENT_BYTES + 1,
+                maximum: MAX_CATALOG_DOCUMENT_BYTES,
+            },
+        ));
+
+        assert_eq!(classified.exit, 4);
+        assert_eq!(classified.body.class, "catalog_io");
+        assert_eq!(
+            classified.body.code,
+            "catalog_document_bytes_limit_exceeded"
+        );
+        assert_eq!(classified.diagnostic.class, "catalog_io");
+        assert_eq!(
+            classified.diagnostic.code,
+            "catalog_document_bytes_limit_exceeded"
+        );
+    }
 }

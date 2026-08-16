@@ -6,6 +6,7 @@ mod exact_v3;
 mod options;
 mod result;
 mod result_v3;
+mod sampling;
 mod simulation;
 mod simulation_v3;
 

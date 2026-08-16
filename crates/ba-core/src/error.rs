@@ -5,6 +5,7 @@ use thiserror::Error;
 pub const MAX_CATALOG_ENTRIES: usize = 256;
 pub const MAX_CATALOG_DIRECTORY_ENTRIES: usize = 512;
 pub const MAX_DOCUMENT_BYTES: u64 = 1_048_576;
+pub const MAX_CATALOG_DOCUMENT_BYTES: u64 = 16 * MAX_DOCUMENT_BYTES;
 pub const MAX_JSON_DEPTH: usize = 64;
 
 #[derive(Debug, Error)]
@@ -33,6 +34,15 @@ pub enum CoreError {
         directory: PathBuf,
         observed: usize,
         maximum: usize,
+    },
+
+    #[error(
+        "catalog document byte limit exceeded in {catalog}: observed {observed}, maximum {maximum} bytes"
+    )]
+    CatalogDocumentBytesLimitExceeded {
+        catalog: PathBuf,
+        observed: u64,
+        maximum: u64,
     },
 
     #[error("catalog generation changed while loading {path}: {message}")]
@@ -111,6 +121,7 @@ impl CoreError {
             | Self::PathPolicy { .. }
             | Self::CatalogEntryLimitExceeded { .. }
             | Self::CatalogDirectoryEntryLimitExceeded { .. }
+            | Self::CatalogDocumentBytesLimitExceeded { .. }
             | Self::CatalogGenerationChanged { .. }
             | Self::DocumentSizeLimitExceeded { .. } => CoreErrorClass::CatalogIo,
             Self::InvalidJson { .. }

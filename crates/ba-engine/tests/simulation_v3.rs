@@ -4,7 +4,9 @@ use std::path::{Path, PathBuf};
 
 use ba_core::{AnyValidatedScenarioBundle, ValidatedScenarioBundleV3, load_any_bundle};
 use ba_engine::{
-    compare_v3, derive_run_seed_v3, replay_v3, simulate_monte_carlo_v3, simulate_trace_v3,
+    DEFAULT_MAX_MONTE_CARLO_RUNS, EngineError, SimulationLimits, compare_v3, derive_run_seed_v3,
+    replay_v3, replay_v3_with_limits, simulate_monte_carlo_v3, simulate_monte_carlo_v3_with_limits,
+    simulate_trace_v3, simulate_trace_v3_with_limits,
 };
 use tempfile::TempDir;
 
@@ -24,6 +26,23 @@ fn bundle(scenario: &str) -> ValidatedScenarioBundleV3 {
         AnyValidatedScenarioBundle::V3(bundle) => bundle,
         AnyValidatedScenarioBundle::V2(_) => panic!("expected v3"),
     }
+}
+
+fn hex(bytes: [u8; 32]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+#[test]
+fn v3_per_run_seed_vector_is_stable() {
+    let bundle = bundle("v3_atomic_cross_target");
+    assert_eq!(
+        hex(derive_run_seed_v3(&bundle, 42, 0)),
+        "d2a936840f0a7ddf7235c9baaba1af4349dea4e8d3e370e00c172828b4ef6a87"
+    );
+    assert_ne!(
+        derive_run_seed_v3(&bundle, 42, 0),
+        derive_run_seed_v3(&bundle, 42, 1)
+    );
 }
 
 #[test]
@@ -199,4 +218,67 @@ fn equivalent_probability_scales_preserve_behavior_identity_and_streams() {
             .expect("scaled")
             .replay_outcomes
     );
+}
+
+#[test]
+fn v3_concrete_execution_limits_fail_before_unbounded_work_or_trace_growth() {
+    let bundle = bundle("v3_atomic_cross_target");
+    let excessive_runs =
+        NonZeroU64::new(DEFAULT_MAX_MONTE_CARLO_RUNS + 1).expect("positive excessive run count");
+    assert!(matches!(
+        simulate_monte_carlo_v3(&bundle, excessive_runs, 1),
+        Err(EngineError::SimulationRunLimitExceeded { .. })
+    ));
+
+    let limits = SimulationLimits {
+        max_trace_primitive_transitions: 5,
+        ..SimulationLimits::default()
+    };
+    assert!(matches!(
+        simulate_trace_v3_with_limits(&bundle, 1, limits),
+        Err(EngineError::SimulationPrimitiveLimitExceeded {
+            scope: "v3 trace",
+            observed: 6,
+            maximum: 5
+        })
+    ));
+    let outcomes = simulate_trace_v3(&bundle, 1)
+        .expect("valid trace")
+        .replay_outcomes;
+    assert!(matches!(
+        replay_v3_with_limits(&bundle, &outcomes, limits),
+        Err(EngineError::SimulationPrimitiveLimitExceeded {
+            scope: "v3 replay",
+            observed: 6,
+            maximum: 5
+        })
+    ));
+
+    let one_run = NonZeroU64::new(1).expect("one run");
+    let per_run_limits = SimulationLimits {
+        max_primitive_transitions_per_run: 5,
+        max_total_primitive_transitions: 100,
+        ..SimulationLimits::default()
+    };
+    assert!(matches!(
+        simulate_monte_carlo_v3_with_limits(&bundle, one_run, 1, per_run_limits),
+        Err(EngineError::SimulationPrimitiveLimitExceeded {
+            scope: "v3 Monte Carlo run",
+            observed: 6,
+            maximum: 5
+        })
+    ));
+    let total_limits = SimulationLimits {
+        max_primitive_transitions_per_run: 100,
+        max_total_primitive_transitions: 5,
+        ..SimulationLimits::default()
+    };
+    assert!(matches!(
+        simulate_monte_carlo_v3_with_limits(&bundle, one_run, 1, total_limits),
+        Err(EngineError::SimulationPrimitiveLimitExceeded {
+            scope: "v3 Monte Carlo total",
+            observed: 6,
+            maximum: 5
+        })
+    ));
 }

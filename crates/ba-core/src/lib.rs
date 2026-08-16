@@ -29,8 +29,8 @@ pub use catalog::{
     load_bundle, validate_document,
 };
 pub use error::{
-    CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES,
-    MAX_DOCUMENT_BYTES, MAX_JSON_DEPTH, ObservedSize,
+    CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_DOCUMENT_BYTES,
+    MAX_CATALOG_ENTRIES, MAX_DOCUMENT_BYTES, MAX_JSON_DEPTH, ObservedSize,
 };
 pub use fingerprint::{CanonicalNode, SEMANTIC_ENCODING_VERSION, SemanticFingerprint};
 pub use id::{

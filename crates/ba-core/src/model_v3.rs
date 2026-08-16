@@ -1170,6 +1170,22 @@ fn validate_safe_non_featured(
     overrides: &[(u64, ProbabilityRatio)],
 ) -> Result<(), CoreError> {
     let unsafe_start = maximum.saturating_sub(increment.saturating_sub(1));
+    let unsafe_count = maximum
+        .checked_sub(unsafe_start)
+        .and_then(|value| value.checked_add(1))
+        .ok_or(CoreError::ArithmeticOverflow {
+            context: "validating maximum-charge non-featured coverage",
+        })?;
+    let override_count =
+        u64::try_from(overrides.len()).map_err(|_| CoreError::ArithmeticOverflow {
+            context: "converting v3 threshold override count",
+        })?;
+    if unsafe_count > override_count {
+        return Err(CoreError::validation(
+            None,
+            "every charge whose non-featured increment would exceed the maximum must have a probability-one override",
+        ));
+    }
     for charge in unsafe_start..=maximum {
         let probability = overrides
             .binary_search_by_key(&charge, |(candidate, _)| *candidate)

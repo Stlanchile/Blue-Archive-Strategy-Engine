@@ -231,3 +231,49 @@ fn endpoint_and_effective_materialization_guards_reject_without_truncation() {
         vec![u64::MAX]
     );
 }
+
+#[test]
+fn unrepresentable_future_repeat_is_absent_instead_of_an_overflow_error() {
+    let schedule = schedule(serde_json::json!({
+        "schema_version": 3,
+        "document_type": "reward_schedule",
+        "reward_schedule_id": "unrepresentable_future_test",
+        "provenance": {
+            "provenance_status": "provisional",
+            "sources": [],
+            "claim_bindings": []
+        },
+        "compatible_ruleset_ids": ["rules"],
+        "initial_milestones": [],
+        "repeating_cycle": {
+            "starts_after_count": 0,
+            "period": 10,
+            "milestones": [{
+                "offset": 1,
+                "rewards": [{"resource": "eligma", "quantity": 1}]
+            }]
+        }
+    }));
+
+    assert_eq!(
+        schedule
+            .first_future_repeat_milestone(u64::MAX - 4)
+            .expect("absence is valid"),
+        None
+    );
+    assert!(
+        schedule
+            .materialized_future_milestones(u64::MAX - 4, 1)
+            .expect("bounded interval without a future occurrence")
+            .is_empty()
+    );
+    assert_eq!(
+        schedule
+            .materialized_future_milestones(u64::MAX - 14, 14)
+            .expect("last representable occurrence")
+            .iter()
+            .map(|milestone| milestone.count)
+            .collect::<Vec<_>>(),
+        vec![u64::MAX - 4]
+    );
+}

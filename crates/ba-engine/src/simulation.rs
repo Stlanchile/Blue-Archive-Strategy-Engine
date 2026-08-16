@@ -23,6 +23,7 @@ use crate::result::{
     RunTraceEvent, RunTraceResult, STREAM_DERIVATION_VERSION, TerminalReasonProbability,
     TerminalReasonProbabilityInterval,
 };
+use crate::sampling::uniform_below;
 
 const STREAM_DOMAIN: &[u8] = b"ba-strategy/mc-run-stream/v1\0";
 
@@ -725,24 +726,6 @@ fn sample_outcome(
         _ => Err(EngineError::InternalInvariantViolation {
             message: "kernel returned an unsupported branch count".to_owned(),
         }),
-    }
-}
-
-fn uniform_below(rng: &mut impl RngCore, bound: u64) -> Result<u64, EngineError> {
-    if bound == 0 {
-        return Err(EngineError::InternalInvariantViolation {
-            message: "cannot sample with a zero bound".to_owned(),
-        });
-    }
-    if bound == 1 {
-        return Ok(0);
-    }
-    let threshold = bound.wrapping_neg() % bound;
-    loop {
-        let value = rng.next_u64();
-        if value >= threshold {
-            return Ok(value % bound);
-        }
     }
 }
 

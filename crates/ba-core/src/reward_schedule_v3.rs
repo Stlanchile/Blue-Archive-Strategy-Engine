@@ -317,15 +317,12 @@ impl RewardScheduleV3 {
                         context: "computing first future repeat cycle index",
                     })?
             };
-            let candidate = base
-                .checked_add(cycle_index.checked_mul(cycle.period).ok_or(
-                    CoreError::ArithmeticOverflow {
-                        context: "computing first future repeat milestone",
-                    },
-                )?)
-                .ok_or(CoreError::ArithmeticOverflow {
-                    context: "computing first future repeat milestone",
-                })?;
+            let Some(candidate) = cycle_index
+                .checked_mul(cycle.period)
+                .and_then(|offset| base.checked_add(offset))
+            else {
+                continue;
+            };
             next = Some(next.map_or(candidate, |current: u64| current.min(candidate)));
         }
         Ok(next)
@@ -430,15 +427,12 @@ impl RewardScheduleV3 {
                             context: "computing first future repeat index",
                         })?
                 };
-                let mut absolute = base
-                    .checked_add(first_index.checked_mul(cycle.period).ok_or(
-                        CoreError::ArithmeticOverflow {
-                            context: "computing first future repeat milestone",
-                        },
-                    )?)
-                    .ok_or(CoreError::ArithmeticOverflow {
-                        context: "computing first future repeat milestone",
-                    })?;
+                let Some(mut absolute) = first_index
+                    .checked_mul(cycle.period)
+                    .and_then(|offset| base.checked_add(offset))
+                else {
+                    continue;
+                };
                 while absolute <= endpoint {
                     milestones.push(MilestoneV3 {
                         count: absolute,
@@ -447,11 +441,10 @@ impl RewardScheduleV3 {
                     if absolute == endpoint {
                         break;
                     }
-                    absolute = absolute.checked_add(cycle.period).ok_or(
-                        CoreError::ArithmeticOverflow {
-                            context: "advancing repeat milestone",
-                        },
-                    )?;
+                    let Some(next) = absolute.checked_add(cycle.period) else {
+                        break;
+                    };
+                    absolute = next;
                 }
             }
         }

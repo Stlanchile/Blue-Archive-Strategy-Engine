@@ -4,8 +4,9 @@ use std::path::{Path, PathBuf};
 use ba_core::schema::RawScenarioV2;
 use ba_core::strict_json::BufferedDocument;
 use ba_core::{
-    AnyValidatedScenarioBundle, Catalog, CoreError, DocumentProfile, compile_any_buffered_bundle,
-    load_any_bundle, validate_document,
+    AnyValidatedScenarioBundle, Catalog, CompiledRulesetV3, CoreError, DocumentProfile,
+    ProbabilityRatio, RulesetId, RulesetMechanicsV3, compile_any_buffered_bundle, load_any_bundle,
+    validate_document,
 };
 use tempfile::TempDir;
 
@@ -156,4 +157,66 @@ fn catalog_ids_are_global_across_profiles() {
     .expect("rewards");
     let error = Catalog::load(temporary.path()).expect_err("duplicate ID");
     assert!(error.to_string().contains("duplicate catalog ruleset ID"));
+}
+
+#[test]
+fn enormous_unsafe_charge_range_is_rejected_without_range_iteration() {
+    let error = CompiledRulesetV3::from_parts(
+        RulesetId::new("bounded_charge_validation").expect("ruleset ID"),
+        RulesetMechanicsV3 {
+            paid_single_cost: 1,
+            paid_single_action_size: 1,
+            ticket_action_size: 1,
+            ordinary_featured_target_probability: ProbabilityRatio::new(0, 1)
+                .expect("zero probability"),
+            maximum_pre_recruitment_charge: u64::MAX,
+            featured_hit_reset_charge: 0,
+            non_featured_increment: u64::MAX,
+            threshold_overrides: Vec::new(),
+        },
+    )
+    .expect_err("unsafe range cannot be covered by an empty override set");
+
+    assert!(
+        error
+            .to_string()
+            .contains("every charge whose non-featured increment would exceed the maximum")
+    );
+}
+
+#[test]
+fn forced_featured_coverage_accepts_only_the_complete_probability_one_boundary() {
+    let mechanics = |threshold_overrides| RulesetMechanicsV3 {
+        paid_single_cost: 1,
+        paid_single_action_size: 1,
+        ticket_action_size: 1,
+        ordinary_featured_target_probability: ProbabilityRatio::new(0, 1)
+            .expect("zero probability"),
+        maximum_pre_recruitment_charge: 3,
+        featured_hit_reset_charge: 0,
+        non_featured_increment: 2,
+        threshold_overrides,
+    };
+    let certain = ProbabilityRatio::new(1, 1).expect("certain");
+    let half = ProbabilityRatio::new(1, 2).expect("half");
+
+    CompiledRulesetV3::from_parts(
+        RulesetId::new("complete_forced_coverage").expect("ruleset ID"),
+        mechanics(vec![(2, certain), (3, certain)]),
+    )
+    .expect("both unsafe charges are forced featured outcomes");
+    assert!(
+        CompiledRulesetV3::from_parts(
+            RulesetId::new("missing_forced_coverage").expect("ruleset ID"),
+            mechanics(vec![(3, certain)]),
+        )
+        .is_err()
+    );
+    assert!(
+        CompiledRulesetV3::from_parts(
+            RulesetId::new("non_certain_forced_coverage").expect("ruleset ID"),
+            mechanics(vec![(2, half), (3, certain)]),
+        )
+        .is_err()
+    );
 }

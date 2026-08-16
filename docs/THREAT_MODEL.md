@@ -36,8 +36,10 @@ An invalid or duplicate unreferenced v3 document rejects the complete catalog,
 and bundle compilation rejects mixed scenario/ruleset/reward profiles.
 
 The loader limits documents to 1 MiB, JSON depth to 64, inspected entries to
-512, and retained JSON candidates to 256. Candidate names are sorted by raw
-Unix bytes for deterministic behavior, including non-UTF-8 names.
+512, retained JSON candidates to 256 per catalog directory, and aggregate
+ruleset/reward document bytes to 16 MiB per complete catalog load. Candidate
+names are sorted by raw Unix bytes for deterministic behavior, including
+non-UTF-8 names.
 
 Metadata comparisons detect observable mutation but are not cryptographic
 integrity and cannot defeat an attacker able to modify an opened inode without

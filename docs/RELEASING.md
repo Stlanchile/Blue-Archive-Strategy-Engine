@@ -10,9 +10,10 @@ create a tag, push, publish a package, or create a GitHub release.
 - Use a full, non-shallow history; inspect contributor history and copied/vendor
   material before release.
 - This repository’s reviewed history identifies only `Shirasu Hare
-  <admin@xhz.email>` and no tracked vendor tree, third-party notices, or copied
-  license material. It therefore uses contributor-neutral dual MIT/Apache-2.0
-  terms. Re-open this assessment if history or imported material changes.
+  <shirasu_hare@stu.abydos.ac>` and no tracked vendor tree, third-party notices,
+  or copied license material. It therefore uses contributor-neutral dual
+  MIT/Apache-2.0 terms. Re-open this assessment if history or imported material
+  changes.
 - Require a fresh online `cargo audit --deny warnings`; advisory/network failure
   is not a clean audit.
 - Require first-party claim-level evidence before adding or approving

@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use ba_core::schema::{RawRulesetV2, RawScenarioV2};
 use ba_core::strict_json::BufferedDocument;
 use ba_core::{
-    Catalog, CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_ENTRIES,
-    MAX_DOCUMENT_BYTES, load_bundle, validate_document,
+    Catalog, CoreError, CoreErrorClass, MAX_CATALOG_DIRECTORY_ENTRIES, MAX_CATALOG_DOCUMENT_BYTES,
+    MAX_CATALOG_ENTRIES, MAX_DOCUMENT_BYTES, load_bundle, validate_document,
 };
 use tempfile::TempDir;
 
@@ -40,6 +40,19 @@ fn valid_ruleset(id: &str) -> String {
     {{"pre_charge":99,"pickup_probability":{{"numerator":1,"denominator":2}}}},
     {{"pre_charge":199,"pickup_probability":{{"numerator":1,"denominator":1}}}}
   ]
+}}"#
+    )
+}
+
+fn valid_reward_schedule(id: &str) -> String {
+    format!(
+        r#"{{
+  "schema_version":2,
+  "document_type":"reward_schedule",
+  "reward_schedule_id":"{id}",
+  "provenance":{{"verification_status":"provisional","sources":[]}},
+  "compatible_ruleset_ids":["ruleset_000"],
+  "milestones":[]
 }}"#
     )
 }
@@ -230,6 +243,37 @@ fn catalog_accepts_all_256_or_rejects_all_257_before_parsing() {
         }
         other => panic!("expected count error before parsing, got {other}"),
     }
+}
+
+#[test]
+fn aggregate_catalog_byte_limit_is_shared_across_rulesets_and_rewards() {
+    let temp = TempDir::new().expect("tempdir");
+    let rules = temp.path().join("rulesets");
+    let rewards = temp.path().join("rewards");
+    fs::create_dir_all(&rules).expect("rules");
+    fs::create_dir_all(&rewards).expect("rewards");
+    let document_bytes = usize::try_from(MAX_DOCUMENT_BYTES).expect("document limit fits usize");
+
+    for index in 0..8 {
+        let mut document = valid_ruleset(&format!("ruleset_{index:03}"));
+        document.push_str(&" ".repeat(document_bytes - document.len()));
+        write(&rules.join(format!("{index:03}.json")), document);
+    }
+    for index in 0..9 {
+        let mut document = valid_reward_schedule(&format!("rewards_{index:03}"));
+        document.push_str(&" ".repeat(document_bytes - document.len()));
+        write(&rewards.join(format!("{index:03}.json")), document);
+    }
+
+    let error = Catalog::load(temp.path()).expect_err("combined catalog exceeds byte budget");
+    assert!(matches!(
+        error,
+        CoreError::CatalogDocumentBytesLimitExceeded {
+            observed,
+            maximum: MAX_CATALOG_DOCUMENT_BYTES,
+            ..
+        } if observed == MAX_CATALOG_DOCUMENT_BYTES + MAX_DOCUMENT_BYTES
+    ));
 }
 
 #[test]

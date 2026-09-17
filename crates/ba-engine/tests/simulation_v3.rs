@@ -33,6 +33,38 @@ fn hex(bytes: [u8; 32]) -> String {
 }
 
 #[test]
+fn v3_certain_outcomes_are_inside_their_monte_carlo_intervals() {
+    for runs in [11, 100] {
+        let result = compare_v3(
+            &bundle("v3_three_target_exact_small"),
+            NonZeroU64::new(runs).expect("runs"),
+            42,
+        )
+        .expect("comparison");
+        assert_eq!(result.exact.all_target_success_probability, 1.0);
+        assert!(result.all_target_success.exact_within_monte_carlo_interval);
+        assert!(
+            result
+                .per_target
+                .iter()
+                .all(|metric| metric.exact_within_monte_carlo_interval)
+        );
+        assert!(
+            result
+                .ordered_prefixes
+                .iter()
+                .all(|metric| metric.exact_within_monte_carlo_interval)
+        );
+        assert!(
+            result
+                .terminal_owned_sets
+                .iter()
+                .all(|metric| metric.exact_within_monte_carlo_interval)
+        );
+    }
+}
+
+#[test]
 fn v3_per_run_seed_vector_is_stable() {
     let bundle = bundle("v3_atomic_cross_target");
     assert_eq!(

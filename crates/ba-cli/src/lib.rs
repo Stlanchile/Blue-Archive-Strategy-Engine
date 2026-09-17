@@ -4,6 +4,7 @@ mod args;
 mod command;
 mod errors;
 mod render;
+mod render_v4;
 mod resolve;
 
 use std::ffi::OsString;

@@ -1,0 +1,241 @@
+[
+  {
+    "name": "single_target_200_analyze",
+    "args": [
+      "analyze",
+      "single_target_200",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "single_target_200_simulate",
+    "args": [
+      "simulate",
+      "single_target_200",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "single_target_200_compare",
+    "args": [
+      "compare",
+      "single_target_200",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "single_target_200_trace",
+    "args": [
+      "simulate",
+      "single_target_200",
+      "--runs",
+      "1",
+      "--seed",
+      "42",
+      "--trace",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_atomic_cross_target_analyze",
+    "args": [
+      "analyze",
+      "v3_atomic_cross_target",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_atomic_cross_target_simulate",
+    "args": [
+      "simulate",
+      "v3_atomic_cross_target",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_atomic_cross_target_compare",
+    "args": [
+      "compare",
+      "v3_atomic_cross_target",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_atomic_cross_target_trace",
+    "args": [
+      "simulate",
+      "v3_atomic_cross_target",
+      "--runs",
+      "1",
+      "--seed",
+      "42",
+      "--trace",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_three_target_exact_small_analyze",
+    "args": [
+      "analyze",
+      "v3_three_target_exact_small",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_three_target_exact_small_simulate",
+    "args": [
+      "simulate",
+      "v3_three_target_exact_small",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_three_target_exact_small_compare",
+    "args": [
+      "compare",
+      "v3_three_target_exact_small",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_three_target_exact_small_trace",
+    "args": [
+      "simulate",
+      "v3_three_target_exact_small",
+      "--runs",
+      "1",
+      "--seed",
+      "42",
+      "--trace",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_four_target_exact_small_analyze",
+    "args": [
+      "analyze",
+      "v3_four_target_exact_small",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_four_target_exact_small_simulate",
+    "args": [
+      "simulate",
+      "v3_four_target_exact_small",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_four_target_exact_small_compare",
+    "args": [
+      "compare",
+      "v3_four_target_exact_small",
+      "--runs",
+      "11",
+      "--seed",
+      "42",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "v3_four_target_exact_small_trace",
+    "args": [
+      "simulate",
+      "v3_four_target_exact_small",
+      "--runs",
+      "1",
+      "--seed",
+      "42",
+      "--trace",
+      "--format",
+      "json"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "duplicate",
+    "args": [
+      "validate",
+      "crates/ba-cli/tests/fixtures/compatibility/duplicate.input.json",
+      "--diagnostics"
+    ],
+    "exit": 3
+  },
+  {
+    "name": "unknown",
+    "args": [
+      "validate",
+      "crates/ba-cli/tests/fixtures/compatibility/unknown.input.json",
+      "--diagnostics"
+    ],
+    "exit": 3
+  },
+  {
+    "name": "unsupported",
+    "args": [
+      "validate",
+      "crates/ba-cli/tests/fixtures/compatibility/unsupported.input.json",
+      "--diagnostics"
+    ],
+    "exit": 3
+  }
+]

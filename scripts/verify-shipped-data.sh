@@ -8,15 +8,17 @@ data_dir="$repo_root/data"
 
 cd "$repo_root"
 
-declare -A frozen_v2_sha256=(
+declare -A frozen_sha256=(
+    ["data/rulesets/jp_2026_07_29_provisional_v3.json"]="ee6e946d11c839eb67d2b14b6909f3fcd3565e8a9956233b76e3d7ffa9917f17"
+    ["data/rewards/jp_2026_07_29_empty_v3.json"]="815f6eb9cd6e5702d04b46864a997931d6004e528ffac5cc61340fd18c798170"
     ["data/rulesets/jp_2026_07_29_provisional_v2.json"]="0d25ca7b3ca75c29667866920f21eb5b75456e55d44db87e1557ae631f2af49b"
     ["data/rewards/jp_2026_07_29_campaign_v2.json"]="ec437c160e8e884608889b34ac2d49131e2f40979f65fc9a8310a9d91025923a"
     ["data/rewards/jp_2026_07_29_empty_v2.json"]="9ed74f018543904ba203d6d3541ebf13857d0b60fe547feddd1d8467a0a6b08c"
 )
-for relative_path in "${!frozen_v2_sha256[@]}"; do
+for relative_path in "${!frozen_sha256[@]}"; do
     observed="$(sha256sum "$relative_path" | awk '{print $1}')"
-    [[ "$observed" == "${frozen_v2_sha256[$relative_path]}" ]] || {
-        printf 'error: frozen v2 data changed: %s\n' "$relative_path" >&2
+    [[ "$observed" == "${frozen_sha256[$relative_path]}" ]] || {
+        printf 'error: frozen runtime data changed: %s\n' "$relative_path" >&2
         exit 1
     }
 done
@@ -60,3 +62,11 @@ if [[ -s "$stdout_file" ]]; then
     printf '%s\n' 'error: induced validation failure wrote to stdout' >&2
     exit 1
 fi
+
+for timing_command in analyze simulate compare; do
+    timing_args=("$timing_command" scenarios/golden/v3_atomic_cross_target.json --acquisition-timing --format json)
+    if [[ "$timing_command" != analyze ]]; then
+        timing_args+=(--runs 100 --seed 42)
+    fi
+    "${binary[@]}" --data-dir "$data_dir" "${timing_args[@]}" >/dev/null
+done

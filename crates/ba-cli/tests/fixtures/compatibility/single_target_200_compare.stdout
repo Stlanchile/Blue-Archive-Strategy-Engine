@@ -1,0 +1,2206 @@
+{
+  "engine_kind": "comparison",
+  "exact": {
+    "engine_kind": "exact",
+    "provenance": {
+      "engine_version": "<PACKAGE_VERSION>",
+      "engine_semantics_version": 2,
+      "result_schema_version": 2,
+      "semantic_encoding_version": "canonical-json-v1",
+      "scenario_id": "single_target_200",
+      "scenario_schema_version": 2,
+      "scenario_behavior_fingerprint": "95eb5b476e17e148909fefd24da3ab00e0e15c4cbc8fdd5ed26758bc4fdb66af",
+      "scenario_document_fingerprint": "044f559d861e3af6624d7e55379cb5f00bc9883049d319bf1d720188d4c1ed70",
+      "ruleset_id": "jp_2026_07_29_provisional_v2",
+      "ruleset_schema_version": 2,
+      "ruleset_behavior_fingerprint": "db0af908e4436e396e9a55e7e0bd39aa8ae30d8a148c34abb07c24cb347fb6ad",
+      "ruleset_document_fingerprint": "c5de387937c5a2060641ef5763ef36f5407fb093560363f535d3630ba5cb1d32",
+      "ruleset_verification_status": "provisional",
+      "ruleset_provenance": {
+        "verification_status": "provisional",
+        "sources": []
+      },
+      "reward_schedule_id": "jp_2026_07_29_empty_v2",
+      "reward_schedule_schema_version": 2,
+      "reward_schedule_behavior_fingerprint": "41387171a8507e76f595d0571b3d21028c166cb487bc49e64f3c072c09e6b10e",
+      "reward_schedule_document_fingerprint": "890d81dd1ef119fae566ece9e24e3ee1fe0b9cb932a5bf9f5948319267a2ffa3",
+      "reward_schedule_verification_status": "provisional",
+      "reward_schedule_provenance": {
+        "verification_status": "provisional",
+        "sources": []
+      }
+    },
+    "context": {
+      "strategy_constraints": {
+        "max_total_recruitments": 200
+      },
+      "compiled_strategy": {
+        "strategy_schema_version": 1,
+        "strategy_id": "sequential",
+        "kind": "sequential_targets",
+        "funding_priority": [
+          "ticket_ten",
+          "paid_single"
+        ],
+        "max_total_recruitments": 200
+      },
+      "initial_resources": {
+        "pyroxene": 24000,
+        "limited_ten_recruitment_tickets": 0,
+        "eligma": 0,
+        "advanced_bd_selectors": 0,
+        "advanced_tech_note_selectors": 0,
+        "superior_tech_note_selectors": 0,
+        "gift_boxes": 0
+      },
+      "ordered_targets": [
+        "target_a"
+      ],
+      "ordered_banners": [
+        "banner_a"
+      ]
+    },
+    "exact_options": {
+      "conservation_tolerance": 1e-12,
+      "max_active_states": 65536,
+      "max_processed_states": 1048576,
+      "max_transition_expansions": 2097152
+    },
+    "success_probability": 0.9999999999999996,
+    "owned_target_terminal_probabilities": [
+      {
+        "owned_targets": [
+          "target_a"
+        ],
+        "probability": 0.9999999999999996
+      }
+    ],
+    "terminal_reason_probabilities": [
+      {
+        "terminal_reason": "targets_acquired",
+        "probability": 0.9999999999999996
+      }
+    ],
+    "expected_terminal_primitive_recruitments": 90.0722689988375,
+    "expected_terminal_primitive_recruitments_given_success": 90.07226899883754,
+    "expected_first_success_recruitment_count_given_success": 90.07226899883754,
+    "expected_paid_pyroxene_spent": 10808.672279860497,
+    "expected_ticket_funded_primitive_recruitments": 0.0,
+    "expected_residual_resources": {
+      "pyroxene": 13191.327720139492,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0
+    },
+    "expected_milestone_rewards_acquired": {
+      "pyroxene": 0.0,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0
+    },
+    "milestone_reach_probabilities": [],
+    "first_success_pmf": [
+      {
+        "recruitment_count": 1,
+        "probability": 0.007
+      },
+      {
+        "recruitment_count": 2,
+        "probability": 0.006951
+      },
+      {
+        "recruitment_count": 3,
+        "probability": 0.006902343
+      },
+      {
+        "recruitment_count": 4,
+        "probability": 0.006854026599
+      },
+      {
+        "recruitment_count": 5,
+        "probability": 0.006806048412806999
+      },
+      {
+        "recruitment_count": 6,
+        "probability": 0.00675840607391735
+      },
+      {
+        "recruitment_count": 7,
+        "probability": 0.00671109723139993
+      },
+      {
+        "recruitment_count": 8,
+        "probability": 0.0066641195507801294
+      },
+      {
+        "recruitment_count": 9,
+        "probability": 0.006617470713924669
+      },
+      {
+        "recruitment_count": 10,
+        "probability": 0.006571148418927196
+      },
+      {
+        "recruitment_count": 11,
+        "probability": 0.0065251503799947045
+      },
+      {
+        "recruitment_count": 12,
+        "probability": 0.0064794743273347425
+      },
+      {
+        "recruitment_count": 13,
+        "probability": 0.006434118007043399
+      },
+      {
+        "recruitment_count": 14,
+        "probability": 0.0063890791809940945
+      },
+      {
+        "recruitment_count": 15,
+        "probability": 0.006344355626727137
+      },
+      {
+        "recruitment_count": 16,
+        "probability": 0.006299945137340046
+      },
+      {
+        "recruitment_count": 17,
+        "probability": 0.006255845521378666
+      },
+      {
+        "recruitment_count": 18,
+        "probability": 0.006212054602729015
+      },
+      {
+        "recruitment_count": 19,
+        "probability": 0.006168570220509912
+      },
+      {
+        "recruitment_count": 20,
+        "probability": 0.006125390228966343
+      },
+      {
+        "recruitment_count": 21,
+        "probability": 0.006082512497363579
+      },
+      {
+        "recruitment_count": 22,
+        "probability": 0.006039934909882034
+      },
+      {
+        "recruitment_count": 23,
+        "probability": 0.005997655365512859
+      },
+      {
+        "recruitment_count": 24,
+        "probability": 0.005955671777954269
+      },
+      {
+        "recruitment_count": 25,
+        "probability": 0.005913982075508589
+      },
+      {
+        "recruitment_count": 26,
+        "probability": 0.005872584200980029
+      },
+      {
+        "recruitment_count": 27,
+        "probability": 0.005831476111573169
+      },
+      {
+        "recruitment_count": 28,
+        "probability": 0.005790655778792156
+      },
+      {
+        "recruitment_count": 29,
+        "probability": 0.005750121188340611
+      },
+      {
+        "recruitment_count": 30,
+        "probability": 0.005709870340022227
+      },
+      {
+        "recruitment_count": 31,
+        "probability": 0.005669901247642071
+      },
+      {
+        "recruitment_count": 32,
+        "probability": 0.005630211938908576
+      },
+      {
+        "recruitment_count": 33,
+        "probability": 0.005590800455336217
+      },
+      {
+        "recruitment_count": 34,
+        "probability": 0.005551664852148863
+      },
+      {
+        "recruitment_count": 35,
+        "probability": 0.005512803198183821
+      },
+      {
+        "recruitment_count": 36,
+        "probability": 0.005474213575796534
+      },
+      {
+        "recruitment_count": 37,
+        "probability": 0.005435894080765958
+      },
+      {
+        "recruitment_count": 38,
+        "probability": 0.005397842822200597
+      },
+      {
+        "recruitment_count": 39,
+        "probability": 0.005360057922445193
+      },
+      {
+        "recruitment_count": 40,
+        "probability": 0.005322537516988076
+      },
+      {
+        "recruitment_count": 41,
+        "probability": 0.0052852797543691595
+      },
+      {
+        "recruitment_count": 42,
+        "probability": 0.005248282796088575
+      },
+      {
+        "recruitment_count": 43,
+        "probability": 0.005211544816515955
+      },
+      {
+        "recruitment_count": 44,
+        "probability": 0.005175064002800343
+      },
+      {
+        "recruitment_count": 45,
+        "probability": 0.005138838554780741
+      },
+      {
+        "recruitment_count": 46,
+        "probability": 0.005102866684897276
+      },
+      {
+        "recruitment_count": 47,
+        "probability": 0.005067146618102996
+      },
+      {
+        "recruitment_count": 48,
+        "probability": 0.005031676591776274
+      },
+      {
+        "recruitment_count": 49,
+        "probability": 0.00499645485563384
+      },
+      {
+        "recruitment_count": 50,
+        "probability": 0.004961479671644404
+      },
+      {
+        "recruitment_count": 51,
+        "probability": 0.004926749313942893
+      },
+      {
+        "recruitment_count": 52,
+        "probability": 0.004892262068745292
+      },
+      {
+        "recruitment_count": 53,
+        "probability": 0.004858016234264076
+      },
+      {
+        "recruitment_count": 54,
+        "probability": 0.004824010120624227
+      },
+      {
+        "recruitment_count": 55,
+        "probability": 0.004790242049779857
+      },
+      {
+        "recruitment_count": 56,
+        "probability": 0.004756710355431398
+      },
+      {
+        "recruitment_count": 57,
+        "probability": 0.0047234133829433785
+      },
+      {
+        "recruitment_count": 58,
+        "probability": 0.004690349489262775
+      },
+      {
+        "recruitment_count": 59,
+        "probability": 0.004657517042837936
+      },
+      {
+        "recruitment_count": 60,
+        "probability": 0.004624914423538071
+      },
+      {
+        "recruitment_count": 61,
+        "probability": 0.004592540022573304
+      },
+      {
+        "recruitment_count": 62,
+        "probability": 0.004560392242415292
+      },
+      {
+        "recruitment_count": 63,
+        "probability": 0.0045284694967183846
+      },
+      {
+        "recruitment_count": 64,
+        "probability": 0.004496770210241355
+      },
+      {
+        "recruitment_count": 65,
+        "probability": 0.004465292818769667
+      },
+      {
+        "recruitment_count": 66,
+        "probability": 0.0044340357690382795
+      },
+      {
+        "recruitment_count": 67,
+        "probability": 0.004402997518655011
+      },
+      {
+        "recruitment_count": 68,
+        "probability": 0.0043721765360244256
+      },
+      {
+        "recruitment_count": 69,
+        "probability": 0.004341571300272255
+      },
+      {
+        "recruitment_count": 70,
+        "probability": 0.0043111803011703495
+      },
+      {
+        "recruitment_count": 71,
+        "probability": 0.004281002039062156
+      },
+      {
+        "recruitment_count": 72,
+        "probability": 0.004251035024788722
+      },
+      {
+        "recruitment_count": 73,
+        "probability": 0.0042212777796152
+      },
+      {
+        "recruitment_count": 74,
+        "probability": 0.004191728835157894
+      },
+      {
+        "recruitment_count": 75,
+        "probability": 0.004162386733311788
+      },
+      {
+        "recruitment_count": 76,
+        "probability": 0.004133250026178605
+      },
+      {
+        "recruitment_count": 77,
+        "probability": 0.004104317275995356
+      },
+      {
+        "recruitment_count": 78,
+        "probability": 0.004075587055063387
+      },
+      {
+        "recruitment_count": 79,
+        "probability": 0.004047057945677944
+      },
+      {
+        "recruitment_count": 80,
+        "probability": 0.004018728540058199
+      },
+      {
+        "recruitment_count": 81,
+        "probability": 0.00399059744027779
+      },
+      {
+        "recruitment_count": 82,
+        "probability": 0.003962663258195847
+      },
+      {
+        "recruitment_count": 83,
+        "probability": 0.003934924615388476
+      },
+      {
+        "recruitment_count": 84,
+        "probability": 0.003907380143080757
+      },
+      {
+        "recruitment_count": 85,
+        "probability": 0.0038800284820791906
+      },
+      {
+        "recruitment_count": 86,
+        "probability": 0.003852868282704636
+      },
+      {
+        "recruitment_count": 87,
+        "probability": 0.0038258982047257037
+      },
+      {
+        "recruitment_count": 88,
+        "probability": 0.003799116917292624
+      },
+      {
+        "recruitment_count": 89,
+        "probability": 0.0037725230988715757
+      },
+      {
+        "recruitment_count": 90,
+        "probability": 0.003746115437179475
+      },
+      {
+        "recruitment_count": 91,
+        "probability": 0.0037198926291192183
+      },
+      {
+        "recruitment_count": 92,
+        "probability": 0.003693853380715384
+      },
+      {
+        "recruitment_count": 93,
+        "probability": 0.0036679964070503762
+      },
+      {
+        "recruitment_count": 94,
+        "probability": 0.0036423204322010238
+      },
+      {
+        "recruitment_count": 95,
+        "probability": 0.0036168241891756164
+      },
+      {
+        "recruitment_count": 96,
+        "probability": 0.003591506419851387
+      },
+      {
+        "recruitment_count": 97,
+        "probability": 0.003566365874912427
+      },
+      {
+        "recruitment_count": 98,
+        "probability": 0.0035414013137880403
+      },
+      {
+        "recruitment_count": 99,
+        "probability": 0.003516611504591524
+      },
+      {
+        "recruitment_count": 100,
+        "probability": 0.24942823028995595
+      },
+      {
+        "recruitment_count": 101,
+        "probability": 0.0017459976120296917
+      },
+      {
+        "recruitment_count": 102,
+        "probability": 0.0017337756287454837
+      },
+      {
+        "recruitment_count": 103,
+        "probability": 0.0017216391993442653
+      },
+      {
+        "recruitment_count": 104,
+        "probability": 0.0017095877249488555
+      },
+      {
+        "recruitment_count": 105,
+        "probability": 0.0016976206108742134
+      },
+      {
+        "recruitment_count": 106,
+        "probability": 0.001685737266598094
+      },
+      {
+        "recruitment_count": 107,
+        "probability": 0.0016739371057319073
+      },
+      {
+        "recruitment_count": 108,
+        "probability": 0.0016622195459917838
+      },
+      {
+        "recruitment_count": 109,
+        "probability": 0.0016505840091698414
+      },
+      {
+        "recruitment_count": 110,
+        "probability": 0.0016390299211056524
+      },
+      {
+        "recruitment_count": 111,
+        "probability": 0.001627556711657913
+      },
+      {
+        "recruitment_count": 112,
+        "probability": 0.0016161638146763076
+      },
+      {
+        "recruitment_count": 113,
+        "probability": 0.0016048506679735735
+      },
+      {
+        "recruitment_count": 114,
+        "probability": 0.0015936167132977585
+      },
+      {
+        "recruitment_count": 115,
+        "probability": 0.0015824613963046743
+      },
+      {
+        "recruitment_count": 116,
+        "probability": 0.0015713841665305416
+      },
+      {
+        "recruitment_count": 117,
+        "probability": 0.0015603844773648277
+      },
+      {
+        "recruitment_count": 118,
+        "probability": 0.0015494617860232738
+      },
+      {
+        "recruitment_count": 119,
+        "probability": 0.001538615553521111
+      },
+      {
+        "recruitment_count": 120,
+        "probability": 0.0015278452446464631
+      },
+      {
+        "recruitment_count": 121,
+        "probability": 0.001517150327933938
+      },
+      {
+        "recruitment_count": 122,
+        "probability": 0.0015065302756384002
+      },
+      {
+        "recruitment_count": 123,
+        "probability": 0.0014959845637089314
+      },
+      {
+        "recruitment_count": 124,
+        "probability": 0.0014855126717629686
+      },
+      {
+        "recruitment_count": 125,
+        "probability": 0.0014751140830606278
+      },
+      {
+        "recruitment_count": 126,
+        "probability": 0.0014647882844792035
+      },
+      {
+        "recruitment_count": 127,
+        "probability": 0.0014545347664878488
+      },
+      {
+        "recruitment_count": 128,
+        "probability": 0.0014443530231224339
+      },
+      {
+        "recruitment_count": 129,
+        "probability": 0.001434242551960577
+      },
+      {
+        "recruitment_count": 130,
+        "probability": 0.0014242028540968528
+      },
+      {
+        "recruitment_count": 131,
+        "probability": 0.0014142334341181748
+      },
+      {
+        "recruitment_count": 132,
+        "probability": 0.0014043338000793476
+      },
+      {
+        "recruitment_count": 133,
+        "probability": 0.001394503463478792
+      },
+      {
+        "recruitment_count": 134,
+        "probability": 0.0013847419392344405
+      },
+      {
+        "recruitment_count": 135,
+        "probability": 0.0013750487456597996
+      },
+      {
+        "recruitment_count": 136,
+        "probability": 0.001365423404440181
+      },
+      {
+        "recruitment_count": 137,
+        "probability": 0.0013558654406090997
+      },
+      {
+        "recruitment_count": 138,
+        "probability": 0.001346374382524836
+      },
+      {
+        "recruitment_count": 139,
+        "probability": 0.0013369497618471622
+      },
+      {
+        "recruitment_count": 140,
+        "probability": 0.001327591113514232
+      },
+      {
+        "recruitment_count": 141,
+        "probability": 0.0013182979757196322
+      },
+      {
+        "recruitment_count": 142,
+        "probability": 0.001309069889889595
+      },
+      {
+        "recruitment_count": 143,
+        "probability": 0.0012999064006603677
+      },
+      {
+        "recruitment_count": 144,
+        "probability": 0.001290807055855745
+      },
+      {
+        "recruitment_count": 145,
+        "probability": 0.001281771406464755
+      },
+      {
+        "recruitment_count": 146,
+        "probability": 0.0012727990066195016
+      },
+      {
+        "recruitment_count": 147,
+        "probability": 0.0012638894135731651
+      },
+      {
+        "recruitment_count": 148,
+        "probability": 0.0012550421876781528
+      },
+      {
+        "recruitment_count": 149,
+        "probability": 0.0012462568923644057
+      },
+      {
+        "recruitment_count": 150,
+        "probability": 0.0012375330941178549
+      },
+      {
+        "recruitment_count": 151,
+        "probability": 0.0012288703624590298
+      },
+      {
+        "recruitment_count": 152,
+        "probability": 0.0012202682699218167
+      },
+      {
+        "recruitment_count": 153,
+        "probability": 0.0012117263920323638
+      },
+      {
+        "recruitment_count": 154,
+        "probability": 0.0012032443072881372
+      },
+      {
+        "recruitment_count": 155,
+        "probability": 0.0011948215971371203
+      },
+      {
+        "recruitment_count": 156,
+        "probability": 0.0011864578459571604
+      },
+      {
+        "recruitment_count": 157,
+        "probability": 0.0011781526410354602
+      },
+      {
+        "recruitment_count": 158,
+        "probability": 0.001169905572548212
+      },
+      {
+        "recruitment_count": 159,
+        "probability": 0.0011617162335403745
+      },
+      {
+        "recruitment_count": 160,
+        "probability": 0.0011535842199055918
+      },
+      {
+        "recruitment_count": 161,
+        "probability": 0.0011455091303662528
+      },
+      {
+        "recruitment_count": 162,
+        "probability": 0.001137490566453689
+      },
+      {
+        "recruitment_count": 163,
+        "probability": 0.001129528132488513
+      },
+      {
+        "recruitment_count": 164,
+        "probability": 0.0011216214355610936
+      },
+      {
+        "recruitment_count": 165,
+        "probability": 0.001113770085512166
+      },
+      {
+        "recruitment_count": 166,
+        "probability": 0.0011059736949135808
+      },
+      {
+        "recruitment_count": 167,
+        "probability": 0.0010982318790491857
+      },
+      {
+        "recruitment_count": 168,
+        "probability": 0.0010905442558958413
+      },
+      {
+        "recruitment_count": 169,
+        "probability": 0.0010829104461045705
+      },
+      {
+        "recruitment_count": 170,
+        "probability": 0.0010753300729818384
+      },
+      {
+        "recruitment_count": 171,
+        "probability": 0.0010678027624709658
+      },
+      {
+        "recruitment_count": 172,
+        "probability": 0.0010603281431336691
+      },
+      {
+        "recruitment_count": 173,
+        "probability": 0.0010529058461317333
+      },
+      {
+        "recruitment_count": 174,
+        "probability": 0.0010455355052088112
+      },
+      {
+        "recruitment_count": 175,
+        "probability": 0.0010382167566723496
+      },
+      {
+        "recruitment_count": 176,
+        "probability": 0.001030949239375643
+      },
+      {
+        "recruitment_count": 177,
+        "probability": 0.0010237325947000137
+      },
+      {
+        "recruitment_count": 178,
+        "probability": 0.0010165664665371136
+      },
+      {
+        "recruitment_count": 179,
+        "probability": 0.0010094505012713537
+      },
+      {
+        "recruitment_count": 180,
+        "probability": 0.0010023843477624543
+      },
+      {
+        "recruitment_count": 181,
+        "probability": 0.000995367657328117
+      },
+      {
+        "recruitment_count": 182,
+        "probability": 0.0009884000837268204
+      },
+      {
+        "recruitment_count": 183,
+        "probability": 0.0009814812831407326
+      },
+      {
+        "recruitment_count": 184,
+        "probability": 0.0009746109141587474
+      },
+      {
+        "recruitment_count": 185,
+        "probability": 0.0009677886377596363
+      },
+      {
+        "recruitment_count": 186,
+        "probability": 0.0009610141172953187
+      },
+      {
+        "recruitment_count": 187,
+        "probability": 0.0009542870184742515
+      },
+      {
+        "recruitment_count": 188,
+        "probability": 0.0009476070093449318
+      },
+      {
+        "recruitment_count": 189,
+        "probability": 0.0009409737602795172
+      },
+      {
+        "recruitment_count": 190,
+        "probability": 0.0009343869439575606
+      },
+      {
+        "recruitment_count": 191,
+        "probability": 0.0009278462353498577
+      },
+      {
+        "recruitment_count": 192,
+        "probability": 0.0009213513117024086
+      },
+      {
+        "recruitment_count": 193,
+        "probability": 0.0009149018525204919
+      },
+      {
+        "recruitment_count": 194,
+        "probability": 0.0009084975395528484
+      },
+      {
+        "recruitment_count": 195,
+        "probability": 0.0009021380567759784
+      },
+      {
+        "recruitment_count": 196,
+        "probability": 0.0008958230903785466
+      },
+      {
+        "recruitment_count": 197,
+        "probability": 0.0008895523287458968
+      },
+      {
+        "recruitment_count": 198,
+        "probability": 0.0008833254624446753
+      },
+      {
+        "recruitment_count": 199,
+        "probability": 0.0008771421842075626
+      },
+      {
+        "recruitment_count": 200,
+        "probability": 0.12442888413115852
+      }
+    ],
+    "first_success_cdf": [
+      {
+        "recruitment_count": 1,
+        "probability": 0.007
+      },
+      {
+        "recruitment_count": 2,
+        "probability": 0.013951
+      },
+      {
+        "recruitment_count": 3,
+        "probability": 0.020853343
+      },
+      {
+        "recruitment_count": 4,
+        "probability": 0.027707369598999998
+      },
+      {
+        "recruitment_count": 5,
+        "probability": 0.034513418011807
+      },
+      {
+        "recruitment_count": 6,
+        "probability": 0.04127182408572435
+      },
+      {
+        "recruitment_count": 7,
+        "probability": 0.047982921317124276
+      },
+      {
+        "recruitment_count": 8,
+        "probability": 0.05464704086790441
+      },
+      {
+        "recruitment_count": 9,
+        "probability": 0.06126451158182908
+      },
+      {
+        "recruitment_count": 10,
+        "probability": 0.06783566000075628
+      },
+      {
+        "recruitment_count": 11,
+        "probability": 0.07436081038075097
+      },
+      {
+        "recruitment_count": 12,
+        "probability": 0.08084028470808571
+      },
+      {
+        "recruitment_count": 13,
+        "probability": 0.08727440271512912
+      },
+      {
+        "recruitment_count": 14,
+        "probability": 0.09366348189612321
+      },
+      {
+        "recruitment_count": 15,
+        "probability": 0.10000783752285035
+      },
+      {
+        "recruitment_count": 16,
+        "probability": 0.10630778266019039
+      },
+      {
+        "recruitment_count": 17,
+        "probability": 0.11256362818156906
+      },
+      {
+        "recruitment_count": 18,
+        "probability": 0.11877568278429808
+      },
+      {
+        "recruitment_count": 19,
+        "probability": 0.12494425300480799
+      },
+      {
+        "recruitment_count": 20,
+        "probability": 0.13106964323377432
+      },
+      {
+        "recruitment_count": 21,
+        "probability": 0.1371521557311379
+      },
+      {
+        "recruitment_count": 22,
+        "probability": 0.14319209064101995
+      },
+      {
+        "recruitment_count": 23,
+        "probability": 0.14918974600653281
+      },
+      {
+        "recruitment_count": 24,
+        "probability": 0.15514541778448707
+      },
+      {
+        "recruitment_count": 25,
+        "probability": 0.16105939985999565
+      },
+      {
+        "recruitment_count": 26,
+        "probability": 0.1669319840609757
+      },
+      {
+        "recruitment_count": 27,
+        "probability": 0.17276346017254887
+      },
+      {
+        "recruitment_count": 28,
+        "probability": 0.17855411595134102
+      },
+      {
+        "recruitment_count": 29,
+        "probability": 0.18430423713968164
+      },
+      {
+        "recruitment_count": 30,
+        "probability": 0.19001410747970385
+      },
+      {
+        "recruitment_count": 31,
+        "probability": 0.19568400872734593
+      },
+      {
+        "recruitment_count": 32,
+        "probability": 0.2013142206662545
+      },
+      {
+        "recruitment_count": 33,
+        "probability": 0.2069050211215907
+      },
+      {
+        "recruitment_count": 34,
+        "probability": 0.21245668597373957
+      },
+      {
+        "recruitment_count": 35,
+        "probability": 0.2179694891719234
+      },
+      {
+        "recruitment_count": 36,
+        "probability": 0.22344370274771994
+      },
+      {
+        "recruitment_count": 37,
+        "probability": 0.22887959682848588
+      },
+      {
+        "recruitment_count": 38,
+        "probability": 0.23427743965068648
+      },
+      {
+        "recruitment_count": 39,
+        "probability": 0.23963749757313169
+      },
+      {
+        "recruitment_count": 40,
+        "probability": 0.24496003509011977
+      },
+      {
+        "recruitment_count": 41,
+        "probability": 0.2502453148444889
+      },
+      {
+        "recruitment_count": 42,
+        "probability": 0.2554935976405775
+      },
+      {
+        "recruitment_count": 43,
+        "probability": 0.2607051424570935
+      },
+      {
+        "recruitment_count": 44,
+        "probability": 0.2658802064598938
+      },
+      {
+        "recruitment_count": 45,
+        "probability": 0.27101904501467455
+      },
+      {
+        "recruitment_count": 46,
+        "probability": 0.2761219116995718
+      },
+      {
+        "recruitment_count": 47,
+        "probability": 0.2811890583176748
+      },
+      {
+        "recruitment_count": 48,
+        "probability": 0.2862207349094511
+      },
+      {
+        "recruitment_count": 49,
+        "probability": 0.2912171897650849
+      },
+      {
+        "recruitment_count": 50,
+        "probability": 0.2961786694367293
+      },
+      {
+        "recruitment_count": 51,
+        "probability": 0.3011054187506722
+      },
+      {
+        "recruitment_count": 52,
+        "probability": 0.30599768081941753
+      },
+      {
+        "recruitment_count": 53,
+        "probability": 0.3108556970536816
+      },
+      {
+        "recruitment_count": 54,
+        "probability": 0.3156797071743058
+      },
+      {
+        "recruitment_count": 55,
+        "probability": 0.32046994922408567
+      },
+      {
+        "recruitment_count": 56,
+        "probability": 0.3252266595795171
+      },
+      {
+        "recruitment_count": 57,
+        "probability": 0.32995007296246043
+      },
+      {
+        "recruitment_count": 58,
+        "probability": 0.3346404224517232
+      },
+      {
+        "recruitment_count": 59,
+        "probability": 0.33929793949456116
+      },
+      {
+        "recruitment_count": 60,
+        "probability": 0.34392285391809924
+      },
+      {
+        "recruitment_count": 61,
+        "probability": 0.34851539394067255
+      },
+      {
+        "recruitment_count": 62,
+        "probability": 0.3530757861830878
+      },
+      {
+        "recruitment_count": 63,
+        "probability": 0.3576042556798062
+      },
+      {
+        "recruitment_count": 64,
+        "probability": 0.36210102589004756
+      },
+      {
+        "recruitment_count": 65,
+        "probability": 0.36656631870881723
+      },
+      {
+        "recruitment_count": 66,
+        "probability": 0.3710003544778555
+      },
+      {
+        "recruitment_count": 67,
+        "probability": 0.37540335199651054
+      },
+      {
+        "recruitment_count": 68,
+        "probability": 0.37977552853253493
+      },
+      {
+        "recruitment_count": 69,
+        "probability": 0.3841170998328072
+      },
+      {
+        "recruitment_count": 70,
+        "probability": 0.38842828013397757
+      },
+      {
+        "recruitment_count": 71,
+        "probability": 0.3927092821730397
+      },
+      {
+        "recruitment_count": 72,
+        "probability": 0.3969603171978284
+      },
+      {
+        "recruitment_count": 73,
+        "probability": 0.4011815949774436
+      },
+      {
+        "recruitment_count": 74,
+        "probability": 0.4053733238126015
+      },
+      {
+        "recruitment_count": 75,
+        "probability": 0.4095357105459133
+      },
+      {
+        "recruitment_count": 76,
+        "probability": 0.4136689605720919
+      },
+      {
+        "recruitment_count": 77,
+        "probability": 0.41777327784808727
+      },
+      {
+        "recruitment_count": 78,
+        "probability": 0.42184886490315066
+      },
+      {
+        "recruitment_count": 79,
+        "probability": 0.4258959228488286
+      },
+      {
+        "recruitment_count": 80,
+        "probability": 0.4299146513888868
+      },
+      {
+        "recruitment_count": 81,
+        "probability": 0.4339052488291646
+      },
+      {
+        "recruitment_count": 82,
+        "probability": 0.4378679120873604
+      },
+      {
+        "recruitment_count": 83,
+        "probability": 0.4418028367027489
+      },
+      {
+        "recruitment_count": 84,
+        "probability": 0.4457102168458297
+      },
+      {
+        "recruitment_count": 85,
+        "probability": 0.44959024532790887
+      },
+      {
+        "recruitment_count": 86,
+        "probability": 0.4534431136106135
+      },
+      {
+        "recruitment_count": 87,
+        "probability": 0.4572690118153392
+      },
+      {
+        "recruitment_count": 88,
+        "probability": 0.4610681287326318
+      },
+      {
+        "recruitment_count": 89,
+        "probability": 0.4648406518315034
+      },
+      {
+        "recruitment_count": 90,
+        "probability": 0.46858676726868287
+      },
+      {
+        "recruitment_count": 91,
+        "probability": 0.4723066598978021
+      },
+      {
+        "recruitment_count": 92,
+        "probability": 0.4760005132785175
+      },
+      {
+        "recruitment_count": 93,
+        "probability": 0.47966850968556785
+      },
+      {
+        "recruitment_count": 94,
+        "probability": 0.4833108301177689
+      },
+      {
+        "recruitment_count": 95,
+        "probability": 0.4869276543069445
+      },
+      {
+        "recruitment_count": 96,
+        "probability": 0.49051916072679586
+      },
+      {
+        "recruitment_count": 97,
+        "probability": 0.4940855266017083
+      },
+      {
+        "recruitment_count": 98,
+        "probability": 0.49762692791549634
+      },
+      {
+        "recruitment_count": 99,
+        "probability": 0.5011435394200878
+      },
+      {
+        "recruitment_count": 100,
+        "probability": 0.7505717697100438
+      },
+      {
+        "recruitment_count": 101,
+        "probability": 0.7523177673220736
+      },
+      {
+        "recruitment_count": 102,
+        "probability": 0.754051542950819
+      },
+      {
+        "recruitment_count": 103,
+        "probability": 0.7557731821501633
+      },
+      {
+        "recruitment_count": 104,
+        "probability": 0.7574827698751121
+      },
+      {
+        "recruitment_count": 105,
+        "probability": 0.7591803904859863
+      },
+      {
+        "recruitment_count": 106,
+        "probability": 0.7608661277525844
+      },
+      {
+        "recruitment_count": 107,
+        "probability": 0.7625400648583164
+      },
+      {
+        "recruitment_count": 108,
+        "probability": 0.7642022844043082
+      },
+      {
+        "recruitment_count": 109,
+        "probability": 0.765852868413478
+      },
+      {
+        "recruitment_count": 110,
+        "probability": 0.7674918983345836
+      },
+      {
+        "recruitment_count": 111,
+        "probability": 0.7691194550462416
+      },
+      {
+        "recruitment_count": 112,
+        "probability": 0.7707356188609178
+      },
+      {
+        "recruitment_count": 113,
+        "probability": 0.7723404695288913
+      },
+      {
+        "recruitment_count": 114,
+        "probability": 0.7739340862421892
+      },
+      {
+        "recruitment_count": 115,
+        "probability": 0.7755165476384939
+      },
+      {
+        "recruitment_count": 116,
+        "probability": 0.7770879318050243
+      },
+      {
+        "recruitment_count": 117,
+        "probability": 0.7786483162823892
+      },
+      {
+        "recruitment_count": 118,
+        "probability": 0.7801977780684125
+      },
+      {
+        "recruitment_count": 119,
+        "probability": 0.7817363936219336
+      },
+      {
+        "recruitment_count": 120,
+        "probability": 0.78326423886658
+      },
+      {
+        "recruitment_count": 121,
+        "probability": 0.784781389194514
+      },
+      {
+        "recruitment_count": 122,
+        "probability": 0.7862879194701524
+      },
+      {
+        "recruitment_count": 123,
+        "probability": 0.7877839040338613
+      },
+      {
+        "recruitment_count": 124,
+        "probability": 0.7892694167056243
+      },
+      {
+        "recruitment_count": 125,
+        "probability": 0.7907445307886849
+      },
+      {
+        "recruitment_count": 126,
+        "probability": 0.7922093190731642
+      },
+      {
+        "recruitment_count": 127,
+        "probability": 0.793663853839652
+      },
+      {
+        "recruitment_count": 128,
+        "probability": 0.7951082068627744
+      },
+      {
+        "recruitment_count": 129,
+        "probability": 0.796542449414735
+      },
+      {
+        "recruitment_count": 130,
+        "probability": 0.7979666522688318
+      },
+      {
+        "recruitment_count": 131,
+        "probability": 0.79938088570295
+      },
+      {
+        "recruitment_count": 132,
+        "probability": 0.8007852195030294
+      },
+      {
+        "recruitment_count": 133,
+        "probability": 0.8021797229665082
+      },
+      {
+        "recruitment_count": 134,
+        "probability": 0.8035644649057426
+      },
+      {
+        "recruitment_count": 135,
+        "probability": 0.8049395136514024
+      },
+      {
+        "recruitment_count": 136,
+        "probability": 0.8063049370558426
+      },
+      {
+        "recruitment_count": 137,
+        "probability": 0.8076608024964517
+      },
+      {
+        "recruitment_count": 138,
+        "probability": 0.8090071768789765
+      },
+      {
+        "recruitment_count": 139,
+        "probability": 0.8103441266408237
+      },
+      {
+        "recruitment_count": 140,
+        "probability": 0.8116717177543379
+      },
+      {
+        "recruitment_count": 141,
+        "probability": 0.8129900157300576
+      },
+      {
+        "recruitment_count": 142,
+        "probability": 0.8142990856199471
+      },
+      {
+        "recruitment_count": 143,
+        "probability": 0.8155989920206075
+      },
+      {
+        "recruitment_count": 144,
+        "probability": 0.8168897990764632
+      },
+      {
+        "recruitment_count": 145,
+        "probability": 0.818171570482928
+      },
+      {
+        "recruitment_count": 146,
+        "probability": 0.8194443694895475
+      },
+      {
+        "recruitment_count": 147,
+        "probability": 0.8207082589031207
+      },
+      {
+        "recruitment_count": 148,
+        "probability": 0.8219633010907988
+      },
+      {
+        "recruitment_count": 149,
+        "probability": 0.8232095579831632
+      },
+      {
+        "recruitment_count": 150,
+        "probability": 0.8244470910772811
+      },
+      {
+        "recruitment_count": 151,
+        "probability": 0.8256759614397401
+      },
+      {
+        "recruitment_count": 152,
+        "probability": 0.8268962297096619
+      },
+      {
+        "recruitment_count": 153,
+        "probability": 0.8281079561016943
+      },
+      {
+        "recruitment_count": 154,
+        "probability": 0.8293112004089824
+      },
+      {
+        "recruitment_count": 155,
+        "probability": 0.8305060220061196
+      },
+      {
+        "recruitment_count": 156,
+        "probability": 0.8316924798520767
+      },
+      {
+        "recruitment_count": 157,
+        "probability": 0.8328706324931122
+      },
+      {
+        "recruitment_count": 158,
+        "probability": 0.8340405380656604
+      },
+      {
+        "recruitment_count": 159,
+        "probability": 0.8352022542992007
+      },
+      {
+        "recruitment_count": 160,
+        "probability": 0.8363558385191063
+      },
+      {
+        "recruitment_count": 161,
+        "probability": 0.8375013476494726
+      },
+      {
+        "recruitment_count": 162,
+        "probability": 0.8386388382159263
+      },
+      {
+        "recruitment_count": 163,
+        "probability": 0.8397683663484148
+      },
+      {
+        "recruitment_count": 164,
+        "probability": 0.8408899877839758
+      },
+      {
+        "recruitment_count": 165,
+        "probability": 0.842003757869488
+      },
+      {
+        "recruitment_count": 166,
+        "probability": 0.8431097315644016
+      },
+      {
+        "recruitment_count": 167,
+        "probability": 0.8442079634434508
+      },
+      {
+        "recruitment_count": 168,
+        "probability": 0.8452985076993467
+      },
+      {
+        "recruitment_count": 169,
+        "probability": 0.8463814181454512
+      },
+      {
+        "recruitment_count": 170,
+        "probability": 0.8474567482184331
+      },
+      {
+        "recruitment_count": 171,
+        "probability": 0.8485245509809041
+      },
+      {
+        "recruitment_count": 172,
+        "probability": 0.8495848791240377
+      },
+      {
+        "recruitment_count": 173,
+        "probability": 0.8506377849701694
+      },
+      {
+        "recruitment_count": 174,
+        "probability": 0.8516833204753782
+      },
+      {
+        "recruitment_count": 175,
+        "probability": 0.8527215372320506
+      },
+      {
+        "recruitment_count": 176,
+        "probability": 0.8537524864714262
+      },
+      {
+        "recruitment_count": 177,
+        "probability": 0.8547762190661262
+      },
+      {
+        "recruitment_count": 178,
+        "probability": 0.8557927855326634
+      },
+      {
+        "recruitment_count": 179,
+        "probability": 0.8568022360339347
+      },
+      {
+        "recruitment_count": 180,
+        "probability": 0.8578046203816971
+      },
+      {
+        "recruitment_count": 181,
+        "probability": 0.8587999880390252
+      },
+      {
+        "recruitment_count": 182,
+        "probability": 0.8597883881227522
+      },
+      {
+        "recruitment_count": 183,
+        "probability": 0.8607698694058928
+      },
+      {
+        "recruitment_count": 184,
+        "probability": 0.8617444803200516
+      },
+      {
+        "recruitment_count": 185,
+        "probability": 0.8627122689578113
+      },
+      {
+        "recruitment_count": 186,
+        "probability": 0.8636732830751066
+      },
+      {
+        "recruitment_count": 187,
+        "probability": 0.8646275700935808
+      },
+      {
+        "recruitment_count": 188,
+        "probability": 0.8655751771029258
+      },
+      {
+        "recruitment_count": 189,
+        "probability": 0.8665161508632052
+      },
+      {
+        "recruitment_count": 190,
+        "probability": 0.8674505378071629
+      },
+      {
+        "recruitment_count": 191,
+        "probability": 0.8683783840425127
+      },
+      {
+        "recruitment_count": 192,
+        "probability": 0.8692997353542151
+      },
+      {
+        "recruitment_count": 193,
+        "probability": 0.8702146372067355
+      },
+      {
+        "recruitment_count": 194,
+        "probability": 0.8711231347462884
+      },
+      {
+        "recruitment_count": 195,
+        "probability": 0.8720252728030644
+      },
+      {
+        "recruitment_count": 196,
+        "probability": 0.8729210958934429
+      },
+      {
+        "recruitment_count": 197,
+        "probability": 0.8738106482221888
+      },
+      {
+        "recruitment_count": 198,
+        "probability": 0.8746939736846335
+      },
+      {
+        "recruitment_count": 199,
+        "probability": 0.8755711158688411
+      },
+      {
+        "recruitment_count": 200,
+        "probability": 0.9999999999999996
+      }
+    ],
+    "probability_conservation": {
+      "maximum_observed_deviation": 4.440892098500626e-16,
+      "final_terminal_probability": 0.9999999999999996,
+      "first_success_probability": 0.9999999999999996,
+      "first_success_success_deviation": 0.0
+    },
+    "solver_diagnostics": {
+      "peak_boundary_frontier": 2,
+      "peak_in_flight_frontier": 1,
+      "processed_states": 600,
+      "transition_expansions": 399
+    }
+  },
+  "monte_carlo": {
+    "engine_kind": "monte_carlo",
+    "provenance": {
+      "engine_version": "<PACKAGE_VERSION>",
+      "engine_semantics_version": 2,
+      "result_schema_version": 2,
+      "semantic_encoding_version": "canonical-json-v1",
+      "scenario_id": "single_target_200",
+      "scenario_schema_version": 2,
+      "scenario_behavior_fingerprint": "95eb5b476e17e148909fefd24da3ab00e0e15c4cbc8fdd5ed26758bc4fdb66af",
+      "scenario_document_fingerprint": "044f559d861e3af6624d7e55379cb5f00bc9883049d319bf1d720188d4c1ed70",
+      "ruleset_id": "jp_2026_07_29_provisional_v2",
+      "ruleset_schema_version": 2,
+      "ruleset_behavior_fingerprint": "db0af908e4436e396e9a55e7e0bd39aa8ae30d8a148c34abb07c24cb347fb6ad",
+      "ruleset_document_fingerprint": "c5de387937c5a2060641ef5763ef36f5407fb093560363f535d3630ba5cb1d32",
+      "ruleset_verification_status": "provisional",
+      "ruleset_provenance": {
+        "verification_status": "provisional",
+        "sources": []
+      },
+      "reward_schedule_id": "jp_2026_07_29_empty_v2",
+      "reward_schedule_schema_version": 2,
+      "reward_schedule_behavior_fingerprint": "41387171a8507e76f595d0571b3d21028c166cb487bc49e64f3c072c09e6b10e",
+      "reward_schedule_document_fingerprint": "890d81dd1ef119fae566ece9e24e3ee1fe0b9cb932a5bf9f5948319267a2ffa3",
+      "reward_schedule_verification_status": "provisional",
+      "reward_schedule_provenance": {
+        "verification_status": "provisional",
+        "sources": []
+      }
+    },
+    "context": {
+      "strategy_constraints": {
+        "max_total_recruitments": 200
+      },
+      "compiled_strategy": {
+        "strategy_schema_version": 1,
+        "strategy_id": "sequential",
+        "kind": "sequential_targets",
+        "funding_priority": [
+          "ticket_ten",
+          "paid_single"
+        ],
+        "max_total_recruitments": 200
+      },
+      "initial_resources": {
+        "pyroxene": 24000,
+        "limited_ten_recruitment_tickets": 0,
+        "eligma": 0,
+        "advanced_bd_selectors": 0,
+        "advanced_tech_note_selectors": 0,
+        "superior_tech_note_selectors": 0,
+        "gift_boxes": 0
+      },
+      "ordered_targets": [
+        "target_a"
+      ],
+      "ordered_banners": [
+        "banner_a"
+      ]
+    },
+    "rng": {
+      "rng_algorithm": "chacha8",
+      "master_seed": 42,
+      "run_count": 11,
+      "run_index_contract": "zero-based ascending indices 0..runs-1",
+      "stream_derivation_version": "mc-run-stream-v1"
+    },
+    "success_probability": 1.0,
+    "owned_target_terminal_probabilities": [
+      {
+        "owned_targets": [
+          "target_a"
+        ],
+        "probability": 1.0
+      }
+    ],
+    "terminal_reason_probabilities": [
+      {
+        "terminal_reason": "targets_acquired",
+        "probability": 1.0
+      }
+    ],
+    "expected_terminal_primitive_recruitments": 111.9090909090909,
+    "expected_terminal_primitive_recruitments_given_success": 111.9090909090909,
+    "expected_first_success_recruitment_count_given_success": 111.9090909090909,
+    "expected_paid_pyroxene_spent": 13429.09090909091,
+    "expected_ticket_funded_primitive_recruitments": 0.0,
+    "expected_residual_resources": {
+      "pyroxene": 10570.90909090909,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0
+    },
+    "expected_milestone_rewards_acquired": {
+      "pyroxene": 0.0,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0
+    },
+    "milestone_reach_probabilities": [],
+    "first_success_pmf": [
+      {
+        "recruitment_count": 18,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 57,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 69,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 97,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 100,
+        "probability": 0.2727272727272727
+      },
+      {
+        "recruitment_count": 135,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 155,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 200,
+        "probability": 0.18181818181818182
+      }
+    ],
+    "first_success_cdf": [
+      {
+        "recruitment_count": 18,
+        "probability": 0.09090909090909091
+      },
+      {
+        "recruitment_count": 57,
+        "probability": 0.18181818181818182
+      },
+      {
+        "recruitment_count": 69,
+        "probability": 0.2727272727272727
+      },
+      {
+        "recruitment_count": 97,
+        "probability": 0.36363636363636365
+      },
+      {
+        "recruitment_count": 100,
+        "probability": 0.6363636363636364
+      },
+      {
+        "recruitment_count": 135,
+        "probability": 0.7272727272727273
+      },
+      {
+        "recruitment_count": 155,
+        "probability": 0.8181818181818182
+      },
+      {
+        "recruitment_count": 200,
+        "probability": 1.0
+      }
+    ],
+    "sample_counts": {
+      "total_runs": 11,
+      "successful_runs": 11
+    },
+    "estimation": {
+      "success_probability_interval_95": {
+        "lower": 0.7411599827511859,
+        "upper": 1.0
+      },
+      "expected_terminal_primitive_recruitments": {
+        "standard_error": 17.118015255309004,
+        "confidence_interval_95": {
+          "lower": 78.35778100868527,
+          "upper": 145.46040080949655
+        }
+      },
+      "expected_terminal_primitive_recruitments_given_success": {
+        "standard_error": 17.118015255309004,
+        "confidence_interval_95": {
+          "lower": 78.35778100868527,
+          "upper": 145.46040080949655
+        }
+      },
+      "expected_first_success_recruitment_count_given_success": {
+        "standard_error": 17.118015255309004,
+        "confidence_interval_95": {
+          "lower": 78.35778100868527,
+          "upper": 145.46040080949655
+        }
+      },
+      "expected_paid_pyroxene_spent": {
+        "standard_error": 2054.16183063708,
+        "confidence_interval_95": {
+          "lower": 9402.933721042233,
+          "upper": 17455.248097139585
+        }
+      },
+      "expected_ticket_funded_primitive_recruitments": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "expected_residual_resources": {
+        "pyroxene": {
+          "standard_error": 2054.16183063708,
+          "confidence_interval_95": {
+            "lower": 6544.751902860413,
+            "upper": 14597.066278957767
+          }
+        },
+        "limited_ten_recruitment_tickets": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "eligma": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_bd_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "superior_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "gift_boxes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        }
+      },
+      "expected_milestone_rewards_acquired": {
+        "pyroxene": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "limited_ten_recruitment_tickets": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "eligma": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_bd_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "superior_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "gift_boxes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        }
+      },
+      "probability_intervals_95": {
+        "owned_target_terminal_probabilities": [
+          {
+            "owned_targets": [
+              "target_a"
+            ],
+            "sample_count": 11,
+            "confidence_interval_95": {
+              "lower": 0.7411599827511859,
+              "upper": 1.0
+            }
+          }
+        ],
+        "terminal_reason_probabilities": [
+          {
+            "terminal_reason": "targets_acquired",
+            "sample_count": 11,
+            "confidence_interval_95": {
+              "lower": 0.7411599827511859,
+              "upper": 1.0
+            }
+          }
+        ],
+        "milestone_reach_probabilities": [],
+        "first_success_pmf": [
+          {
+            "recruitment_count": 18,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 57,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 69,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 97,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 100,
+            "sample_count": 3,
+            "confidence_interval_95": {
+              "lower": 0.09745880573921467,
+              "upper": 0.5656502930102463
+            }
+          },
+          {
+            "recruitment_count": 135,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 155,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 200,
+            "sample_count": 2,
+            "confidence_interval_95": {
+              "lower": 0.05136660067100063,
+              "upper": 0.4769861375782448
+            }
+          }
+        ],
+        "first_success_cdf": [
+          {
+            "recruitment_count": 18,
+            "sample_count": 1,
+            "confidence_interval_95": {
+              "lower": 0.01623175226282597,
+              "upper": 0.3773646254862038
+            }
+          },
+          {
+            "recruitment_count": 57,
+            "sample_count": 2,
+            "confidence_interval_95": {
+              "lower": 0.05136660067100063,
+              "upper": 0.4769861375782448
+            }
+          },
+          {
+            "recruitment_count": 69,
+            "sample_count": 3,
+            "confidence_interval_95": {
+              "lower": 0.09745880573921467,
+              "upper": 0.5656502930102463
+            }
+          },
+          {
+            "recruitment_count": 97,
+            "sample_count": 4,
+            "confidence_interval_95": {
+              "lower": 0.15166223614131383,
+              "upper": 0.6462032231083628
+            }
+          },
+          {
+            "recruitment_count": 100,
+            "sample_count": 7,
+            "confidence_interval_95": {
+              "lower": 0.35379677689163724,
+              "upper": 0.8483377638586862
+            }
+          },
+          {
+            "recruitment_count": 135,
+            "sample_count": 8,
+            "confidence_interval_95": {
+              "lower": 0.4343497069897537,
+              "upper": 0.9025411942607853
+            }
+          },
+          {
+            "recruitment_count": 155,
+            "sample_count": 9,
+            "confidence_interval_95": {
+              "lower": 0.5230138624217553,
+              "upper": 0.9486333993289995
+            }
+          },
+          {
+            "recruitment_count": 200,
+            "sample_count": 11,
+            "confidence_interval_95": {
+              "lower": 0.7411599827511859,
+              "upper": 1.0
+            }
+          }
+        ]
+      }
+    }
+  },
+  "success_probability_difference": 4.440892098500626e-16,
+  "success_probability_within_monte_carlo_interval": true
+}

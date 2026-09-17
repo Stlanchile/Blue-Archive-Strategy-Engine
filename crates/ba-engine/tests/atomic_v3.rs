@@ -266,3 +266,53 @@ fn repeat_boundary_410_uses_absolute_campaign_count() {
     assert_eq!(result.milestone_rewards_acquired.gift_boxes, 2);
     assert_eq!(result.milestone_rewards_acquired.eligma, 0);
 }
+
+#[test]
+fn spent_tickets_leave_room_for_rewards_at_maximum_inventory() {
+    let bundle = campaign_bundle(385, 0, u64::MAX, 10);
+    let outcomes = [PrimitiveAcquisition::CurrentFeaturedTarget; 10];
+    let result = replay_v3(&bundle, &outcomes).expect("spent ticket makes room for reward");
+    assert_eq!(
+        result.terminal_resources.limited_ten_recruitment_tickets,
+        u64::MAX
+    );
+    assert_eq!(result.terminal_resources.eligma, 3);
+    assert_eq!(
+        result
+            .milestone_rewards_acquired
+            .limited_ten_recruitment_tickets,
+        1
+    );
+    let exact = ba_engine::analyze_exact_v3(&bundle, ba_engine::ExactSolverOptions::default())
+        .expect("exact terminal accounting");
+    let expected = u64::MAX as f64;
+    assert!(
+        (exact
+            .expected_residual_resources
+            .limited_ten_recruitment_tickets
+            - expected)
+            .abs()
+            < expected * 1e-12
+    );
+    let sampled = ba_engine::simulate_monte_carlo_v3(
+        &bundle,
+        std::num::NonZeroU64::new(2).expect("runs"),
+        42,
+    )
+    .expect("sampled terminal accounting");
+    assert_eq!(
+        sampled
+            .expected_residual_resources
+            .limited_ten_recruitment_tickets,
+        u64::MAX as f64
+    );
+}
+
+#[test]
+fn unspent_tickets_still_reject_a_real_reward_overflow() {
+    let bundle = campaign_bundle(389, 120, u64::MAX, 1);
+    assert!(matches!(
+        replay_v3(&bundle, &[PrimitiveAcquisition::CurrentFeaturedTarget]),
+        Err(ba_engine::EngineError::ArithmeticOverflow { .. })
+    ));
+}

@@ -51,3 +51,23 @@ fn every_shipped_scenario_matches_frozen_calibration_and_headroom() {
     assert_eq!(DEFAULT_MAX_PROCESSED_STATES, 1_048_576);
     assert_eq!(DEFAULT_MAX_TRANSITION_EXPANSIONS, 2_097_152);
 }
+
+#[test]
+fn shipped_v3_scenarios_match_qualified_baseline_counts() {
+    let cases: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/v3_calibration.json")).unwrap();
+    for case in cases.as_array().unwrap() {
+        let path = case["path"].as_str().unwrap();
+        let ba_core::AnyValidatedScenarioBundle::V3(bundle) =
+            ba_core::load_any_bundle(workspace_path("data"), workspace_path(path)).unwrap()
+        else {
+            panic!("v3")
+        };
+        let result = ba_engine::analyze_exact_v3(&bundle, ExactSolverOptions::default()).unwrap();
+        assert_eq!(
+            serde_json::to_value(result.solver_diagnostics).unwrap(),
+            case["diagnostics"],
+            "{path}"
+        );
+    }
+}

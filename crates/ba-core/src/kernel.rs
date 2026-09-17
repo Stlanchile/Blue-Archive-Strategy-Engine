@@ -217,13 +217,13 @@ pub fn begin_action(
     world.remaining_pyroxene = world
         .remaining_pyroxene
         .checked_sub(pyroxene_deducted)
-        .ok_or(CoreError::InvalidAction {
+        .ok_or_else(|| CoreError::InvalidAction {
             message: "paid action deduction underflowed".to_owned(),
         })?;
     world.available_ticket_count = world
         .available_ticket_count
         .checked_sub(tickets_deducted)
-        .ok_or(CoreError::InvalidAction {
+        .ok_or_else(|| CoreError::InvalidAction {
             message: "ticket action deduction underflowed".to_owned(),
         })?;
     Ok((
@@ -320,7 +320,7 @@ pub fn apply_primitive_transition(
     next.remaining_primitive_draws =
         next.remaining_primitive_draws
             .checked_sub(1)
-            .ok_or(CoreError::InternalInvariant {
+            .ok_or_else(|| CoreError::InternalInvariant {
                 message: "action remaining draw count underflowed".to_owned(),
             })?;
 
@@ -387,7 +387,7 @@ pub fn reconstruct_funding(
     let spent = initial
         .pyroxene
         .checked_sub(terminal.remaining_pyroxene)
-        .ok_or(CoreError::InternalInvariant {
+        .ok_or_else(|| CoreError::InternalInvariant {
             message: "terminal pyroxene exceeds initial pyroxene".to_owned(),
         })?;
     let paid_cost = bundle.ruleset().paid_single_cost();
@@ -405,7 +405,7 @@ pub fn reconstruct_funding(
     let ticket_funded_primitive_recruitments = terminal
         .cumulative_primitive_recruitments
         .checked_sub(paid_funded_primitive_recruitments)
-        .ok_or(CoreError::InternalInvariant {
+        .ok_or_else(|| CoreError::InternalInvariant {
             message: "reconstructed paid draws exceed terminal draws".to_owned(),
         })?;
     let ticket_size = bundle.ruleset().ticket_action_size();

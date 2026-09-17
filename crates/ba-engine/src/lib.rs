@@ -1,11 +1,13 @@
 #![forbid(unsafe_code)]
 
+mod acquisition_timing;
 mod error;
 mod exact;
 mod exact_v3;
 mod options;
 mod result;
 mod result_v3;
+mod result_v4;
 mod sampling;
 mod simulation;
 mod simulation_v3;
@@ -49,4 +51,11 @@ pub use simulation::{
 pub use simulation_v3::{
     compare_v3, derive_run_seed_v3, replay_v3, replay_v3_with_limits, simulate_monte_carlo_v3,
     simulate_monte_carlo_v3_with_limits, simulate_trace_v3, simulate_trace_v3_with_limits,
+};
+
+pub use acquisition_timing::{AcquisitionTimingOptions, MAX_ACQUISITION_TIMING_SUPPORT_POINTS};
+pub use exact_v3::analyze_exact_v3_with_acquisition_timing;
+pub use result_v4::*;
+pub use simulation_v3::{
+    compare_v3_with_acquisition_timing, simulate_monte_carlo_v3_with_acquisition_timing,
 };

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.0
+
+- Added opt-in schema-v3 per-target first-acquisition PMFs/CDFs for exact analysis,
+  serial Monte Carlo and comparison, with a schema-4 envelope preserving the
+  embedded schema-3 analysis and all default output.
+- Added bounded sparse support (65,536 keys) and new-report rendering (64 MiB),
+  pointwise Wilson intervals and explicit unacquired outcomes.
+- Retained baseline corrections: exact Wilson endpoints for impossible/certain
+  events, actual remaining v3 ticket inventory after spending/rewards, and lazy
+  kernel error construction. Genuine inventory overflow still rejects.
+- Froze complete legacy output snapshots and all shipped v3 solver calibration
+  counts. Input/semantics versions, state keys, fingerprints and RNG are unchanged.
+- Prepared a local Linux x86_64 packaging rehearsal; runtime gameplay data remains
+  provisional. No publication or new dependency is included.
+
 ## 0.3.0
 
 - Added homogeneous schema v3 bundles with one through four ordered targets,

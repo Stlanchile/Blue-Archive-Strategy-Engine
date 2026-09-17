@@ -1,0 +1,90 @@
+use sha2::{Digest, Sha256};
+use std::{fs, path::Path};
+#[test]
+fn qualified_runtime_and_golden_document_bytes_are_frozen() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    for (path, hash) in [
+        (
+            "data/rewards/jp_2026_07_29_campaign_v2.json",
+            "ec437c160e8e884608889b34ac2d49131e2f40979f65fc9a8310a9d91025923a",
+        ),
+        (
+            "data/rewards/jp_2026_07_29_empty_v2.json",
+            "9ed74f018543904ba203d6d3541ebf13857d0b60fe547feddd1d8467a0a6b08c",
+        ),
+        (
+            "data/rewards/jp_2026_07_29_empty_v3.json",
+            "815f6eb9cd6e5702d04b46864a997931d6004e528ffac5cc61340fd18c798170",
+        ),
+        (
+            "data/rulesets/jp_2026_07_29_provisional_v2.json",
+            "0d25ca7b3ca75c29667866920f21eb5b75456e55d44db87e1557ae631f2af49b",
+        ),
+        (
+            "data/rulesets/jp_2026_07_29_provisional_v3.json",
+            "ee6e946d11c839eb67d2b14b6909f3fcd3565e8a9956233b76e3d7ffa9917f17",
+        ),
+        (
+            "scenarios/golden/campaign_dual_310.json",
+            "8b8a9a807cfe1c634f66948a0fc908f66460522f553d29a894309deafcee7371",
+        ),
+        (
+            "scenarios/golden/charge_199_one.json",
+            "ba0cfb5567584064100d2ad4b317ef12dc14aba3ca6ce4c77f1b5eff2133321e",
+        ),
+        (
+            "scenarios/golden/charge_99_one.json",
+            "4e98d09a1de4f902cbcbfacb01b993aff15e2765feacfcf8db170b6d658ae11e",
+        ),
+        (
+            "scenarios/golden/dual_independent_200.json",
+            "f5fdf62dd0e8cc5063da5c68fa6cb849ee16e5b7624ea651ce020dff4faefc97",
+        ),
+        (
+            "scenarios/golden/dual_shared_200.json",
+            "df5fa07c71c84bb1fbcb5b2ea179779ad31d442501ecafc8809ecb411fe50494",
+        ),
+        (
+            "scenarios/golden/initial_success.json",
+            "dc78160507cbaaffc199ac36c1cd768da364fd7c7d81777507799a721af9ea92",
+        ),
+        (
+            "scenarios/golden/single_target_200.json",
+            "a4db8687cf7cd93bf439258f013b1655ab7bb31726321264c0fd1d948e3c08d2",
+        ),
+        (
+            "scenarios/golden/ticket_atomic.json",
+            "c2988de8f6c132633f8f7dfa61a5eacd92ff23c906470cbd026da07036d8f175",
+        ),
+        (
+            "scenarios/golden/v2_funding_paid_first.json",
+            "37d43ab9285783a317988b1887d8736d057181f82a5edc368ce96e3cbade9e54",
+        ),
+        (
+            "scenarios/golden/v2_funding_ticket_first.json",
+            "a01ab322d6fa93875bbd95ae421afc794c5b0336ac6fe9b4925eefcc08755729",
+        ),
+        (
+            "scenarios/golden/v3_atomic_cross_target.json",
+            "667328bf3db76afd943480100da3a4ece975dbbd70dd812cbf0ae1cae4763488",
+        ),
+        (
+            "scenarios/golden/v3_four_target_exact_small.json",
+            "7eaa4ad7dbd244a067915af0e3eed171e30b5682a8882ce6a338c93044717785",
+        ),
+        (
+            "scenarios/golden/v3_single_cross_target_zero.json",
+            "1b0efaca037550638104c7697ab67d80c473c6bf4d398bcd263d77e9f49f33f6",
+        ),
+        (
+            "scenarios/golden/v3_three_target_exact_small.json",
+            "98338b5b9cdcc79fc56f50bf1234d62a4d3a2f4b66564fb5290d0f7b4619c485",
+        ),
+    ] {
+        assert_eq!(
+            format!("{:x}", Sha256::digest(fs::read(root.join(path)).unwrap())),
+            hash,
+            "{path}"
+        );
+    }
+}

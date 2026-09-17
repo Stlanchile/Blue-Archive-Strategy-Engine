@@ -81,6 +81,8 @@ required_files=(
     docs/CALIBRATION.md docs/DATA_PROVENANCE.md docs/PROTOCOLS.md
     docs/RELEASING.md docs/SCHEMA_V2.md docs/SCHEMA_V3.md
     docs/STRATEGIES.md docs/THREAT_MODEL.md
+    docs/COMPATIBILITY.md docs/ACQUISITION_TIMING.md
+    docs/adr/0002-marginal-acquisition-timing.md
     docs/adr/0001-deterministic-parallel-monte-carlo.md
     data/rulesets/jp_2026_07_29_provisional_v2.json
     data/rulesets/jp_2026_07_29_provisional_v3.json
@@ -126,7 +128,9 @@ cp -- "$repo_root/docs/CALIBRATION.md" \
     "$repo_root/docs/RELEASING.md" "$repo_root/docs/SCHEMA_V2.md" \
     "$repo_root/docs/SCHEMA_V3.md" \
     "$repo_root/docs/STRATEGIES.md" "$repo_root/docs/THREAT_MODEL.md" "$stage/docs/"
-cp -- "$repo_root/docs/adr/0001-deterministic-parallel-monte-carlo.md" "$stage/docs/adr/"
+cp -- "$repo_root/docs/COMPATIBILITY.md" "$repo_root/docs/ACQUISITION_TIMING.md" "$stage/docs/"
+cp -- "$repo_root/docs/adr/0001-deterministic-parallel-monte-carlo.md" \
+    "$repo_root/docs/adr/0002-marginal-acquisition-timing.md" "$stage/docs/adr/"
 
 find "$stage" -type d -exec chmod 0755 {} +
 find "$stage" -type f -exec chmod 0644 {} +

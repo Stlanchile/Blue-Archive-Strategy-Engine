@@ -32,6 +32,31 @@ fn hex(bytes: [u8; 32]) -> String {
 }
 
 #[test]
+fn certain_outcomes_are_inside_their_monte_carlo_intervals() {
+    let impossible = synthetic_bundle(
+        "no_resources",
+        half_probability_mechanics(),
+        Resources::default(),
+        0,
+        1,
+        vec![],
+    );
+    for (bundle, probability) in [(impossible, 0.0), (bundle("initial_success"), 1.0)] {
+        for runs in [11, 100] {
+            let result =
+                compare(&bundle, NonZeroU64::new(runs).expect("runs"), 42).expect("comparison");
+            assert_eq!(result.exact.success_probability, probability);
+            let interval = result
+                .monte_carlo
+                .estimation
+                .success_probability_interval_95;
+            assert!((interval.lower..=interval.upper).contains(&probability));
+            assert!(result.success_probability_within_monte_carlo_interval);
+        }
+    }
+}
+
+#[test]
 fn per_run_seed_vectors_are_stable_and_indexed_independently() {
     let bundle = bundle("single_target_200");
     assert_eq!(

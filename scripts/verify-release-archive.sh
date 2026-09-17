@@ -207,7 +207,8 @@ for metadata in "${metadata_entries[@]}"; do
         }
     fi
 
-    [[ "$entry" != "$root/tests/fixtures" && "$entry" != "$root/tests/fixtures/"* ]] || {
+    # Match complete path components at any depth, including crate-local fixtures.
+    [[ "$entry" != */tests/fixtures && "$entry" != */tests/fixtures/* ]] || {
         printf 'error: test fixtures must not be included in runtime archive: %s\n' "$entry" >&2
         exit 1
     }
@@ -225,6 +226,8 @@ required_paths=(
     LICENSE-MIT LICENSE-APACHE
     docs/CALIBRATION.md docs/DATA_PROVENANCE.md docs/PROTOCOLS.md docs/SCHEMA_V2.md
     docs/RELEASING.md docs/SCHEMA_V3.md docs/STRATEGIES.md docs/THREAT_MODEL.md
+    docs/COMPATIBILITY.md docs/ACQUISITION_TIMING.md
+    docs/adr/0002-marginal-acquisition-timing.md
     docs/adr/0001-deterministic-parallel-monte-carlo.md
     data/rulesets/jp_2026_07_29_provisional_v2.json
     data/rulesets/jp_2026_07_29_provisional_v3.json
@@ -280,5 +283,31 @@ if [[ "$(uname -s)" == Linux ]]; then
             analyze single_target_v2 --format json >/dev/null
         "$binary" --data-dir "$extract_root/$root/data" --scenario-dir "$extract_root/$root/scenarios/golden" \
             analyze v3_three_target_exact_small --format json >/dev/null
+        for timing_command in analyze simulate compare; do
+            timing_args=("$timing_command" v3_atomic_cross_target --acquisition-timing --format json)
+            if [[ "$timing_command" != analyze ]]; then
+                timing_args+=(--runs 100 --seed 42)
+            fi
+            "$binary" --data-dir "$extract_root/$root/data" --scenario-dir "$extract_root/$root/scenarios/golden" \
+                "${timing_args[@]}" >"$verification_root/timing.json"
+            python3 - "$verification_root/timing.json" <<'PYJSON'
+import json, sys
+with open(sys.argv[1], encoding="utf-8") as source:
+    report = json.load(source)
+assert report["result_schema_version"] == 4
+assert "acquisition_timing" in report
+PYJSON
+        done
+        if "$binary" --data-dir "$extract_root/$root/data" analyze missing-input.json --acquisition-timing --format json \
+            >"$verification_root/missing.stdout" 2>"$verification_root/missing.stderr"; then
+            printf '%s\n' 'error: missing input succeeded' >&2
+            exit 1
+        fi
+        [[ ! -s "$verification_root/missing.stdout" ]] || { printf '%s\n' 'error: missing input wrote stdout' >&2; exit 1; }
+        "$binary" --data-dir "$extract_root/$root/data" catalog list all --format json >"$verification_root/catalog.json"
+        if grep -q 'timing_oracle' "$verification_root/catalog.json"; then
+            printf '%s\n' 'error: synthetic timing fixture was packaged' >&2
+            exit 1
+        fi
     )
 fi

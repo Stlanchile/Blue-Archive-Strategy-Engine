@@ -1,0 +1,9 @@
+{
+  "diagnostics_schema_version": 1,
+  "error": {
+    "class": "validation",
+    "code": "unsupported_document",
+    "message": "unsupported document dispatch in crates/ba-cli/tests/fixtures/compatibility/unsupported.input.json: schema_version=Some(4), document_type=Some(\"unsupported\")",
+    "hint": "use schema_version 2 or 3 with a supported document_type"
+  }
+}

@@ -738,8 +738,18 @@ fn wilson_interval(successes: u64, runs: u64) -> ConfidenceInterval {
     let center = (p + z_squared / (2.0 * n)) / denominator;
     let half_width = z * ((p * (1.0 - p) / n + z_squared / (4.0 * n * n)).sqrt()) / denominator;
     ConfidenceInterval {
-        lower: (center - half_width).max(0.0),
-        upper: (center + half_width).min(1.0),
+        // Preserve exact endpoints: cancellation can otherwise exclude a
+        // probability of zero or one from its own Wilson interval.
+        lower: if successes == 0 {
+            0.0
+        } else {
+            (center - half_width).max(0.0)
+        },
+        upper: if successes == runs {
+            1.0
+        } else {
+            (center + half_width).min(1.0)
+        },
     }
 }
 

@@ -1,0 +1,1210 @@
+{
+  "engine_kind": "comparison",
+  "exact": {
+    "engine_kind": "exact",
+    "provenance": {
+      "engine_version": "<PACKAGE_VERSION>",
+      "engine_semantics_version": 3,
+      "result_schema_version": 3,
+      "semantic_encoding_version": "canonical-json-v1",
+      "scenario_id": "v3_four_target_exact_small",
+      "scenario_schema_version": 3,
+      "scenario_behavior_fingerprint": "924f6391f7d806a6fd16e65f7f7b081bc8b1928e275bbea0bdb330c685b2baa6",
+      "scenario_document_fingerprint": "35cd1232a1b96e61504e15a5fba7e88abfa259518e8317aa2f0277df4c202d09",
+      "ruleset_id": "jp_2026_07_29_provisional_v3",
+      "ruleset_schema_version": 3,
+      "ruleset_behavior_fingerprint": "feeb4ed5107b2bfa334b18b6fd05de59ff212428441d81654e30d4aad507116c",
+      "ruleset_document_fingerprint": "d87163273230cae4b6391a9bbedd7674dc0474447b177450b315102ab26e4cbc",
+      "ruleset_provenance_status": "provisional",
+      "ruleset_provenance": {
+        "provenance_status": "provisional",
+        "sources": [],
+        "claim_bindings": []
+      },
+      "reward_schedule_id": "jp_2026_07_29_empty_v3",
+      "reward_schedule_schema_version": 3,
+      "reward_schedule_behavior_fingerprint": "6e24d576c84b201a8e261b9731370774867488d4bd7191ad4880670256a769d2",
+      "reward_schedule_document_fingerprint": "73e0be53b0e2b6702489cac597ab832ed0fb4335a826b245b5af743240d6fcb1",
+      "reward_schedule_provenance_status": "provisional",
+      "reward_schedule_provenance": {
+        "provenance_status": "provisional",
+        "sources": [],
+        "claim_bindings": []
+      },
+      "authority": {
+        "scenario": "scenario_document_user_authored",
+        "featured_target_probabilities": "ruleset_document",
+        "cross_target_probabilities": "scenario_document_user_authored",
+        "banner_topology": "scenario_document_user_authored",
+        "target_order": "scenario_document_user_authored",
+        "initial_state": "scenario_document_user_authored",
+        "strategy": "scenario_document_user_authored"
+      }
+    },
+    "context": {
+      "compiled_strategy": {
+        "strategy_schema_version": 2,
+        "strategy_id": "sequential_targets_v3",
+        "kind": "sequential_targets",
+        "funding_priority": [
+          "paid_single",
+          "ticket_ten"
+        ],
+        "max_additional_recruitments": 4
+      },
+      "initial_resources": {
+        "pyroxene": 480,
+        "limited_ten_recruitment_tickets": 0,
+        "eligma": 0,
+        "advanced_bd_selectors": 0,
+        "advanced_tech_note_selectors": 0,
+        "superior_tech_note_selectors": 0,
+        "gift_boxes": 0,
+        "keystone_fragments": 0,
+        "secret_tech_notes": 0,
+        "superior_bd_selectors": 0,
+        "high_grade_gift_boxes": 0
+      },
+      "initial_campaign_recruitment_count": 385,
+      "maximum_additional_recruitments": 4,
+      "maximum_absolute_campaign_recruitment_count": 389,
+      "ordered_target_ids": [
+        "target_a",
+        "target_b",
+        "target_c",
+        "target_d"
+      ],
+      "ordered_banner_ids": [
+        "banner_a",
+        "banner_b",
+        "banner_c",
+        "banner_d"
+      ],
+      "charge_group_topology": [
+        {
+          "banner_id": "banner_a",
+          "charge_group_id": "group_a"
+        },
+        {
+          "banner_id": "banner_b",
+          "charge_group_id": "group_b"
+        },
+        {
+          "banner_id": "banner_c",
+          "charge_group_id": "group_c"
+        },
+        {
+          "banner_id": "banner_d",
+          "charge_group_id": "group_d"
+        }
+      ],
+      "initial_owned_targets": [],
+      "initial_charges": [
+        {
+          "charge_group_id": "group_a",
+          "pre_recruitment_charge": 199
+        },
+        {
+          "charge_group_id": "group_b",
+          "pre_recruitment_charge": 199
+        },
+        {
+          "charge_group_id": "group_c",
+          "pre_recruitment_charge": 199
+        },
+        {
+          "charge_group_id": "group_d",
+          "pre_recruitment_charge": 199
+        }
+      ],
+      "schedule_kind": "finite",
+      "effective_future_milestone_count": 0
+    },
+    "exact_options": {
+      "conservation_tolerance": 1e-12,
+      "max_active_states": 65536,
+      "max_processed_states": 1048576,
+      "max_transition_expansions": 2097152
+    },
+    "all_target_success_probability": 1.0,
+    "terminal_owned_set_probabilities": [
+      {
+        "owned_targets": [
+          "target_a",
+          "target_b",
+          "target_c",
+          "target_d"
+        ],
+        "probability": 1.0
+      }
+    ],
+    "terminal_reason_probabilities": [
+      {
+        "terminal_reason": "targets_acquired",
+        "probability": 1.0
+      }
+    ],
+    "per_target_acquisition_probabilities": [
+      {
+        "target_id": "target_a",
+        "probability": 1.0
+      },
+      {
+        "target_id": "target_b",
+        "probability": 1.0
+      },
+      {
+        "target_id": "target_c",
+        "probability": 1.0
+      },
+      {
+        "target_id": "target_d",
+        "probability": 1.0
+      }
+    ],
+    "ordered_prefix_completion_probabilities": [
+      {
+        "prefix_length": 1,
+        "target_ids": [
+          "target_a"
+        ],
+        "probability": 1.0
+      },
+      {
+        "prefix_length": 2,
+        "target_ids": [
+          "target_a",
+          "target_b"
+        ],
+        "probability": 1.0
+      },
+      {
+        "prefix_length": 3,
+        "target_ids": [
+          "target_a",
+          "target_b",
+          "target_c"
+        ],
+        "probability": 1.0
+      },
+      {
+        "prefix_length": 4,
+        "target_ids": [
+          "target_a",
+          "target_b",
+          "target_c",
+          "target_d"
+        ],
+        "probability": 1.0
+      }
+    ],
+    "expected_additional_primitive_recruitments": 4.0,
+    "expected_additional_primitive_recruitments_given_success": 4.0,
+    "expected_first_all_target_completion_count_given_success": 4.0,
+    "expected_paid_pyroxene_spent": 480.0,
+    "expected_ticket_funded_primitive_recruitments": 0.0,
+    "expected_residual_resources": {
+      "pyroxene": 0.0,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0,
+      "keystone_fragments": 0.0,
+      "secret_tech_notes": 0.0,
+      "superior_bd_selectors": 0.0,
+      "high_grade_gift_boxes": 0.0
+    },
+    "expected_milestone_rewards_acquired": {
+      "pyroxene": 0.0,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0,
+      "keystone_fragments": 0.0,
+      "secret_tech_notes": 0.0,
+      "superior_bd_selectors": 0.0,
+      "high_grade_gift_boxes": 0.0
+    },
+    "absolute_campaign_milestone_reach_probabilities": [],
+    "first_all_target_completion_pmf": [
+      {
+        "additional_recruitment_count": 4,
+        "probability": 1.0
+      }
+    ],
+    "first_all_target_completion_cdf": [
+      {
+        "additional_recruitment_count": 4,
+        "probability": 1.0
+      }
+    ],
+    "probability_conservation": {
+      "maximum_observed_deviation": 0.0,
+      "final_terminal_probability": 1.0,
+      "first_all_target_completion_probability": 1.0,
+      "first_completion_success_deviation": 0.0
+    },
+    "solver_diagnostics": {
+      "peak_boundary_frontier": 1,
+      "peak_in_flight_frontier": 1,
+      "processed_states": 9,
+      "transition_expansions": 4
+    }
+  },
+  "monte_carlo": {
+    "engine_kind": "monte_carlo",
+    "provenance": {
+      "engine_version": "<PACKAGE_VERSION>",
+      "engine_semantics_version": 3,
+      "result_schema_version": 3,
+      "semantic_encoding_version": "canonical-json-v1",
+      "scenario_id": "v3_four_target_exact_small",
+      "scenario_schema_version": 3,
+      "scenario_behavior_fingerprint": "924f6391f7d806a6fd16e65f7f7b081bc8b1928e275bbea0bdb330c685b2baa6",
+      "scenario_document_fingerprint": "35cd1232a1b96e61504e15a5fba7e88abfa259518e8317aa2f0277df4c202d09",
+      "ruleset_id": "jp_2026_07_29_provisional_v3",
+      "ruleset_schema_version": 3,
+      "ruleset_behavior_fingerprint": "feeb4ed5107b2bfa334b18b6fd05de59ff212428441d81654e30d4aad507116c",
+      "ruleset_document_fingerprint": "d87163273230cae4b6391a9bbedd7674dc0474447b177450b315102ab26e4cbc",
+      "ruleset_provenance_status": "provisional",
+      "ruleset_provenance": {
+        "provenance_status": "provisional",
+        "sources": [],
+        "claim_bindings": []
+      },
+      "reward_schedule_id": "jp_2026_07_29_empty_v3",
+      "reward_schedule_schema_version": 3,
+      "reward_schedule_behavior_fingerprint": "6e24d576c84b201a8e261b9731370774867488d4bd7191ad4880670256a769d2",
+      "reward_schedule_document_fingerprint": "73e0be53b0e2b6702489cac597ab832ed0fb4335a826b245b5af743240d6fcb1",
+      "reward_schedule_provenance_status": "provisional",
+      "reward_schedule_provenance": {
+        "provenance_status": "provisional",
+        "sources": [],
+        "claim_bindings": []
+      },
+      "authority": {
+        "scenario": "scenario_document_user_authored",
+        "featured_target_probabilities": "ruleset_document",
+        "cross_target_probabilities": "scenario_document_user_authored",
+        "banner_topology": "scenario_document_user_authored",
+        "target_order": "scenario_document_user_authored",
+        "initial_state": "scenario_document_user_authored",
+        "strategy": "scenario_document_user_authored"
+      }
+    },
+    "context": {
+      "compiled_strategy": {
+        "strategy_schema_version": 2,
+        "strategy_id": "sequential_targets_v3",
+        "kind": "sequential_targets",
+        "funding_priority": [
+          "paid_single",
+          "ticket_ten"
+        ],
+        "max_additional_recruitments": 4
+      },
+      "initial_resources": {
+        "pyroxene": 480,
+        "limited_ten_recruitment_tickets": 0,
+        "eligma": 0,
+        "advanced_bd_selectors": 0,
+        "advanced_tech_note_selectors": 0,
+        "superior_tech_note_selectors": 0,
+        "gift_boxes": 0,
+        "keystone_fragments": 0,
+        "secret_tech_notes": 0,
+        "superior_bd_selectors": 0,
+        "high_grade_gift_boxes": 0
+      },
+      "initial_campaign_recruitment_count": 385,
+      "maximum_additional_recruitments": 4,
+      "maximum_absolute_campaign_recruitment_count": 389,
+      "ordered_target_ids": [
+        "target_a",
+        "target_b",
+        "target_c",
+        "target_d"
+      ],
+      "ordered_banner_ids": [
+        "banner_a",
+        "banner_b",
+        "banner_c",
+        "banner_d"
+      ],
+      "charge_group_topology": [
+        {
+          "banner_id": "banner_a",
+          "charge_group_id": "group_a"
+        },
+        {
+          "banner_id": "banner_b",
+          "charge_group_id": "group_b"
+        },
+        {
+          "banner_id": "banner_c",
+          "charge_group_id": "group_c"
+        },
+        {
+          "banner_id": "banner_d",
+          "charge_group_id": "group_d"
+        }
+      ],
+      "initial_owned_targets": [],
+      "initial_charges": [
+        {
+          "charge_group_id": "group_a",
+          "pre_recruitment_charge": 199
+        },
+        {
+          "charge_group_id": "group_b",
+          "pre_recruitment_charge": 199
+        },
+        {
+          "charge_group_id": "group_c",
+          "pre_recruitment_charge": 199
+        },
+        {
+          "charge_group_id": "group_d",
+          "pre_recruitment_charge": 199
+        }
+      ],
+      "schedule_kind": "finite",
+      "effective_future_milestone_count": 0
+    },
+    "rng": {
+      "rng_algorithm": "chacha8",
+      "master_seed": 42,
+      "run_count": 11,
+      "run_index_contract": "zero-based ascending indices 0..runs-1",
+      "stream_derivation_version": "mc-run-stream-v1"
+    },
+    "all_target_success_probability": 1.0,
+    "terminal_owned_set_probabilities": [
+      {
+        "owned_targets": [],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_b"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_b"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_c"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_c"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_b",
+          "target_c"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_b",
+          "target_c"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_b",
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_b",
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_c",
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_c",
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_b",
+          "target_c",
+          "target_d"
+        ],
+        "probability": 0.0
+      },
+      {
+        "owned_targets": [
+          "target_a",
+          "target_b",
+          "target_c",
+          "target_d"
+        ],
+        "probability": 1.0
+      }
+    ],
+    "terminal_reason_probabilities": [
+      {
+        "terminal_reason": "targets_acquired",
+        "probability": 1.0
+      },
+      {
+        "terminal_reason": "resources_exhausted",
+        "probability": 0.0
+      },
+      {
+        "terminal_reason": "strategy_horizon_reached",
+        "probability": 0.0
+      }
+    ],
+    "per_target_acquisition_probabilities": [
+      {
+        "target_id": "target_a",
+        "probability": 1.0
+      },
+      {
+        "target_id": "target_b",
+        "probability": 1.0
+      },
+      {
+        "target_id": "target_c",
+        "probability": 1.0
+      },
+      {
+        "target_id": "target_d",
+        "probability": 1.0
+      }
+    ],
+    "ordered_prefix_completion_probabilities": [
+      {
+        "prefix_length": 1,
+        "target_ids": [
+          "target_a"
+        ],
+        "probability": 1.0
+      },
+      {
+        "prefix_length": 2,
+        "target_ids": [
+          "target_a",
+          "target_b"
+        ],
+        "probability": 1.0
+      },
+      {
+        "prefix_length": 3,
+        "target_ids": [
+          "target_a",
+          "target_b",
+          "target_c"
+        ],
+        "probability": 1.0
+      },
+      {
+        "prefix_length": 4,
+        "target_ids": [
+          "target_a",
+          "target_b",
+          "target_c",
+          "target_d"
+        ],
+        "probability": 1.0
+      }
+    ],
+    "expected_additional_primitive_recruitments": 4.0,
+    "expected_additional_primitive_recruitments_given_success": 4.0,
+    "expected_first_all_target_completion_count_given_success": 4.0,
+    "expected_paid_pyroxene_spent": 480.0,
+    "expected_ticket_funded_primitive_recruitments": 0.0,
+    "expected_residual_resources": {
+      "pyroxene": 0.0,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0,
+      "keystone_fragments": 0.0,
+      "secret_tech_notes": 0.0,
+      "superior_bd_selectors": 0.0,
+      "high_grade_gift_boxes": 0.0
+    },
+    "expected_milestone_rewards_acquired": {
+      "pyroxene": 0.0,
+      "limited_ten_recruitment_tickets": 0.0,
+      "eligma": 0.0,
+      "advanced_bd_selectors": 0.0,
+      "advanced_tech_note_selectors": 0.0,
+      "superior_tech_note_selectors": 0.0,
+      "gift_boxes": 0.0,
+      "keystone_fragments": 0.0,
+      "secret_tech_notes": 0.0,
+      "superior_bd_selectors": 0.0,
+      "high_grade_gift_boxes": 0.0
+    },
+    "absolute_campaign_milestone_reach_probabilities": [],
+    "first_all_target_completion_pmf": [
+      {
+        "additional_recruitment_count": 4,
+        "probability": 1.0
+      }
+    ],
+    "first_all_target_completion_cdf": [
+      {
+        "additional_recruitment_count": 4,
+        "probability": 1.0
+      }
+    ],
+    "sample_counts": {
+      "total_runs": 11,
+      "successful_runs": 11
+    },
+    "estimation": {
+      "all_target_success_probability_interval_95": {
+        "lower": 0.7411599827511859,
+        "upper": 1.0
+      },
+      "per_target_probability_intervals_95": [
+        {
+          "id": "target_a",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        },
+        {
+          "id": "target_b",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        },
+        {
+          "id": "target_c",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        },
+        {
+          "id": "target_d",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        }
+      ],
+      "ordered_prefix_probability_intervals_95": [
+        {
+          "id": "prefix_1",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        },
+        {
+          "id": "prefix_2",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        },
+        {
+          "id": "prefix_3",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        },
+        {
+          "id": "prefix_4",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        }
+      ],
+      "terminal_owned_set_probability_intervals_95": [
+        {
+          "owned_targets": [],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_b"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_b"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_c"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_c"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_b",
+            "target_c"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_b",
+            "target_c"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_b",
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_b",
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_c",
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_c",
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_b",
+            "target_c",
+            "target_d"
+          ],
+          "sample_count": 0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.2588400172488141
+          }
+        },
+        {
+          "owned_targets": [
+            "target_a",
+            "target_b",
+            "target_c",
+            "target_d"
+          ],
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        }
+      ],
+      "expected_additional_primitive_recruitments": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 4.0,
+          "upper": 4.0
+        }
+      },
+      "expected_residual_resources": {
+        "pyroxene": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "limited_ten_recruitment_tickets": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "eligma": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_bd_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "superior_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "gift_boxes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "keystone_fragments": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "secret_tech_notes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "superior_bd_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "high_grade_gift_boxes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        }
+      },
+      "expected_milestone_rewards_acquired": {
+        "pyroxene": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "limited_ten_recruitment_tickets": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "eligma": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_bd_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "advanced_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "superior_tech_note_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "gift_boxes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "keystone_fragments": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "secret_tech_notes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "superior_bd_selectors": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        },
+        "high_grade_gift_boxes": {
+          "standard_error": 0.0,
+          "confidence_interval_95": {
+            "lower": 0.0,
+            "upper": 0.0
+          }
+        }
+      }
+    }
+  },
+  "all_target_success": {
+    "id": "all_targets",
+    "simulation_minus_exact": 0.0,
+    "exact_within_monte_carlo_interval": true
+  },
+  "per_target": [
+    {
+      "id": "target_a",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "id": "target_b",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "id": "target_c",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "id": "target_d",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    }
+  ],
+  "ordered_prefixes": [
+    {
+      "id": "prefix_1",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "id": "prefix_2",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "id": "prefix_3",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "id": "prefix_4",
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    }
+  ],
+  "terminal_owned_sets": [
+    {
+      "owned_targets": [],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_b"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_b"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_c"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_c"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_b",
+        "target_c"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_b",
+        "target_c"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_b",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_b",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_c",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_c",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_b",
+        "target_c",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_b",
+        "target_c",
+        "target_d"
+      ],
+      "simulation_minus_exact": 0.0,
+      "exact_within_monte_carlo_interval": true
+    }
+  ]
+}

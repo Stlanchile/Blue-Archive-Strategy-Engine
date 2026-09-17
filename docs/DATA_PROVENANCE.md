@@ -101,3 +101,7 @@ Secondary sources may aid discovery but cannot satisfy a required first-party
 claim group. Missing evidence remains a release-readiness blocker and must not
 be handled by weakening validation, silently downgrading a claim requirement,
 or inventing gameplay values.
+
+## v0.4
+
+The v0.4 timing reports inherit the existing bundle authority. No new gameplay data or source qualification is added. Shipped v3 rules and the empty reward schedule remain provisional and byte-frozen. Timing precision and confidence intervals do not establish gameplay factual accuracy; source-backed campaign rewards remain deferred.

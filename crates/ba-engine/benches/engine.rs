@@ -1,3 +1,5 @@
+mod timing;
+
 use std::fs;
 use std::hint::black_box;
 use std::num::NonZeroU64;
@@ -46,6 +48,7 @@ fn stage_synthetic() -> TempDir {
 }
 
 fn main() {
+    timing::run();
     measure("v2 ruleset read and validation", || {
         validate_document(
             workspace_path("data"),

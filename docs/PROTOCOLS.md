@@ -115,3 +115,7 @@ Mechanics or strategy behavior changes require an engine semantics and package
 version change. Aggregate wire changes require a result schema change.
 Canonical encoding changes require a semantic encoding version change. Stream
 derivation changes require a stream derivation version change.
+
+## v0.4
+
+Opt-in v0.4 timing reports have outer result_schema_version = 4 and embed an unchanged schema-3 analysis (whose provenance.result_schema_version remains 3). Engine semantics remain 3; document schemas remain 2/3. Timing options affect only report feasibility, never canonical-json-v1 fingerprints, mc-run-stream-v1 derivation, ChaCha8 consumption, serial aggregation or trace/replay. See [ACQUISITION_TIMING.md](ACQUISITION_TIMING.md) for every new field and [COMPATIBILITY.md](COMPATIBILITY.md) for frozen surfaces.

@@ -1,0 +1,282 @@
+{
+  "engine_kind": "exact",
+  "provenance": {
+    "engine_version": "<PACKAGE_VERSION>",
+    "engine_semantics_version": 3,
+    "result_schema_version": 3,
+    "semantic_encoding_version": "canonical-json-v1",
+    "scenario_id": "v3_atomic_cross_target",
+    "scenario_schema_version": 3,
+    "scenario_behavior_fingerprint": "ae9e1f41e32edab6b8bf99768a1c7693605e412bc364d1ec5492e3bd2ac8d97b",
+    "scenario_document_fingerprint": "cdd835015c51716ac85ad800fca40f8265760d4013b7272efde6816ccb2692ba",
+    "ruleset_id": "jp_2026_07_29_provisional_v3",
+    "ruleset_schema_version": 3,
+    "ruleset_behavior_fingerprint": "feeb4ed5107b2bfa334b18b6fd05de59ff212428441d81654e30d4aad507116c",
+    "ruleset_document_fingerprint": "d87163273230cae4b6391a9bbedd7674dc0474447b177450b315102ab26e4cbc",
+    "ruleset_provenance_status": "provisional",
+    "ruleset_provenance": {
+      "provenance_status": "provisional",
+      "sources": [],
+      "claim_bindings": []
+    },
+    "reward_schedule_id": "jp_2026_07_29_empty_v3",
+    "reward_schedule_schema_version": 3,
+    "reward_schedule_behavior_fingerprint": "6e24d576c84b201a8e261b9731370774867488d4bd7191ad4880670256a769d2",
+    "reward_schedule_document_fingerprint": "73e0be53b0e2b6702489cac597ab832ed0fb4335a826b245b5af743240d6fcb1",
+    "reward_schedule_provenance_status": "provisional",
+    "reward_schedule_provenance": {
+      "provenance_status": "provisional",
+      "sources": [],
+      "claim_bindings": []
+    },
+    "authority": {
+      "scenario": "scenario_document_user_authored",
+      "featured_target_probabilities": "ruleset_document",
+      "cross_target_probabilities": "scenario_document_user_authored",
+      "banner_topology": "scenario_document_user_authored",
+      "target_order": "scenario_document_user_authored",
+      "initial_state": "scenario_document_user_authored",
+      "strategy": "scenario_document_user_authored"
+    }
+  },
+  "context": {
+    "compiled_strategy": {
+      "strategy_schema_version": 2,
+      "strategy_id": "sequential_targets_v3",
+      "kind": "sequential_targets",
+      "funding_priority": [
+        "ticket_ten",
+        "paid_single"
+      ],
+      "max_additional_recruitments": 10
+    },
+    "initial_resources": {
+      "pyroxene": 0,
+      "limited_ten_recruitment_tickets": 1,
+      "eligma": 0,
+      "advanced_bd_selectors": 0,
+      "advanced_tech_note_selectors": 0,
+      "superior_tech_note_selectors": 0,
+      "gift_boxes": 0,
+      "keystone_fragments": 0,
+      "secret_tech_notes": 0,
+      "superior_bd_selectors": 0,
+      "high_grade_gift_boxes": 0
+    },
+    "initial_campaign_recruitment_count": 0,
+    "maximum_additional_recruitments": 10,
+    "maximum_absolute_campaign_recruitment_count": 10,
+    "ordered_target_ids": [
+      "target_a",
+      "target_b"
+    ],
+    "ordered_banner_ids": [
+      "banner_a",
+      "banner_b"
+    ],
+    "charge_group_topology": [
+      {
+        "banner_id": "banner_a",
+        "charge_group_id": "shared"
+      },
+      {
+        "banner_id": "banner_b",
+        "charge_group_id": "shared"
+      }
+    ],
+    "initial_owned_targets": [],
+    "initial_charges": [
+      {
+        "charge_group_id": "shared",
+        "pre_recruitment_charge": 99
+      }
+    ],
+    "schedule_kind": "finite",
+    "effective_future_milestone_count": 0
+  },
+  "exact_options": {
+    "conservation_tolerance": 1e-12,
+    "max_active_states": 65536,
+    "max_processed_states": 1048576,
+    "max_transition_expansions": 2097152
+  },
+  "all_target_success_probability": 0.061264511581829065,
+  "terminal_owned_set_probabilities": [
+    {
+      "owned_targets": [
+        "target_a"
+      ],
+      "probability": 0.4693677442090853
+    },
+    {
+      "owned_targets": [
+        "target_b"
+      ],
+      "probability": 0.4693677442090854
+    },
+    {
+      "owned_targets": [
+        "target_a",
+        "target_b"
+      ],
+      "probability": 0.061264511581829065
+    }
+  ],
+  "terminal_reason_probabilities": [
+    {
+      "terminal_reason": "targets_acquired",
+      "probability": 0.061264511581829065
+    },
+    {
+      "terminal_reason": "strategy_horizon_reached",
+      "probability": 0.9387354884181707
+    }
+  ],
+  "per_target_acquisition_probabilities": [
+    {
+      "target_id": "target_a",
+      "probability": 0.5306322557909143
+    },
+    {
+      "target_id": "target_b",
+      "probability": 0.5306322557909144
+    }
+  ],
+  "ordered_prefix_completion_probabilities": [
+    {
+      "prefix_length": 1,
+      "target_ids": [
+        "target_a"
+      ],
+      "probability": 0.5306322557909143
+    },
+    {
+      "prefix_length": 2,
+      "target_ids": [
+        "target_a",
+        "target_b"
+      ],
+      "probability": 0.061264511581829065
+    }
+  ],
+  "expected_additional_primitive_recruitments": 9.999999999999996,
+  "expected_additional_primitive_recruitments_given_success": 10.0,
+  "expected_first_all_target_completion_count_given_success": 5.953172391647784,
+  "expected_paid_pyroxene_spent": 0.0,
+  "expected_ticket_funded_primitive_recruitments": 9.999999999999996,
+  "expected_residual_resources": {
+    "pyroxene": 0.0,
+    "limited_ten_recruitment_tickets": 0.0,
+    "eligma": 0.0,
+    "advanced_bd_selectors": 0.0,
+    "advanced_tech_note_selectors": 0.0,
+    "superior_tech_note_selectors": 0.0,
+    "gift_boxes": 0.0,
+    "keystone_fragments": 0.0,
+    "secret_tech_notes": 0.0,
+    "superior_bd_selectors": 0.0,
+    "high_grade_gift_boxes": 0.0
+  },
+  "expected_milestone_rewards_acquired": {
+    "pyroxene": 0.0,
+    "limited_ten_recruitment_tickets": 0.0,
+    "eligma": 0.0,
+    "advanced_bd_selectors": 0.0,
+    "advanced_tech_note_selectors": 0.0,
+    "superior_tech_note_selectors": 0.0,
+    "gift_boxes": 0.0,
+    "keystone_fragments": 0.0,
+    "secret_tech_notes": 0.0,
+    "superior_bd_selectors": 0.0,
+    "high_grade_gift_boxes": 0.0
+  },
+  "absolute_campaign_milestone_reach_probabilities": [],
+  "first_all_target_completion_pmf": [
+    {
+      "additional_recruitment_count": 2,
+      "probability": 0.007
+    },
+    {
+      "additional_recruitment_count": 3,
+      "probability": 0.006951
+    },
+    {
+      "additional_recruitment_count": 4,
+      "probability": 0.006902343
+    },
+    {
+      "additional_recruitment_count": 5,
+      "probability": 0.006854026599
+    },
+    {
+      "additional_recruitment_count": 6,
+      "probability": 0.006806048412806999
+    },
+    {
+      "additional_recruitment_count": 7,
+      "probability": 0.00675840607391735
+    },
+    {
+      "additional_recruitment_count": 8,
+      "probability": 0.006711097231399929
+    },
+    {
+      "additional_recruitment_count": 9,
+      "probability": 0.006664119550780129
+    },
+    {
+      "additional_recruitment_count": 10,
+      "probability": 0.006617470713924668
+    }
+  ],
+  "first_all_target_completion_cdf": [
+    {
+      "additional_recruitment_count": 2,
+      "probability": 0.007
+    },
+    {
+      "additional_recruitment_count": 3,
+      "probability": 0.013951
+    },
+    {
+      "additional_recruitment_count": 4,
+      "probability": 0.020853343
+    },
+    {
+      "additional_recruitment_count": 5,
+      "probability": 0.027707369599
+    },
+    {
+      "additional_recruitment_count": 6,
+      "probability": 0.034513418011807
+    },
+    {
+      "additional_recruitment_count": 7,
+      "probability": 0.04127182408572435
+    },
+    {
+      "additional_recruitment_count": 8,
+      "probability": 0.047982921317124276
+    },
+    {
+      "additional_recruitment_count": 9,
+      "probability": 0.05464704086790441
+    },
+    {
+      "additional_recruitment_count": 10,
+      "probability": 0.06126451158182907
+    }
+  ],
+  "probability_conservation": {
+    "maximum_observed_deviation": 2.220446049250313e-16,
+    "final_terminal_probability": 0.9999999999999998,
+    "first_all_target_completion_probability": 0.06126451158182907,
+    "first_completion_success_deviation": 6.938893903907228e-18
+  },
+  "solver_diagnostics": {
+    "peak_boundary_frontier": 21,
+    "peak_in_flight_frontier": 19,
+    "processed_states": 121,
+    "transition_expansions": 296
+  }
+}

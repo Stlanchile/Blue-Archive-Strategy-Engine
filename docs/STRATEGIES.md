@@ -63,3 +63,7 @@ recruitment categories.
 
 There are no target-specific budgets, conditional policies, target-order
 optimization, policy search, executable plugins, or automatic exact fallback.
+
+## v0.4
+
+The v0.4 timing observer follows the existing strategy and terminal rules. It records primitive acquisition within atomic actions, but makes no new decision at that point and assumes no recruiting after termination. Marginal probabilities include unsuccessful all-target runs.

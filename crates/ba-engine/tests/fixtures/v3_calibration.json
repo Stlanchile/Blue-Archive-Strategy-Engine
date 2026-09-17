@@ -1,0 +1,83 @@
+[
+  {
+    "path": "scenarios/golden/v3_atomic_cross_target.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 21,
+      "peak_in_flight_frontier": 19,
+      "processed_states": 121,
+      "transition_expansions": 296
+    }
+  },
+  {
+    "path": "scenarios/golden/v3_four_target_exact_small.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 1,
+      "peak_in_flight_frontier": 1,
+      "processed_states": 9,
+      "transition_expansions": 4
+    }
+  },
+  {
+    "path": "scenarios/golden/v3_single_cross_target_zero.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 2,
+      "peak_in_flight_frontier": 1,
+      "processed_states": 600,
+      "transition_expansions": 399
+    }
+  },
+  {
+    "path": "scenarios/golden/v3_three_target_exact_small.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 1,
+      "peak_in_flight_frontier": 1,
+      "processed_states": 7,
+      "transition_expansions": 3
+    }
+  },
+  {
+    "path": "scenarios/examples/dual_target_independent_ticket_first_v3.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 300,
+      "peak_in_flight_frontier": 290,
+      "processed_states": 32670,
+      "transition_expansions": 57299
+    }
+  },
+  {
+    "path": "scenarios/examples/dual_target_shared_paid_first_v3.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 202,
+      "peak_in_flight_frontier": 201,
+      "processed_states": 40997,
+      "transition_expansions": 60893
+    }
+  },
+  {
+    "path": "scenarios/examples/four_target_independent_simulation_v3.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 599,
+      "peak_in_flight_frontier": 598,
+      "processed_states": 319597,
+      "transition_expansions": 318202
+    }
+  },
+  {
+    "path": "scenarios/examples/single_target_v3.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 2,
+      "peak_in_flight_frontier": 1,
+      "processed_states": 600,
+      "transition_expansions": 399
+    }
+  },
+  {
+    "path": "scenarios/examples/three_target_mixed_cross_acquisition_v3.json",
+    "diagnostics": {
+      "peak_boundary_frontier": 400,
+      "peak_in_flight_frontier": 399,
+      "processed_states": 150696,
+      "transition_expansions": 224745
+    }
+  }
+]

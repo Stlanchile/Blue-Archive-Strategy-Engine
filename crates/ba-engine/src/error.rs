@@ -5,6 +5,12 @@ use crate::{AnalysisProvenance, ExactSolverOptions};
 
 #[derive(Debug, Error)]
 pub enum EngineError {
+    #[error("acquisition timing support limit exceeded: observed {observed}, maximum {maximum}")]
+    AcquisitionTimingSupportLimitExceeded { observed: usize, maximum: usize },
+
+    #[error("invalid acquisition timing options: requested {requested}, maximum {maximum}")]
+    InvalidAcquisitionTimingOptions { requested: usize, maximum: usize },
+
     #[error("active-state limit exceeded: observed {observed}, maximum {maximum}")]
     SolverStateLimitExceeded { observed: usize, maximum: usize },
 
@@ -52,7 +58,9 @@ impl EngineError {
     #[must_use]
     pub const fn class(&self) -> EngineErrorClass {
         match self {
-            Self::SolverStateLimitExceeded { .. }
+            Self::AcquisitionTimingSupportLimitExceeded { .. }
+            | Self::InvalidAcquisitionTimingOptions { .. }
+            | Self::SolverStateLimitExceeded { .. }
             | Self::SolverProcessedStateLimitExceeded { .. }
             | Self::SolverTransitionLimitExceeded { .. }
             | Self::SimulationRunLimitExceeded { .. }

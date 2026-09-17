@@ -1,0 +1,479 @@
+{
+  "engine_kind": "monte_carlo",
+  "provenance": {
+    "engine_version": "<PACKAGE_VERSION>",
+    "engine_semantics_version": 2,
+    "result_schema_version": 2,
+    "semantic_encoding_version": "canonical-json-v1",
+    "scenario_id": "single_target_200",
+    "scenario_schema_version": 2,
+    "scenario_behavior_fingerprint": "95eb5b476e17e148909fefd24da3ab00e0e15c4cbc8fdd5ed26758bc4fdb66af",
+    "scenario_document_fingerprint": "044f559d861e3af6624d7e55379cb5f00bc9883049d319bf1d720188d4c1ed70",
+    "ruleset_id": "jp_2026_07_29_provisional_v2",
+    "ruleset_schema_version": 2,
+    "ruleset_behavior_fingerprint": "db0af908e4436e396e9a55e7e0bd39aa8ae30d8a148c34abb07c24cb347fb6ad",
+    "ruleset_document_fingerprint": "c5de387937c5a2060641ef5763ef36f5407fb093560363f535d3630ba5cb1d32",
+    "ruleset_verification_status": "provisional",
+    "ruleset_provenance": {
+      "verification_status": "provisional",
+      "sources": []
+    },
+    "reward_schedule_id": "jp_2026_07_29_empty_v2",
+    "reward_schedule_schema_version": 2,
+    "reward_schedule_behavior_fingerprint": "41387171a8507e76f595d0571b3d21028c166cb487bc49e64f3c072c09e6b10e",
+    "reward_schedule_document_fingerprint": "890d81dd1ef119fae566ece9e24e3ee1fe0b9cb932a5bf9f5948319267a2ffa3",
+    "reward_schedule_verification_status": "provisional",
+    "reward_schedule_provenance": {
+      "verification_status": "provisional",
+      "sources": []
+    }
+  },
+  "context": {
+    "strategy_constraints": {
+      "max_total_recruitments": 200
+    },
+    "compiled_strategy": {
+      "strategy_schema_version": 1,
+      "strategy_id": "sequential",
+      "kind": "sequential_targets",
+      "funding_priority": [
+        "ticket_ten",
+        "paid_single"
+      ],
+      "max_total_recruitments": 200
+    },
+    "initial_resources": {
+      "pyroxene": 24000,
+      "limited_ten_recruitment_tickets": 0,
+      "eligma": 0,
+      "advanced_bd_selectors": 0,
+      "advanced_tech_note_selectors": 0,
+      "superior_tech_note_selectors": 0,
+      "gift_boxes": 0
+    },
+    "ordered_targets": [
+      "target_a"
+    ],
+    "ordered_banners": [
+      "banner_a"
+    ]
+  },
+  "rng": {
+    "rng_algorithm": "chacha8",
+    "master_seed": 42,
+    "run_count": 11,
+    "run_index_contract": "zero-based ascending indices 0..runs-1",
+    "stream_derivation_version": "mc-run-stream-v1"
+  },
+  "success_probability": 1.0,
+  "owned_target_terminal_probabilities": [
+    {
+      "owned_targets": [
+        "target_a"
+      ],
+      "probability": 1.0
+    }
+  ],
+  "terminal_reason_probabilities": [
+    {
+      "terminal_reason": "targets_acquired",
+      "probability": 1.0
+    }
+  ],
+  "expected_terminal_primitive_recruitments": 111.9090909090909,
+  "expected_terminal_primitive_recruitments_given_success": 111.9090909090909,
+  "expected_first_success_recruitment_count_given_success": 111.9090909090909,
+  "expected_paid_pyroxene_spent": 13429.09090909091,
+  "expected_ticket_funded_primitive_recruitments": 0.0,
+  "expected_residual_resources": {
+    "pyroxene": 10570.90909090909,
+    "limited_ten_recruitment_tickets": 0.0,
+    "eligma": 0.0,
+    "advanced_bd_selectors": 0.0,
+    "advanced_tech_note_selectors": 0.0,
+    "superior_tech_note_selectors": 0.0,
+    "gift_boxes": 0.0
+  },
+  "expected_milestone_rewards_acquired": {
+    "pyroxene": 0.0,
+    "limited_ten_recruitment_tickets": 0.0,
+    "eligma": 0.0,
+    "advanced_bd_selectors": 0.0,
+    "advanced_tech_note_selectors": 0.0,
+    "superior_tech_note_selectors": 0.0,
+    "gift_boxes": 0.0
+  },
+  "milestone_reach_probabilities": [],
+  "first_success_pmf": [
+    {
+      "recruitment_count": 18,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 57,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 69,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 97,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 100,
+      "probability": 0.2727272727272727
+    },
+    {
+      "recruitment_count": 135,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 155,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 200,
+      "probability": 0.18181818181818182
+    }
+  ],
+  "first_success_cdf": [
+    {
+      "recruitment_count": 18,
+      "probability": 0.09090909090909091
+    },
+    {
+      "recruitment_count": 57,
+      "probability": 0.18181818181818182
+    },
+    {
+      "recruitment_count": 69,
+      "probability": 0.2727272727272727
+    },
+    {
+      "recruitment_count": 97,
+      "probability": 0.36363636363636365
+    },
+    {
+      "recruitment_count": 100,
+      "probability": 0.6363636363636364
+    },
+    {
+      "recruitment_count": 135,
+      "probability": 0.7272727272727273
+    },
+    {
+      "recruitment_count": 155,
+      "probability": 0.8181818181818182
+    },
+    {
+      "recruitment_count": 200,
+      "probability": 1.0
+    }
+  ],
+  "sample_counts": {
+    "total_runs": 11,
+    "successful_runs": 11
+  },
+  "estimation": {
+    "success_probability_interval_95": {
+      "lower": 0.7411599827511859,
+      "upper": 1.0
+    },
+    "expected_terminal_primitive_recruitments": {
+      "standard_error": 17.118015255309004,
+      "confidence_interval_95": {
+        "lower": 78.35778100868527,
+        "upper": 145.46040080949655
+      }
+    },
+    "expected_terminal_primitive_recruitments_given_success": {
+      "standard_error": 17.118015255309004,
+      "confidence_interval_95": {
+        "lower": 78.35778100868527,
+        "upper": 145.46040080949655
+      }
+    },
+    "expected_first_success_recruitment_count_given_success": {
+      "standard_error": 17.118015255309004,
+      "confidence_interval_95": {
+        "lower": 78.35778100868527,
+        "upper": 145.46040080949655
+      }
+    },
+    "expected_paid_pyroxene_spent": {
+      "standard_error": 2054.16183063708,
+      "confidence_interval_95": {
+        "lower": 9402.933721042233,
+        "upper": 17455.248097139585
+      }
+    },
+    "expected_ticket_funded_primitive_recruitments": {
+      "standard_error": 0.0,
+      "confidence_interval_95": {
+        "lower": 0.0,
+        "upper": 0.0
+      }
+    },
+    "expected_residual_resources": {
+      "pyroxene": {
+        "standard_error": 2054.16183063708,
+        "confidence_interval_95": {
+          "lower": 6544.751902860413,
+          "upper": 14597.066278957767
+        }
+      },
+      "limited_ten_recruitment_tickets": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "eligma": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "advanced_bd_selectors": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "advanced_tech_note_selectors": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "superior_tech_note_selectors": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "gift_boxes": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      }
+    },
+    "expected_milestone_rewards_acquired": {
+      "pyroxene": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "limited_ten_recruitment_tickets": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "eligma": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "advanced_bd_selectors": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "advanced_tech_note_selectors": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "superior_tech_note_selectors": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "gift_boxes": {
+        "standard_error": 0.0,
+        "confidence_interval_95": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      }
+    },
+    "probability_intervals_95": {
+      "owned_target_terminal_probabilities": [
+        {
+          "owned_targets": [
+            "target_a"
+          ],
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        }
+      ],
+      "terminal_reason_probabilities": [
+        {
+          "terminal_reason": "targets_acquired",
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        }
+      ],
+      "milestone_reach_probabilities": [],
+      "first_success_pmf": [
+        {
+          "recruitment_count": 18,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 57,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 69,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 97,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 100,
+          "sample_count": 3,
+          "confidence_interval_95": {
+            "lower": 0.09745880573921467,
+            "upper": 0.5656502930102463
+          }
+        },
+        {
+          "recruitment_count": 135,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 155,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 200,
+          "sample_count": 2,
+          "confidence_interval_95": {
+            "lower": 0.05136660067100063,
+            "upper": 0.4769861375782448
+          }
+        }
+      ],
+      "first_success_cdf": [
+        {
+          "recruitment_count": 18,
+          "sample_count": 1,
+          "confidence_interval_95": {
+            "lower": 0.01623175226282597,
+            "upper": 0.3773646254862038
+          }
+        },
+        {
+          "recruitment_count": 57,
+          "sample_count": 2,
+          "confidence_interval_95": {
+            "lower": 0.05136660067100063,
+            "upper": 0.4769861375782448
+          }
+        },
+        {
+          "recruitment_count": 69,
+          "sample_count": 3,
+          "confidence_interval_95": {
+            "lower": 0.09745880573921467,
+            "upper": 0.5656502930102463
+          }
+        },
+        {
+          "recruitment_count": 97,
+          "sample_count": 4,
+          "confidence_interval_95": {
+            "lower": 0.15166223614131383,
+            "upper": 0.6462032231083628
+          }
+        },
+        {
+          "recruitment_count": 100,
+          "sample_count": 7,
+          "confidence_interval_95": {
+            "lower": 0.35379677689163724,
+            "upper": 0.8483377638586862
+          }
+        },
+        {
+          "recruitment_count": 135,
+          "sample_count": 8,
+          "confidence_interval_95": {
+            "lower": 0.4343497069897537,
+            "upper": 0.9025411942607853
+          }
+        },
+        {
+          "recruitment_count": 155,
+          "sample_count": 9,
+          "confidence_interval_95": {
+            "lower": 0.5230138624217553,
+            "upper": 0.9486333993289995
+          }
+        },
+        {
+          "recruitment_count": 200,
+          "sample_count": 11,
+          "confidence_interval_95": {
+            "lower": 0.7411599827511859,
+            "upper": 1.0
+          }
+        }
+      ]
+    }
+  }
+}

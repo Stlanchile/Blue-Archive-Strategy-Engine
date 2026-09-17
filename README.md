@@ -2,7 +2,7 @@
 
 # Blue Archive Strategy Engine
 
-`ba-strategy` 0.3.0 is a local Rust probability engine for ordered Blue Archive
+`ba-strategy` 0.4.0 is a local Rust probability engine for ordered Blue Archive
 recruitment targets. Frozen schema v2 supports one or two targets; schema v3
 supports one through four targets, cross-target acquisition, campaign progress,
 and finite or repeating recruitment-count rewards. Both profiles support
@@ -143,3 +143,23 @@ boundaries are described in [`docs/RELEASING.md`](docs/RELEASING.md).
 Contributing, security reporting, and the dual MIT/Apache-2.0 terms are in
 [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md),
 [`LICENSE-MIT`](LICENSE-MIT), and [`LICENSE-APACHE`](LICENSE-APACHE).
+
+## Per-target acquisition timing
+
+Version 0.4.0 adds opt-in schema-v3 timing reports:
+
+```bash
+ba-strategy analyze scenarios/golden/v3_atomic_cross_target.json --acquisition-timing --format json
+ba-strategy simulate scenarios/examples/four_target_independent_simulation_v3.json --runs 10000 --seed 42 --acquisition-timing --format json
+ba-strategy compare scenarios/golden/v3_atomic_cross_target.json --runs 1000 --seed 42 --acquisition-timing --format text
+```
+
+PMFs and CDFs are unconditional over all modeled executions, including partial
+success. Initially owned targets appear at additional count zero (available at
+observation start). Reports stop with the existing strategy. Schema 4 embeds the
+unchanged schema-3 analysis; without the flag, existing v2/v3 output is preserved.
+The flag requires v3 and conflicts with `--trace`. Pointwise 95% intervals are
+not simultaneous bands. Sparse support is capped at 65,536 keys per dataset and
+new rendered output at 64 MiB. Shipped data remains provisional; timing does not
+qualify gameplay sources. See [the timing contract](docs/ACQUISITION_TIMING.md)
+and [compatibility](docs/COMPATIBILITY.md).

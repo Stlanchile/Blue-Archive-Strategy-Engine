@@ -1,0 +1,12 @@
+{
+  "diagnostics_schema_version": 1,
+  "error": {
+    "class": "validation",
+    "code": "invalid_json",
+    "message": "invalid JSON document crates/ba-cli/tests/fixtures/compatibility/unknown.input.json: strict typed parse failed: unknown field `unknown`, expected one of `schema_version`, `document_type`, `scenario_id`, `ruleset_id`, `reward_schedule_id`, `authority`, `initial_recruitment_count`, `students`, `banners`, `initial_charges`, `initial_resources`, `initial_owned_targets`, `targets`, `cross_target_probability_tables`, `strategy` at line 1 column 56",
+    "pointer": "/unknown",
+    "line": 1,
+    "column": 56,
+    "hint": "correct the JSON value at the reported location"
+  }
+}

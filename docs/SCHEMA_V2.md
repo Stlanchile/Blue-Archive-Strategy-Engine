@@ -93,3 +93,7 @@ events, serial Monte Carlo primitive outcomes, aggregate behavioral metrics,
 and per-run seeds for a fixed master seed. It changes the document fingerprint
 and corresponding declared provenance/status in v2 output. Full serialized v2
 results may therefore differ even when their behavioral projections are equal.
+
+## v0.4
+
+Schema v2 is unchanged in v0.4. `--acquisition-timing` is unsupported for v2; author an explicit schema-v3 scenario to use timing reports. No automatic conversion occurs.

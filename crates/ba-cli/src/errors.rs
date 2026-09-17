@@ -6,6 +6,7 @@ use serde::Serialize;
 
 #[derive(Debug)]
 pub(crate) enum AppError {
+    OutputSizeLimitExceeded { maximum: usize },
     Core(CoreError),
     Engine(EngineError),
     Exact(ExactAnalysisFailure),
@@ -166,6 +167,18 @@ pub(crate) fn classify_error(error: AppError) -> ClassifiedError {
             Some("supply --seed explicitly or restore operating-system entropy"),
         ),
         AppError::Usage(message) => usage_error(message),
+        AppError::OutputSizeLimitExceeded { maximum } => classified(
+            5,
+            "engine",
+            "output_size_limit_exceeded",
+            format!("rendered acquisition timing output exceeds {maximum} UTF-8 bytes"),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
         AppError::Internal(message) => classified(
             70,
             "internal",
@@ -240,6 +253,10 @@ fn core_error_code(error: &CoreError) -> &'static str {
 
 fn engine_error_code(error: &EngineError) -> &'static str {
     match error {
+        EngineError::AcquisitionTimingSupportLimitExceeded { .. } => {
+            "acquisition_timing_support_limit_exceeded"
+        }
+        EngineError::InvalidAcquisitionTimingOptions { .. } => "invalid_acquisition_timing_options",
         EngineError::SolverStateLimitExceeded { .. } => "solver_state_limit_exceeded",
         EngineError::SolverProcessedStateLimitExceeded { .. } => {
             "solver_processed_state_limit_exceeded"

@@ -129,13 +129,13 @@ pub fn begin_action_v3(
     world.remaining_pyroxene = world
         .remaining_pyroxene
         .checked_sub(pyroxene_deducted)
-        .ok_or(CoreError::InvalidAction {
+        .ok_or_else(|| CoreError::InvalidAction {
             message: "v3 paid action deduction underflowed".to_owned(),
         })?;
     world.available_ticket_count = world
         .available_ticket_count
         .checked_sub(tickets_deducted)
-        .ok_or(CoreError::InvalidAction {
+        .ok_or_else(|| CoreError::InvalidAction {
             message: "v3 ticket action deduction underflowed".to_owned(),
         })?;
     Ok((
@@ -250,7 +250,7 @@ pub fn apply_primitive_transition_v3(
     next.remaining_primitive_draws =
         next.remaining_primitive_draws
             .checked_sub(1)
-            .ok_or(CoreError::InternalInvariant {
+            .ok_or_else(|| CoreError::InternalInvariant {
                 message: "v3 action remaining draw count underflowed".to_owned(),
             })?;
     let absolute_count = bundle
@@ -297,7 +297,7 @@ pub fn reconstruct_funding_v3(
     let spent = initial
         .get(LedgerResourceKind::Pyroxene)
         .checked_sub(terminal.remaining_pyroxene)
-        .ok_or(CoreError::InternalInvariant {
+        .ok_or_else(|| CoreError::InternalInvariant {
             message: "terminal v3 pyroxene exceeds initial pyroxene".to_owned(),
         })?;
     let paid_cost = bundle.ruleset().paid_single_cost();
@@ -315,7 +315,7 @@ pub fn reconstruct_funding_v3(
     let ticket_funded_primitive_recruitments = terminal
         .cumulative_primitive_recruitments
         .checked_sub(paid_funded_primitive_recruitments)
-        .ok_or(CoreError::InternalInvariant {
+        .ok_or_else(|| CoreError::InternalInvariant {
             message: "reconstructed v3 paid draws exceed terminal draws".to_owned(),
         })?;
     let ticket_size = bundle.ruleset().ticket_action_size();
@@ -338,14 +338,19 @@ pub fn terminal_resources_v3(
     terminal: &WorldStateKey,
 ) -> Result<ResourceLedger, CoreError> {
     let mut resources = bundle.scenario().initial_resources();
-    let absolute = bundle
-        .scenario()
-        .absolute_campaign_count(terminal.cumulative_primitive_recruitments)?;
-    resources.checked_add_ledger(
-        bundle
-            .reward_schedule()
-            .resources_earned_between(bundle.scenario().initial_recruitment_count(), absolute)?,
-    )?;
+    let rewards =
+        milestone_rewards_acquired_v3(bundle, terminal.cumulative_primitive_recruitments)?;
+    // Active inventories already account for spending and deferred rewards in
+    // the kernel. Adding gross ticket rewards to the initial balance can
+    // overflow even when the actual remaining inventory is representable.
+    for (kind, quantity) in rewards.iter_canonical() {
+        if !matches!(
+            kind,
+            LedgerResourceKind::Pyroxene | LedgerResourceKind::LimitedTenRecruitmentTickets
+        ) {
+            resources.checked_add(kind, quantity)?;
+        }
+    }
     set_active_resources(
         &mut resources,
         terminal.remaining_pyroxene,

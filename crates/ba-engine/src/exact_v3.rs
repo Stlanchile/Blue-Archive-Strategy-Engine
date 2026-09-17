@@ -7,6 +7,7 @@ use ba_core::{
     reconstruct_funding_v3, terminal_resources_v3,
 };
 
+use crate::acquisition_timing::{AcquisitionTimingOptions, SupportBudget, newly_owned_target};
 use crate::error::EngineError;
 use crate::options::ExactSolverOptions;
 use crate::result::SolverDiagnostics;
@@ -17,6 +18,7 @@ use crate::result_v3::{
     TerminalOwnedSetProbabilityV3, TerminalReasonProbabilityV3, expected_from_ledger_sums,
     ledger_values,
 };
+use crate::result_v4::*;
 
 #[derive(Debug, Clone, Copy, Default)]
 struct ScaledMass {
@@ -221,6 +223,34 @@ pub fn analyze_exact_v3(
     bundle: &ValidatedScenarioBundleV3,
     options: ExactSolverOptions,
 ) -> Result<ExactAnalysisResultV3, EngineError> {
+    analyze_exact_v3_impl(bundle, options, &mut None)
+}
+
+/// Observe unconditional first acquisition at primitive transitions without changing state keys.
+pub fn analyze_exact_v3_with_acquisition_timing(
+    bundle: &ValidatedScenarioBundleV3,
+    exact_options: ExactSolverOptions,
+    timing_options: AcquisitionTimingOptions,
+) -> Result<ExactAcquisitionTimingResultV4, EngineError> {
+    let mut timing = Some(ExactTiming::new(bundle, timing_options)?);
+    let analysis = analyze_exact_v3_impl(bundle, exact_options, &mut timing)?;
+    let timing = timing.ok_or_else(|| EngineError::InternalInvariantViolation {
+        message: "enabled exact timing collector is missing".to_owned(),
+    })?;
+    let acquisition_timing = timing.project(bundle, &analysis, timing_options)?;
+    Ok(ExactAcquisitionTimingResultV4 {
+        result_schema_version: RESULT_SCHEMA_VERSION_V4,
+        engine_kind: "exact_acquisition_timing",
+        analysis,
+        acquisition_timing,
+    })
+}
+
+fn analyze_exact_v3_impl(
+    bundle: &ValidatedScenarioBundleV3,
+    options: ExactSolverOptions,
+    timing: &mut Option<ExactTiming>,
+) -> Result<ExactAnalysisResultV3, EngineError> {
     let options = options.validate()?;
     let initial = initial_world_v3(bundle);
     let mut boundary = BTreeMap::new();
@@ -292,6 +322,21 @@ pub fn analyze_exact_v3(
                     )?;
                     let transitioned =
                         apply_primitive_transition_v3(bundle, &state, branch.acquisition)?;
+                    if let Some(timing) = timing
+                        && let Some(index) = newly_owned_target(
+                            state.world.owned_target_mask,
+                            transitioned.state.world.owned_target_mask,
+                            timing.masses.len(),
+                        )?
+                    {
+                        timing
+                            .budget
+                            .entry(
+                                &mut timing.masses[index],
+                                transitioned.event.additional_recruitment_count,
+                            )?
+                            .add(child_mass)?;
+                    }
                     if transitioned.event.first_all_targets_completed {
                         add_mass(
                             &mut first_completion,
@@ -335,6 +380,15 @@ pub fn analyze_exact_v3(
         &options,
         "v3 final terminal fold",
     )?;
+    if let Some(timing) = timing {
+        for ((state, _), mass) in &terminal {
+            for (index, unacquired) in timing.unacquired.iter_mut().enumerate() {
+                if state.owned_target_mask & (1 << index) == 0 {
+                    unacquired.add(*mass)?;
+                }
+            }
+        }
+    }
     build_result(bundle, options, terminal, first_completion, diagnostics)
 }
 
@@ -701,4 +755,106 @@ fn owned_targets(bundle: &ValidatedScenarioBundleV3, mask: u8) -> Vec<ba_core::S
         .filter(|(index, _)| mask & (1_u8 << index) != 0)
         .map(|(_, target)| target.student_id.clone())
         .collect()
+}
+
+struct ExactTiming {
+    masses: Vec<BTreeMap<u64, ScaledMass>>,
+    unacquired: Vec<ScaledMass>,
+    budget: SupportBudget,
+}
+
+impl ExactTiming {
+    fn new(
+        bundle: &ValidatedScenarioBundleV3,
+        options: AcquisitionTimingOptions,
+    ) -> Result<Self, EngineError> {
+        let initial = initial_world_v3(bundle);
+        let mut result = Self {
+            masses: vec![BTreeMap::new(); bundle.scenario().targets().len()],
+            unacquired: vec![ScaledMass::default(); bundle.scenario().targets().len()],
+            budget: SupportBudget::new(options),
+        };
+        for (index, map) in result.masses.iter_mut().enumerate() {
+            if initial.owned_target_mask & (1 << index) != 0 {
+                *result.budget.entry(map, 0)? = ScaledMass::one();
+            }
+        }
+        Ok(result)
+    }
+
+    fn project(
+        self,
+        bundle: &ValidatedScenarioBundleV3,
+        analysis: &ExactAnalysisResultV3,
+        options: AcquisitionTimingOptions,
+    ) -> Result<ExactAcquisitionTimingV4, EngineError> {
+        let tolerance = analysis.exact_options.conservation_tolerance;
+        let initial = initial_world_v3(bundle);
+        let mut targets = Vec::with_capacity(self.masses.len());
+        for (index, (masses, unacquired)) in
+            self.masses.into_iter().zip(self.unacquired).enumerate()
+        {
+            let mut running = ScaledMass::default();
+            let mut previous = 0.0;
+            let mut pmf = Vec::with_capacity(masses.len());
+            let mut cdf = Vec::with_capacity(masses.len());
+            for (count, mass) in masses {
+                running.add(mass)?;
+                let probability = mass.to_f64();
+                let cumulative = running.to_f64();
+                check_timing_probability(probability, tolerance)?;
+                check_timing_probability(cumulative, tolerance)?;
+                if cumulative < previous {
+                    return Err(EngineError::ProbabilityInvariantViolation {
+                        message: "acquisition timing CDF decreased".to_owned(),
+                    });
+                }
+                previous = cumulative;
+                let absolute = bundle.scenario().absolute_campaign_count(count)?;
+                pmf.push(AcquisitionTimingPointV4 {
+                    additional_recruitment_count: count,
+                    absolute_campaign_recruitment_count: absolute,
+                    probability,
+                });
+                cdf.push(AcquisitionTimingPointV4 {
+                    additional_recruitment_count: count,
+                    absolute_campaign_recruitment_count: absolute,
+                    probability: cumulative,
+                });
+            }
+            let acquired = running.to_f64();
+            let not_acquired = unacquired.to_f64();
+            check_timing_probability(acquired, tolerance)?;
+            check_timing_probability(not_acquired, tolerance)?;
+            let marginal = analysis.per_target_acquisition_probabilities[index].probability;
+            running.add(unacquired)?;
+            if (acquired - marginal).abs() > tolerance || (running.to_f64() - 1.0).abs() > tolerance
+            {
+                return Err(EngineError::ProbabilityInvariantViolation {
+                    message: format!(
+                        "acquisition timing target {index} fails marginal conservation"
+                    ),
+                });
+            }
+            targets.push(TargetAcquisitionTimingV4 {
+                target_index: index,
+                target_id: bundle.scenario().targets()[index].student_id.clone(),
+                initially_owned: initial.owned_target_mask & (1 << index) != 0,
+                acquired_by_terminal_probability: acquired,
+                not_acquired_by_terminal_probability: not_acquired,
+                pmf,
+                cdf,
+            });
+        }
+        Ok(ExactAcquisitionTimingV4 { options, targets })
+    }
+}
+
+fn check_timing_probability(value: f64, tolerance: f64) -> Result<(), EngineError> {
+    if !value.is_finite() || value < -tolerance || value > 1.0 + tolerance {
+        return Err(EngineError::ProbabilityInvariantViolation {
+            message: format!("invalid acquisition timing probability {value}"),
+        });
+    }
+    Ok(())
 }

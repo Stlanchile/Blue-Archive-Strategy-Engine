@@ -1,0 +1,15 @@
+{
+  "schema_version": 3,
+  "document_type": "reward_schedule",
+  "reward_schedule_id": "timing_empty",
+  "provenance": {
+    "provenance_status": "provisional",
+    "sources": [],
+    "claim_bindings": []
+  },
+  "compatible_ruleset_ids": [
+    "timing_oracle"
+  ],
+  "initial_milestones": [],
+  "repeating_cycle": null
+}

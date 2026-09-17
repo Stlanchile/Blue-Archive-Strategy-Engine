@@ -1,0 +1,11 @@
+{
+  "diagnostics_schema_version": 1,
+  "error": {
+    "class": "validation",
+    "code": "invalid_json",
+    "message": "invalid JSON document crates/ba-cli/tests/fixtures/compatibility/duplicate.input.json: duplicate/depth scan failed: duplicate object key \"schema_version\" at line 1 column 36",
+    "line": 1,
+    "column": 36,
+    "hint": "correct the JSON value at the reported location"
+  }
+}

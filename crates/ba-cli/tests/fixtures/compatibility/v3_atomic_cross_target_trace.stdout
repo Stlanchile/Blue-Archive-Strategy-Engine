@@ -1,0 +1,398 @@
+{
+  "engine_kind": "trace",
+  "provenance": {
+    "engine_version": "<PACKAGE_VERSION>",
+    "engine_semantics_version": 3,
+    "result_schema_version": 3,
+    "semantic_encoding_version": "canonical-json-v1",
+    "scenario_id": "v3_atomic_cross_target",
+    "scenario_schema_version": 3,
+    "scenario_behavior_fingerprint": "ae9e1f41e32edab6b8bf99768a1c7693605e412bc364d1ec5492e3bd2ac8d97b",
+    "scenario_document_fingerprint": "cdd835015c51716ac85ad800fca40f8265760d4013b7272efde6816ccb2692ba",
+    "ruleset_id": "jp_2026_07_29_provisional_v3",
+    "ruleset_schema_version": 3,
+    "ruleset_behavior_fingerprint": "feeb4ed5107b2bfa334b18b6fd05de59ff212428441d81654e30d4aad507116c",
+    "ruleset_document_fingerprint": "d87163273230cae4b6391a9bbedd7674dc0474447b177450b315102ab26e4cbc",
+    "ruleset_provenance_status": "provisional",
+    "ruleset_provenance": {
+      "provenance_status": "provisional",
+      "sources": [],
+      "claim_bindings": []
+    },
+    "reward_schedule_id": "jp_2026_07_29_empty_v3",
+    "reward_schedule_schema_version": 3,
+    "reward_schedule_behavior_fingerprint": "6e24d576c84b201a8e261b9731370774867488d4bd7191ad4880670256a769d2",
+    "reward_schedule_document_fingerprint": "73e0be53b0e2b6702489cac597ab832ed0fb4335a826b245b5af743240d6fcb1",
+    "reward_schedule_provenance_status": "provisional",
+    "reward_schedule_provenance": {
+      "provenance_status": "provisional",
+      "sources": [],
+      "claim_bindings": []
+    },
+    "authority": {
+      "scenario": "scenario_document_user_authored",
+      "featured_target_probabilities": "ruleset_document",
+      "cross_target_probabilities": "scenario_document_user_authored",
+      "banner_topology": "scenario_document_user_authored",
+      "target_order": "scenario_document_user_authored",
+      "initial_state": "scenario_document_user_authored",
+      "strategy": "scenario_document_user_authored"
+    }
+  },
+  "context": {
+    "compiled_strategy": {
+      "strategy_schema_version": 2,
+      "strategy_id": "sequential_targets_v3",
+      "kind": "sequential_targets",
+      "funding_priority": [
+        "ticket_ten",
+        "paid_single"
+      ],
+      "max_additional_recruitments": 10
+    },
+    "initial_resources": {
+      "pyroxene": 0,
+      "limited_ten_recruitment_tickets": 1,
+      "eligma": 0,
+      "advanced_bd_selectors": 0,
+      "advanced_tech_note_selectors": 0,
+      "superior_tech_note_selectors": 0,
+      "gift_boxes": 0,
+      "keystone_fragments": 0,
+      "secret_tech_notes": 0,
+      "superior_bd_selectors": 0,
+      "high_grade_gift_boxes": 0
+    },
+    "initial_campaign_recruitment_count": 0,
+    "maximum_additional_recruitments": 10,
+    "maximum_absolute_campaign_recruitment_count": 10,
+    "ordered_target_ids": [
+      "target_a",
+      "target_b"
+    ],
+    "ordered_banner_ids": [
+      "banner_a",
+      "banner_b"
+    ],
+    "charge_group_topology": [
+      {
+        "banner_id": "banner_a",
+        "charge_group_id": "shared"
+      },
+      {
+        "banner_id": "banner_b",
+        "charge_group_id": "shared"
+      }
+    ],
+    "initial_owned_targets": [],
+    "initial_charges": [
+      {
+        "charge_group_id": "shared",
+        "pre_recruitment_charge": 99
+      }
+    ],
+    "schedule_kind": "finite",
+    "effective_future_milestone_count": 0
+  },
+  "rng": {
+    "rng_algorithm": "chacha8",
+    "master_seed": 42,
+    "run_count": 1,
+    "run_index_contract": "zero-based ascending indices 0..runs-1",
+    "stream_derivation_version": "mc-run-stream-v1"
+  },
+  "terminal_additional_primitive_recruitments": 10,
+  "terminal_absolute_campaign_recruitment_count": 10,
+  "first_all_target_completion_additional_count": null,
+  "paid_pyroxene_spent": 0,
+  "ticket_funded_primitive_recruitments": 10,
+  "terminal_resources": {
+    "pyroxene": 0,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0,
+    "keystone_fragments": 0,
+    "secret_tech_notes": 0,
+    "superior_bd_selectors": 0,
+    "high_grade_gift_boxes": 0
+  },
+  "milestone_rewards_acquired": {
+    "pyroxene": 0,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0,
+    "keystone_fragments": 0,
+    "secret_tech_notes": 0,
+    "superior_bd_selectors": 0,
+    "high_grade_gift_boxes": 0
+  },
+  "terminal_owned_targets": [
+    "target_b"
+  ],
+  "terminal_reason": "strategy_horizon_reached",
+  "replay_outcomes": [
+    {
+      "kind": "other_configured_target_acquired",
+      "target_index": 1
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    },
+    {
+      "kind": "no_configured_target_acquired"
+    }
+  ],
+  "events": [
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "ticket_ten",
+        "primitive_draws": 10,
+        "pyroxene_deducted": 0,
+        "tickets_deducted": 1
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 1,
+        "absolute_campaign_recruitment_count": 1,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": "target_b",
+        "outcome": {
+          "kind": "other_configured_target_acquired",
+          "target_index": 1
+        },
+        "pre_charge": 99,
+        "post_charge": 100,
+        "target_newly_owned": true,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 2,
+        "absolute_campaign_recruitment_count": 2,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 100,
+        "post_charge": 101,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 3,
+        "absolute_campaign_recruitment_count": 3,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 101,
+        "post_charge": 102,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 4,
+        "absolute_campaign_recruitment_count": 4,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 102,
+        "post_charge": 103,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 5,
+        "absolute_campaign_recruitment_count": 5,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 103,
+        "post_charge": 104,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 6,
+        "absolute_campaign_recruitment_count": 6,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 104,
+        "post_charge": 105,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 7,
+        "absolute_campaign_recruitment_count": 7,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 105,
+        "post_charge": 106,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 8,
+        "absolute_campaign_recruitment_count": 8,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 106,
+        "post_charge": 107,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 9,
+        "absolute_campaign_recruitment_count": 9,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 107,
+        "post_charge": 108,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "additional_recruitment_count": 10,
+        "absolute_campaign_recruitment_count": 10,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "acquired_target_id": null,
+        "outcome": {
+          "kind": "no_configured_target_acquired"
+        },
+        "pre_charge": 108,
+        "post_charge": 109,
+        "target_newly_owned": false,
+        "first_all_targets_completed": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "terminal",
+      "data": {
+        "terminal_reason": "strategy_horizon_reached"
+      }
+    }
+  ]
+}

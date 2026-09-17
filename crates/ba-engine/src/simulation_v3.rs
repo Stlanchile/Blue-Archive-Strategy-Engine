@@ -11,8 +11,11 @@ use rand_chacha::ChaCha8Rng;
 use rand_core::{RngCore, SeedableRng};
 use sha2::{Digest, Sha256};
 
+use crate::acquisition_timing::{
+    AcquisitionTimingOptions, SupportBudget, compare_timing, newly_owned_target,
+};
 use crate::error::EngineError;
-use crate::exact_v3::analyze_exact_v3;
+use crate::exact_v3::{analyze_exact_v3, analyze_exact_v3_with_acquisition_timing};
 use crate::options::{ExactSolverOptions, SimulationLimits};
 use crate::result::{
     ConfidenceInterval, EstimateDiagnostics, RNG_ALGORITHM, RngProvenance,
@@ -27,12 +30,14 @@ use crate::result_v3::{
     TerminalOwnedSetProbabilityIntervalV3, TerminalOwnedSetProbabilityV3,
     TerminalReasonProbabilityV3, TerminalSetComparisonV3, expected_from_ledger_sums, ledger_values,
 };
+use crate::result_v4::*;
 use crate::sampling::uniform_below;
 
 const STREAM_DOMAIN: &[u8] = b"ba-strategy/mc-run-stream/v1\0";
 
 #[derive(Debug, Clone)]
 struct ConcreteRunV3 {
+    first_acquisitions: Option<[Option<u64>; 4]>,
     terminal: WorldStateKey,
     first_completion: Option<u64>,
     terminal_reason: TerminalReason,
@@ -171,6 +176,38 @@ pub fn simulate_monte_carlo_v3_with_limits(
     master_seed: u64,
     limits: SimulationLimits,
 ) -> Result<MonteCarloAnalysisResultV3, EngineError> {
+    simulate_monte_carlo_v3_impl(bundle, runs, master_seed, limits, &mut None)
+}
+
+/// Sample marginal acquisition times using the unchanged serial run streams.
+pub fn simulate_monte_carlo_v3_with_acquisition_timing(
+    bundle: &ValidatedScenarioBundleV3,
+    runs: NonZeroU64,
+    master_seed: u64,
+    limits: SimulationLimits,
+    timing_options: AcquisitionTimingOptions,
+) -> Result<MonteCarloAcquisitionTimingResultV4, EngineError> {
+    let mut timing = Some(SampledTiming::new(bundle, timing_options));
+    let analysis = simulate_monte_carlo_v3_impl(bundle, runs, master_seed, limits, &mut timing)?;
+    let timing = timing.ok_or_else(|| EngineError::InternalInvariantViolation {
+        message: "enabled sampled timing collector is missing".to_owned(),
+    })?;
+    let acquisition_timing = timing.project(bundle, &analysis, timing_options)?;
+    Ok(MonteCarloAcquisitionTimingResultV4 {
+        result_schema_version: RESULT_SCHEMA_VERSION_V4,
+        engine_kind: "monte_carlo_acquisition_timing",
+        analysis,
+        acquisition_timing,
+    })
+}
+
+fn simulate_monte_carlo_v3_impl(
+    bundle: &ValidatedScenarioBundleV3,
+    runs: NonZeroU64,
+    master_seed: u64,
+    limits: SimulationLimits,
+    timing: &mut Option<SampledTiming>,
+) -> Result<MonteCarloAnalysisResultV3, EngineError> {
     let limits = limits.validate()?;
     let run_count = runs.get();
     if run_count > limits.max_runs {
@@ -214,9 +251,14 @@ pub fn simulate_monte_carlo_v3_with_limits(
         } else {
             "v3 Monte Carlo run"
         };
-        let run = execute_run_v3(bundle, false, run_limit, scope, |distribution| {
-            sample_outcome_v3(distribution, &mut rng)
-        })?;
+        let run = execute_run_v3(
+            bundle,
+            false,
+            timing.is_some(),
+            run_limit,
+            scope,
+            |distribution| sample_outcome_v3(distribution, &mut rng),
+        )?;
         total_primitives = total_primitives
             .checked_add(run.terminal.cumulative_primitive_recruitments)
             .ok_or(EngineError::ArithmeticOverflow {
@@ -291,6 +333,9 @@ pub fn simulate_monte_carlo_v3_with_limits(
         residual_moments.add(residual)?;
         reward_moments.add(rewards)?;
         terminal_moments.add(run.terminal.cumulative_primitive_recruitments as f64)?;
+        if let Some(timing) = timing {
+            timing.observe(&run)?;
+        }
     }
 
     let divisor = run_count as f64;
@@ -474,6 +519,7 @@ pub fn simulate_trace_v3_with_limits(
     let run = execute_run_v3(
         bundle,
         true,
+        false,
         limits.max_trace_primitive_transitions,
         "v3 trace",
         |distribution| sample_outcome_v3(distribution, &mut rng),
@@ -499,6 +545,7 @@ pub fn replay_v3_with_limits(
         execute_run_v3(
             bundle,
             true,
+            false,
             limits.max_trace_primitive_transitions,
             "v3 replay",
             |distribution| {
@@ -544,6 +591,50 @@ pub fn compare_v3(
 ) -> Result<ComparisonResultV3, EngineError> {
     let exact = analyze_exact_v3(bundle, ExactSolverOptions::default())?;
     let monte_carlo = simulate_monte_carlo_v3(bundle, runs, master_seed)?;
+    assemble_comparison_v3(bundle, exact, monte_carlo)
+}
+
+/// Execute timing-enabled exact analysis first, then one serial simulation.
+pub fn compare_v3_with_acquisition_timing(
+    bundle: &ValidatedScenarioBundleV3,
+    runs: NonZeroU64,
+    master_seed: u64,
+    exact_options: ExactSolverOptions,
+    limits: SimulationLimits,
+    timing_options: AcquisitionTimingOptions,
+) -> Result<ComparisonAcquisitionTimingResultV4, EngineError> {
+    let exact = analyze_exact_v3_with_acquisition_timing(bundle, exact_options, timing_options)?;
+    let sampled = simulate_monte_carlo_v3_with_acquisition_timing(
+        bundle,
+        runs,
+        master_seed,
+        limits,
+        timing_options,
+    )?;
+    let comparisons = compare_timing(
+        bundle,
+        &exact.acquisition_timing,
+        &sampled.acquisition_timing,
+        runs.get(),
+        timing_options,
+    )?;
+    Ok(ComparisonAcquisitionTimingResultV4 {
+        result_schema_version: RESULT_SCHEMA_VERSION_V4,
+        engine_kind: "acquisition_timing_comparison",
+        analysis: assemble_comparison_v3(bundle, exact.analysis, sampled.analysis)?,
+        acquisition_timing: AcquisitionTimingComparisonV4 {
+            exact: exact.acquisition_timing,
+            monte_carlo: sampled.acquisition_timing,
+            comparisons,
+        },
+    })
+}
+
+fn assemble_comparison_v3(
+    bundle: &ValidatedScenarioBundleV3,
+    exact: crate::ExactAnalysisResultV3,
+    monte_carlo: MonteCarloAnalysisResultV3,
+) -> Result<ComparisonResultV3, EngineError> {
     let success_interval = monte_carlo
         .estimation
         .all_target_success_probability_interval_95;
@@ -669,6 +760,7 @@ pub fn compare_v3(
 fn execute_run_v3<F>(
     bundle: &ValidatedScenarioBundleV3,
     trace: bool,
+    collect_timing: bool,
     primitive_limit: u64,
     limit_scope: &'static str,
     mut choose_outcome: F,
@@ -677,6 +769,9 @@ where
     F: FnMut(&ba_core::CompiledOutcomeDistribution) -> Result<PrimitiveAcquisition, EngineError>,
 {
     let mut world = initial_world_v3(bundle);
+    let mut first_acquisitions = collect_timing.then(|| {
+        std::array::from_fn(|index| (world.owned_target_mask & (1 << index) != 0).then_some(0))
+    });
     let mut first_completion =
         (world.owned_target_mask == bundle.scenario().all_targets_mask()).then_some(0);
     let mut outcomes = Vec::new();
@@ -716,6 +811,21 @@ where
                         outcomes.push(outcome);
                     }
                     let transitioned = apply_primitive_transition_v3(bundle, &in_flight, outcome)?;
+                    if let Some(first) = &mut first_acquisitions
+                        && let Some(index) = newly_owned_target(
+                            in_flight.world.owned_target_mask,
+                            transitioned.state.world.owned_target_mask,
+                            bundle.scenario().targets().len(),
+                        )?
+                    {
+                        let previous =
+                            first[index].replace(transitioned.event.additional_recruitment_count);
+                        if previous.is_some() {
+                            return Err(EngineError::InternalInvariantViolation {
+                                message: "first acquisition was already recorded".to_owned(),
+                            });
+                        }
+                    }
                     if trace {
                         events.push(RunTraceEventV3::PrimitiveTransition(
                             transitioned.event.clone(),
@@ -764,6 +874,7 @@ where
         events.push(RunTraceEventV3::Terminal { terminal_reason });
     }
     Ok(ConcreteRunV3 {
+        first_acquisitions,
         terminal: world,
         first_completion,
         terminal_reason,
@@ -821,7 +932,7 @@ fn sample_outcome_v3(
     }
 }
 
-fn wilson_interval(successes: u64, runs: u64) -> ConfidenceInterval {
+pub(crate) fn wilson_interval(successes: u64, runs: u64) -> ConfidenceInterval {
     let n = runs as f64;
     let p = successes as f64 / n;
     let z = 1.96_f64;
@@ -830,8 +941,18 @@ fn wilson_interval(successes: u64, runs: u64) -> ConfidenceInterval {
     let center = (p + z_squared / (2.0 * n)) / denominator;
     let half_width = z * ((p * (1.0 - p) / n + z_squared / (4.0 * n * n)).sqrt()) / denominator;
     ConfidenceInterval {
-        lower: (center - half_width).max(0.0),
-        upper: (center + half_width).min(1.0),
+        // Preserve exact endpoints: cancellation can otherwise exclude a
+        // probability of zero or one from its own Wilson interval.
+        lower: if successes == 0 {
+            0.0
+        } else {
+            (center - half_width).max(0.0)
+        },
+        upper: if successes == runs {
+            1.0
+        } else {
+            (center + half_width).min(1.0)
+        },
     }
 }
 
@@ -921,6 +1042,103 @@ fn owned_targets(bundle: &ValidatedScenarioBundleV3, mask: u8) -> Vec<ba_core::S
         .filter(|(index, _)| mask & (1_u8 << index) != 0)
         .map(|(_, target)| target.student_id.clone())
         .collect()
+}
+
+struct SampledTiming {
+    counts: Vec<BTreeMap<u64, u64>>,
+    unacquired: Vec<u64>,
+    budget: SupportBudget,
+}
+
+impl SampledTiming {
+    fn new(bundle: &ValidatedScenarioBundleV3, options: AcquisitionTimingOptions) -> Self {
+        Self {
+            counts: vec![BTreeMap::new(); bundle.scenario().targets().len()],
+            unacquired: vec![0; bundle.scenario().targets().len()],
+            budget: SupportBudget::new(options),
+        }
+    }
+
+    fn observe(&mut self, run: &ConcreteRunV3) -> Result<(), EngineError> {
+        let first =
+            run.first_acquisitions
+                .ok_or_else(|| EngineError::InternalInvariantViolation {
+                    message: "enabled run is missing first-acquisition observations".to_owned(),
+                })?;
+        for (index, count) in first.into_iter().enumerate().take(self.counts.len()) {
+            if count.is_some() != (run.terminal.owned_target_mask & (1 << index) != 0) {
+                return Err(EngineError::InternalInvariantViolation {
+                    message: "first-acquisition observations disagree with terminal ownership"
+                        .to_owned(),
+                });
+            }
+            let slot = if let Some(count) = count {
+                self.budget.entry(&mut self.counts[index], count)?
+            } else {
+                &mut self.unacquired[index]
+            };
+            *slot = slot.checked_add(1).ok_or(EngineError::ArithmeticOverflow {
+                context: "counting first-acquisition samples",
+            })?;
+        }
+        Ok(())
+    }
+
+    fn project(
+        self,
+        bundle: &ValidatedScenarioBundleV3,
+        analysis: &MonteCarloAnalysisResultV3,
+        options: AcquisitionTimingOptions,
+    ) -> Result<MonteCarloAcquisitionTimingV4, EngineError> {
+        let runs = analysis.sample_counts.total_runs;
+        let initial = initial_world_v3(bundle);
+        let mut targets = Vec::with_capacity(self.counts.len());
+        for (index, (counts, unacquired)) in
+            self.counts.into_iter().zip(self.unacquired).enumerate()
+        {
+            let mut acquired = 0_u64;
+            let mut pmf = Vec::with_capacity(counts.len());
+            let mut cdf = Vec::with_capacity(counts.len());
+            for (count, samples) in counts {
+                acquired =
+                    acquired
+                        .checked_add(samples)
+                        .ok_or(EngineError::ArithmeticOverflow {
+                            context: "summing acquisition timing samples",
+                        })?;
+                let absolute = bundle.scenario().absolute_campaign_count(count)?;
+                let point = |samples| SampledAcquisitionTimingPointV4 {
+                    additional_recruitment_count: count,
+                    absolute_campaign_recruitment_count: absolute,
+                    probability: samples as f64 / runs as f64,
+                    sample_count: samples,
+                    confidence_interval_95: wilson_interval(samples, runs),
+                };
+                pmf.push(point(samples));
+                cdf.push(point(acquired));
+            }
+            if acquired.checked_add(unacquired) != Some(runs)
+                || acquired
+                    != analysis.estimation.per_target_probability_intervals_95[index].sample_count
+            {
+                return Err(EngineError::InternalInvariantViolation {
+                    message: "acquisition timing sample counts fail conservation".to_owned(),
+                });
+            }
+            targets.push(SampledTargetAcquisitionTimingV4 {
+                target_index: index,
+                target_id: bundle.scenario().targets()[index].student_id.clone(),
+                initially_owned: initial.owned_target_mask & (1 << index) != 0,
+                acquired_by_terminal_probability: acquired as f64 / runs as f64,
+                not_acquired_by_terminal_probability: unacquired as f64 / runs as f64,
+                acquired_sample_count: acquired,
+                not_acquired_sample_count: unacquired,
+                pmf,
+                cdf,
+            });
+        }
+        Ok(MonteCarloAcquisitionTimingV4 { options, targets })
+    }
 }
 
 #[cfg(test)]

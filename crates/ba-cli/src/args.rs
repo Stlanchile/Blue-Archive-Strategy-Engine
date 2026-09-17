@@ -38,12 +38,18 @@ pub(crate) enum Command {
     /// Exhaustively enumerate every modeled probability branch.
     Analyze {
         scenario: PathBuf,
+        /// Report per-target first-acquisition timing (schema v3 only).
+        #[arg(long)]
+        acquisition_timing: bool,
         #[arg(long, value_enum, default_value_t)]
         format: OutputFormat,
     },
     /// Run Monte Carlo with an OS-random seed unless --seed is supplied.
     Simulate {
         scenario: PathBuf,
+        /// Report per-target first-acquisition timing (schema v3 only).
+        #[arg(long, conflicts_with = "trace")]
+        acquisition_timing: bool,
         #[arg(long)]
         runs: NonZeroU64,
         /// Reproduce a run with this master seed instead of using OS entropy.
@@ -57,6 +63,9 @@ pub(crate) enum Command {
     /// Compare exact analysis with OS-seeded or explicitly seeded Monte Carlo.
     Compare {
         scenario: PathBuf,
+        /// Report per-target first-acquisition timing (schema v3 only).
+        #[arg(long)]
+        acquisition_timing: bool,
         #[arg(long)]
         runs: NonZeroU64,
         /// Reproduce a run with this master seed instead of using OS entropy.

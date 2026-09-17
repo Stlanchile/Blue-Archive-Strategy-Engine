@@ -1,6 +1,6 @@
 # Release readiness
 
-Version 0.3.0 is prepared for controlled Linux x86_64 CLI release verification.
+Version 0.4.0 is prepared for controlled Linux x86_64 CLI release verification.
 It is not yet approved as a formal source-backed gameplay-data release. This is
 not a crates.io publication workflow, and local implementation work must not
 create a tag, push, publish a package, or create a GitHub release.
@@ -10,10 +10,11 @@ create a tag, push, publish a package, or create a GitHub release.
 - Use a full, non-shallow history; inspect contributor history and copied/vendor
   material before release.
 - This repository’s reviewed history identifies only `Shirasu Hare
-  <shirasu_hare@stu.abydos.ac>` and no tracked vendor tree, third-party notices,
+  <admin@xhz.email>` (nine commits at the qualified baseline) and no tracked vendor tree, third-party notices,
   or copied license material. It therefore uses contributor-neutral dual
   MIT/Apache-2.0 terms. Re-open this assessment if history or imported material
-  changes.
+  changes. The project contact address `shirasu_hare@stu.abydos.ac` is separate
+  from the author identity recorded in Git history.
 - Require a fresh online `cargo audit --deny warnings`; advisory/network failure
   is not a clean audit.
 - Require first-party claim-level evidence before adding or approving
@@ -63,3 +64,7 @@ impossible.
 Packaging verification is not publication. It must not create a tag, push,
 publish crates, create a GitHub release, or describe an incomplete source/audit
 gate as complete.
+
+## v0.4
+
+Include docs/COMPATIBILITY.md, docs/ACQUISITION_TIMING.md and ADR 0002 in both required-file lists. Archive verification runs legacy v2/v3 and all three timing commands from an unrelated directory and checks empty stdout for missing input. Package twice from identical inputs and compare archive bytes. A package assembled from an uncommitted implementation tree is a rehearsal artifact: its HEAD metadata does not attest that the binary corresponds to a clean committed snapshot. Formal release provenance needs a separately accepted source snapshot. Do not overwrite prior user delivery files.

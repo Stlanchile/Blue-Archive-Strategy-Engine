@@ -1,0 +1,6910 @@
+{
+  "engine_kind": "trace",
+  "provenance": {
+    "engine_version": "<PACKAGE_VERSION>",
+    "engine_semantics_version": 2,
+    "result_schema_version": 2,
+    "semantic_encoding_version": "canonical-json-v1",
+    "scenario_id": "single_target_200",
+    "scenario_schema_version": 2,
+    "scenario_behavior_fingerprint": "95eb5b476e17e148909fefd24da3ab00e0e15c4cbc8fdd5ed26758bc4fdb66af",
+    "scenario_document_fingerprint": "044f559d861e3af6624d7e55379cb5f00bc9883049d319bf1d720188d4c1ed70",
+    "ruleset_id": "jp_2026_07_29_provisional_v2",
+    "ruleset_schema_version": 2,
+    "ruleset_behavior_fingerprint": "db0af908e4436e396e9a55e7e0bd39aa8ae30d8a148c34abb07c24cb347fb6ad",
+    "ruleset_document_fingerprint": "c5de387937c5a2060641ef5763ef36f5407fb093560363f535d3630ba5cb1d32",
+    "ruleset_verification_status": "provisional",
+    "ruleset_provenance": {
+      "verification_status": "provisional",
+      "sources": []
+    },
+    "reward_schedule_id": "jp_2026_07_29_empty_v2",
+    "reward_schedule_schema_version": 2,
+    "reward_schedule_behavior_fingerprint": "41387171a8507e76f595d0571b3d21028c166cb487bc49e64f3c072c09e6b10e",
+    "reward_schedule_document_fingerprint": "890d81dd1ef119fae566ece9e24e3ee1fe0b9cb932a5bf9f5948319267a2ffa3",
+    "reward_schedule_verification_status": "provisional",
+    "reward_schedule_provenance": {
+      "verification_status": "provisional",
+      "sources": []
+    }
+  },
+  "context": {
+    "strategy_constraints": {
+      "max_total_recruitments": 200
+    },
+    "compiled_strategy": {
+      "strategy_schema_version": 1,
+      "strategy_id": "sequential",
+      "kind": "sequential_targets",
+      "funding_priority": [
+        "ticket_ten",
+        "paid_single"
+      ],
+      "max_total_recruitments": 200
+    },
+    "initial_resources": {
+      "pyroxene": 24000,
+      "limited_ten_recruitment_tickets": 0,
+      "eligma": 0,
+      "advanced_bd_selectors": 0,
+      "advanced_tech_note_selectors": 0,
+      "superior_tech_note_selectors": 0,
+      "gift_boxes": 0
+    },
+    "ordered_targets": [
+      "target_a"
+    ],
+    "ordered_banners": [
+      "banner_a"
+    ]
+  },
+  "rng": {
+    "rng_algorithm": "chacha8",
+    "master_seed": 42,
+    "run_count": 1,
+    "run_index_contract": "zero-based ascending indices 0..runs-1",
+    "stream_derivation_version": "mc-run-stream-v1"
+  },
+  "terminal_primitive_recruitments": 200,
+  "first_success_recruitment_count": 200,
+  "paid_pyroxene_spent": 24000,
+  "ticket_funded_primitive_recruitments": 0,
+  "terminal_resources": {
+    "pyroxene": 0,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0
+  },
+  "milestone_rewards_acquired": {
+    "pyroxene": 0,
+    "limited_ten_recruitment_tickets": 0,
+    "eligma": 0,
+    "advanced_bd_selectors": 0,
+    "advanced_tech_note_selectors": 0,
+    "superior_tech_note_selectors": 0,
+    "gift_boxes": 0
+  },
+  "terminal_owned_targets": [
+    "target_a"
+  ],
+  "terminal_reason": "targets_acquired",
+  "replay_outcomes": [
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "miss",
+    "pickup"
+  ],
+  "events": [
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 1,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 0,
+        "post_charge": 1,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 2,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 1,
+        "post_charge": 2,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 3,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 2,
+        "post_charge": 3,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 4,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 3,
+        "post_charge": 4,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 5,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 4,
+        "post_charge": 5,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 6,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 5,
+        "post_charge": 6,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 7,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 6,
+        "post_charge": 7,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 8,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 7,
+        "post_charge": 8,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 9,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 8,
+        "post_charge": 9,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 10,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 9,
+        "post_charge": 10,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 11,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 10,
+        "post_charge": 11,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 12,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 11,
+        "post_charge": 12,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 13,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 12,
+        "post_charge": 13,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 14,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 13,
+        "post_charge": 14,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 15,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 14,
+        "post_charge": 15,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 16,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 15,
+        "post_charge": 16,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 17,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 16,
+        "post_charge": 17,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 18,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 17,
+        "post_charge": 18,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 19,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 18,
+        "post_charge": 19,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 20,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 19,
+        "post_charge": 20,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 21,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 20,
+        "post_charge": 21,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 22,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 21,
+        "post_charge": 22,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 23,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 22,
+        "post_charge": 23,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 24,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 23,
+        "post_charge": 24,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 25,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 24,
+        "post_charge": 25,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 26,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 25,
+        "post_charge": 26,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 27,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 26,
+        "post_charge": 27,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 28,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 27,
+        "post_charge": 28,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 29,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 28,
+        "post_charge": 29,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 30,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 29,
+        "post_charge": 30,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 31,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 30,
+        "post_charge": 31,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 32,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 31,
+        "post_charge": 32,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 33,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 32,
+        "post_charge": 33,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 34,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 33,
+        "post_charge": 34,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 35,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 34,
+        "post_charge": 35,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 36,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 35,
+        "post_charge": 36,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 37,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 36,
+        "post_charge": 37,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 38,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 37,
+        "post_charge": 38,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 39,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 38,
+        "post_charge": 39,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 40,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 39,
+        "post_charge": 40,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 41,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 40,
+        "post_charge": 41,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 42,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 41,
+        "post_charge": 42,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 43,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 42,
+        "post_charge": 43,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 44,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 43,
+        "post_charge": 44,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 45,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 44,
+        "post_charge": 45,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 46,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 45,
+        "post_charge": 46,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 47,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 46,
+        "post_charge": 47,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 48,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 47,
+        "post_charge": 48,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 49,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 48,
+        "post_charge": 49,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 50,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 49,
+        "post_charge": 50,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 51,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 50,
+        "post_charge": 51,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 52,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 51,
+        "post_charge": 52,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 53,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 52,
+        "post_charge": 53,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 54,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 53,
+        "post_charge": 54,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 55,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 54,
+        "post_charge": 55,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 56,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 55,
+        "post_charge": 56,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 57,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 56,
+        "post_charge": 57,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 58,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 57,
+        "post_charge": 58,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 59,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 58,
+        "post_charge": 59,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 60,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 59,
+        "post_charge": 60,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 61,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 60,
+        "post_charge": 61,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 62,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 61,
+        "post_charge": 62,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 63,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 62,
+        "post_charge": 63,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 64,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 63,
+        "post_charge": 64,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 65,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 64,
+        "post_charge": 65,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 66,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 65,
+        "post_charge": 66,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 67,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 66,
+        "post_charge": 67,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 68,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 67,
+        "post_charge": 68,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 69,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 68,
+        "post_charge": 69,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 70,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 69,
+        "post_charge": 70,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 71,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 70,
+        "post_charge": 71,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 72,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 71,
+        "post_charge": 72,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 73,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 72,
+        "post_charge": 73,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 74,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 73,
+        "post_charge": 74,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 75,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 74,
+        "post_charge": 75,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 76,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 75,
+        "post_charge": 76,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 77,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 76,
+        "post_charge": 77,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 78,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 77,
+        "post_charge": 78,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 79,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 78,
+        "post_charge": 79,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 80,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 79,
+        "post_charge": 80,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 81,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 80,
+        "post_charge": 81,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 82,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 81,
+        "post_charge": 82,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 83,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 82,
+        "post_charge": 83,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 84,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 83,
+        "post_charge": 84,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 85,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 84,
+        "post_charge": 85,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 86,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 85,
+        "post_charge": 86,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 87,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 86,
+        "post_charge": 87,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 88,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 87,
+        "post_charge": 88,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 89,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 88,
+        "post_charge": 89,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 90,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 89,
+        "post_charge": 90,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 91,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 90,
+        "post_charge": 91,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 92,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 91,
+        "post_charge": 92,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 93,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 92,
+        "post_charge": 93,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 94,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 93,
+        "post_charge": 94,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 95,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 94,
+        "post_charge": 95,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 96,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 95,
+        "post_charge": 96,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 97,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 96,
+        "post_charge": 97,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 98,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 97,
+        "post_charge": 98,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 99,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 98,
+        "post_charge": 99,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 100,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 99,
+        "post_charge": 100,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 101,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 100,
+        "post_charge": 101,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 102,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 101,
+        "post_charge": 102,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 103,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 102,
+        "post_charge": 103,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 104,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 103,
+        "post_charge": 104,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 105,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 104,
+        "post_charge": 105,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 106,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 105,
+        "post_charge": 106,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 107,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 106,
+        "post_charge": 107,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 108,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 107,
+        "post_charge": 108,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 109,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 108,
+        "post_charge": 109,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 110,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 109,
+        "post_charge": 110,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 111,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 110,
+        "post_charge": 111,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 112,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 111,
+        "post_charge": 112,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 113,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 112,
+        "post_charge": 113,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 114,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 113,
+        "post_charge": 114,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 115,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 114,
+        "post_charge": 115,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 116,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 115,
+        "post_charge": 116,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 117,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 116,
+        "post_charge": 117,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 118,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 117,
+        "post_charge": 118,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 119,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 118,
+        "post_charge": 119,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 120,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 119,
+        "post_charge": 120,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 121,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 120,
+        "post_charge": 121,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 122,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 121,
+        "post_charge": 122,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 123,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 122,
+        "post_charge": 123,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 124,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 123,
+        "post_charge": 124,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 125,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 124,
+        "post_charge": 125,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 126,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 125,
+        "post_charge": 126,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 127,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 126,
+        "post_charge": 127,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 128,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 127,
+        "post_charge": 128,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 129,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 128,
+        "post_charge": 129,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 130,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 129,
+        "post_charge": 130,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 131,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 130,
+        "post_charge": 131,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 132,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 131,
+        "post_charge": 132,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 133,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 132,
+        "post_charge": 133,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 134,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 133,
+        "post_charge": 134,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 135,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 134,
+        "post_charge": 135,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 136,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 135,
+        "post_charge": 136,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 137,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 136,
+        "post_charge": 137,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 138,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 137,
+        "post_charge": 138,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 139,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 138,
+        "post_charge": 139,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 140,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 139,
+        "post_charge": 140,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 141,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 140,
+        "post_charge": 141,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 142,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 141,
+        "post_charge": 142,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 143,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 142,
+        "post_charge": 143,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 144,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 143,
+        "post_charge": 144,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 145,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 144,
+        "post_charge": 145,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 146,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 145,
+        "post_charge": 146,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 147,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 146,
+        "post_charge": 147,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 148,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 147,
+        "post_charge": 148,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 149,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 148,
+        "post_charge": 149,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 150,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 149,
+        "post_charge": 150,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 151,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 150,
+        "post_charge": 151,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 152,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 151,
+        "post_charge": 152,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 153,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 152,
+        "post_charge": 153,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 154,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 153,
+        "post_charge": 154,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 155,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 154,
+        "post_charge": 155,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 156,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 155,
+        "post_charge": 156,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 157,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 156,
+        "post_charge": 157,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 158,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 157,
+        "post_charge": 158,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 159,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 158,
+        "post_charge": 159,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 160,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 159,
+        "post_charge": 160,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 161,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 160,
+        "post_charge": 161,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 162,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 161,
+        "post_charge": 162,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 163,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 162,
+        "post_charge": 163,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 164,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 163,
+        "post_charge": 164,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 165,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 164,
+        "post_charge": 165,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 166,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 165,
+        "post_charge": 166,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 167,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 166,
+        "post_charge": 167,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 168,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 167,
+        "post_charge": 168,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 169,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 168,
+        "post_charge": 169,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 170,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 169,
+        "post_charge": 170,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 171,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 170,
+        "post_charge": 171,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 172,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 171,
+        "post_charge": 172,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 173,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 172,
+        "post_charge": 173,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 174,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 173,
+        "post_charge": 174,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 175,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 174,
+        "post_charge": 175,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 176,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 175,
+        "post_charge": 176,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 177,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 176,
+        "post_charge": 177,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 178,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 177,
+        "post_charge": 178,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 179,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 178,
+        "post_charge": 179,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 180,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 179,
+        "post_charge": 180,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 181,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 180,
+        "post_charge": 181,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 182,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 181,
+        "post_charge": 182,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 183,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 182,
+        "post_charge": 183,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 184,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 183,
+        "post_charge": 184,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 185,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 184,
+        "post_charge": 185,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 186,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 185,
+        "post_charge": 186,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 187,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 186,
+        "post_charge": 187,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 188,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 187,
+        "post_charge": 188,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 189,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 188,
+        "post_charge": 189,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 190,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 189,
+        "post_charge": 190,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 191,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 190,
+        "post_charge": 191,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 192,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 191,
+        "post_charge": 192,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 193,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 192,
+        "post_charge": 193,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 194,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 193,
+        "post_charge": 194,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 195,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 194,
+        "post_charge": 195,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 196,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 195,
+        "post_charge": 196,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 197,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 196,
+        "post_charge": 197,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 198,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 197,
+        "post_charge": 198,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 199,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "miss",
+        "pre_charge": 198,
+        "post_charge": 199,
+        "target_newly_owned": false,
+        "first_success": false,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "action_started",
+      "data": {
+        "banner_id": "banner_a",
+        "funding": "paid_single",
+        "primitive_draws": 1,
+        "pyroxene_deducted": 120,
+        "tickets_deducted": 0
+      }
+    },
+    {
+      "event": "primitive_transition",
+      "data": {
+        "recruitment_count": 200,
+        "banner_id": "banner_a",
+        "featured_student_id": "target_a",
+        "outcome": "pickup",
+        "pre_charge": 199,
+        "post_charge": 0,
+        "target_newly_owned": true,
+        "first_success": true,
+        "milestone_count": null,
+        "rewards": [],
+        "tickets_deferred": 0
+      }
+    },
+    {
+      "event": "first_success",
+      "data": {
+        "recruitment_count": 200
+      }
+    },
+    {
+      "event": "action_completed",
+      "data": {
+        "tickets_activated": 0,
+        "available_ticket_count": 0
+      }
+    },
+    {
+      "event": "terminal",
+      "data": {
+        "terminal_reason": "targets_acquired"
+      }
+    }
+  ]
+}

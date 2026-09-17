@@ -29,3 +29,7 @@ Revisit only after measured serial throughput on representative v3
 three/four-target scenarios is a demonstrated bottleneck and an implementation
 can preserve byte-stable per-run streams, ascending aggregation semantics,
 trace/replay behavior, and all existing v2 vectors.
+
+## v0.4
+
+The deferral remains in force for v0.4. September 2026 baseline measurements of 10,000 serial runs were about 109 ms for single-target v3 and 398 ms for the four-target example (CLI, Linux/WSL2). These workloads do not establish a parallelism requirement. Timing-enabled/disabled measurements are recorded in CALIBRATION.md; no wall-clock thresholds or solver guard increases are introduced.

@@ -55,3 +55,7 @@ V3 source IDs, labels, references, authority literals, banner IDs, and
 probability values are data only. They never influence file lookup, catalog
 enumeration, URL access, or security decisions. Provenance references remain
 inert even when they resemble paths or URLs.
+
+## v0.4
+
+Acquisition timing adds sparse histogram work, with at most 65,536 distinct target/count keys per exact, sampled or comparison dataset. Comparison counts synthetic zero/horizon support. New JSON/text is serialized through a bounded in-memory writer (64 MiB UTF-8 including newline) before stdout. Support/output failures return engine exit 5 with no partial report; OS write failures retain exit 70 and cannot roll back an external stream. No new filesystem authority, input schema, network use, threads or executable policies are introduced. Provenance strings remain inert.

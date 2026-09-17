@@ -19,9 +19,13 @@ use crate::args::{
     ScenarioCommand,
 };
 use crate::errors::AppError;
-use crate::render;
 use crate::resolve::{
     default_example_directory, default_golden_directory, is_bare_scenario_name, resolve_scenario,
+};
+use crate::{render, render_v4};
+use ba_engine::{
+    analyze_exact_v3_with_acquisition_timing, compare_v3_with_acquisition_timing,
+    simulate_monte_carlo_v3_with_acquisition_timing,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -53,11 +57,27 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
                 result,
             )
         }
-        Command::Analyze { scenario, format } => {
+        Command::Analyze {
+            scenario,
+            acquisition_timing,
+            format,
+        } => {
             let path = resolve_scenario(&data_dir, scenario_dir.as_deref(), &scenario);
             let result = load_scenario_bundle(&data_dir, scenario_dir.as_deref(), &scenario, path)
                 .map_err(AppError::from)
                 .and_then(|bundle| match bundle {
+                    AnyValidatedScenarioBundle::V2(_) if acquisition_timing => {
+                        Err(timing_profile_error())
+                    }
+                    AnyValidatedScenarioBundle::V3(bundle) if acquisition_timing => {
+                        analyze_exact_v3_with_acquisition_timing(
+                            &bundle,
+                            Default::default(),
+                            Default::default(),
+                        )
+                        .map_err(AppError::from)
+                        .and_then(|value| render_v4::exact(&value, format))
+                    }
                     AnyValidatedScenarioBundle::V2(bundle) => {
                         analyze_exact_detailed(&bundle, ExactSolverOptions::default())
                             .map_err(AppError::from)
@@ -79,6 +99,7 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
         }
         Command::Simulate {
             scenario,
+            acquisition_timing,
             runs,
             seed,
             trace,
@@ -93,6 +114,9 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
                             "simulate --trace requires --runs 1".to_owned(),
                         ));
                     }
+                    if acquisition_timing && matches!(&bundle, AnyValidatedScenarioBundle::V2(_)) {
+                        return Err(timing_profile_error());
+                    }
                     let seed = resolve_master_seed(seed)?;
                     match bundle {
                         AnyValidatedScenarioBundle::V2(bundle) if trace => {
@@ -104,6 +128,17 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
                             simulate_monte_carlo(&bundle, runs, seed)
                                 .map(|value| SimulationOutput::Aggregate(Box::new(value)))
                                 .map_err(AppError::from)
+                        }
+                        AnyValidatedScenarioBundle::V3(bundle) if acquisition_timing => {
+                            simulate_monte_carlo_v3_with_acquisition_timing(
+                                &bundle,
+                                runs,
+                                seed,
+                                Default::default(),
+                                Default::default(),
+                            )
+                            .map(|value| SimulationOutput::Timing(Box::new(value)))
+                            .map_err(AppError::from)
                         }
                         AnyValidatedScenarioBundle::V3(bundle) if trace => {
                             simulate_trace_v3(&bundle, seed)
@@ -118,6 +153,7 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
                     }
                 })
                 .and_then(|value| match value {
+                    SimulationOutput::Timing(value) => render_v4::monte_carlo(&value, format),
                     SimulationOutput::Trace(value) => render::trace(&value, format),
                     SimulationOutput::Aggregate(value) => render::monte_carlo(&value, format),
                     SimulationOutput::TraceV3(value) => render::trace_v3(&value, format),
@@ -133,6 +169,7 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
         }
         Command::Compare {
             scenario,
+            acquisition_timing,
             runs,
             seed,
             format,
@@ -141,11 +178,26 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
             let result = load_scenario_bundle(&data_dir, scenario_dir.as_deref(), &scenario, path)
                 .map_err(AppError::from)
                 .and_then(|bundle| {
+                    if acquisition_timing && matches!(&bundle, AnyValidatedScenarioBundle::V2(_)) {
+                        return Err(timing_profile_error());
+                    }
                     let seed = resolve_master_seed(seed)?;
                     match bundle {
                         AnyValidatedScenarioBundle::V2(bundle) => compare(&bundle, runs, seed)
                             .map_err(AppError::from)
                             .and_then(|value| render::comparison(&value, format)),
+                        AnyValidatedScenarioBundle::V3(bundle) if acquisition_timing => {
+                            compare_v3_with_acquisition_timing(
+                                &bundle,
+                                runs,
+                                seed,
+                                Default::default(),
+                                Default::default(),
+                                Default::default(),
+                            )
+                            .map_err(AppError::from)
+                            .and_then(|value| render_v4::comparison(&value, format))
+                        }
                         AnyValidatedScenarioBundle::V3(bundle) => compare_v3(&bundle, runs, seed)
                             .map_err(AppError::from)
                             .and_then(|value| render::comparison_v3(&value, format)),
@@ -168,7 +220,12 @@ pub(crate) fn execute(cli: Cli) -> (RenderMode, Result<String, AppError>) {
     }
 }
 
+fn timing_profile_error() -> AppError {
+    AppError::Usage("--acquisition-timing requires a schema-v3 scenario".to_owned())
+}
+
 enum SimulationOutput {
+    Timing(Box<ba_engine::MonteCarloAcquisitionTimingResultV4>),
     Trace(Box<ba_engine::RunTraceResult>),
     Aggregate(Box<ba_engine::MonteCarloAnalysisResult>),
     TraceV3(Box<ba_engine::RunTraceResultV3>),

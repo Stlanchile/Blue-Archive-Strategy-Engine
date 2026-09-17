@@ -183,7 +183,7 @@ completion. Tickets earned during the action activate only at completion.
 ## Reward schedule
 
 `initial_milestones` is finite, strictly increasing, and may be empty.
-`repeating_cycle` is required but may be `null`. For start `S`, period `P`,
+`repeating_cycle` may be omitted or `null`; both mean no repeating cycle. For start `S`, period `P`,
 offset `o`, and zero-based cycle `k`:
 
 ```text
@@ -219,3 +219,7 @@ compiled acquisition branches and pure transition functions.
 There is no automatic exact-to-simulation fallback, parallel execution,
 worker-count flag, calendar model, policy optimizer, remote data access, or
 runtime provenance fetch.
+
+## v0.4
+
+Acquisition timing in v0.4 is a report option, not an input field. The schema and mechanics above remain unchanged. See [ACQUISITION_TIMING.md](ACQUISITION_TIMING.md) for the opt-in schema-4 report and [COMPATIBILITY.md](COMPATIBILITY.md) for the qualified baseline.

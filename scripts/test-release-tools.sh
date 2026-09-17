@@ -28,7 +28,7 @@ cleanup() {
 trap cleanup EXIT
 
 verifier="$repo_root/scripts/verify-release-archive.sh"
-runtime_root="ba-strategy-v0.3.0-x86_64-unknown-linux-gnu"
+runtime_root="ba-strategy-v0.4.0-x86_64-unknown-linux-gnu"
 tar_plain=(
     tar --create --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner
 )
@@ -47,6 +47,34 @@ expect_rejection() {
         exit 1
     }
 }
+
+for member in \
+    tests/fixtures \
+    crates/ba-engine/tests/fixtures/acquisition_timing/scenario.json \
+    crates/ba-cli/tests/fixtures/compatibility/trace.stdout \
+    tests/fixtures-notes.json not-tests/fixtures tests/fixtures.json; do
+    case_name="${member//\//-}"
+    case_root="$test_root/$case_name"
+    mkdir -p -- "$case_root/$runtime_root/$(dirname -- "$member")"
+    if [[ "$member" == tests/fixtures ]]; then
+        mkdir -- "$case_root/$runtime_root/$member"
+    else
+        printf '%s\n' '{}' > "$case_root/$runtime_root/$member"
+    fi
+    chmod -R u=rwX,go=rX "$case_root"
+    # Include the member without ancestor entries to exercise descendant paths too.
+    "${tar_create[@]}" --no-recursion --file "$test_root/$case_name.tar.gz" \
+        --directory "$case_root" "$runtime_root" "$runtime_root/$member"
+    case "$member" in
+        tests/fixtures|crates/*)
+            expect_rejection "$test_root/$case_name.tar.gz" "test fixtures must not be included"
+            ;;
+        *)
+            # Similar component names must reach the ordinary required-file check.
+            expect_rejection "$test_root/$case_name.tar.gz" "archive is missing"
+            ;;
+    esac
+done
 
 case_root="$test_root/extra-root"
 mkdir -p -- "$case_root/$runtime_root" "$case_root/unexpected-root"
@@ -140,7 +168,7 @@ expect_rejection "$test_root/checksum-link.tar.gz" "non-symlink regular file"
 
 if output="$(
     "$repo_root/scripts/package-release.sh" \
-        --version 0.3.0 \
+        --version 0.4.0 \
         --target ../../outside \
         --output-dir "$test_root/package-output" 2>&1
 )"; then

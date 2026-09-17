@@ -2,7 +2,7 @@
 
 # Blue Archive Strategy Engine
 
-`ba-strategy` 0.3.0 是一款在本地运行的 Rust 概率分析引擎，用于分析按顺序指定的
+`ba-strategy` 0.4.0 是一款在本地运行的 Rust 概率分析引擎，用于分析按顺序指定的
 《蔚蓝档案》招募目标。冻结的 schema v2 支持一到两个目标；schema v3 支持一到四个
 目标、跨目标获得、招募周期中途进度，以及有限或循环的招募次数奖励。两个 profile
 均支持穷举分析、可复现的串行蒙特卡洛模拟、轨迹记录与重放，以及精确分析与模拟对比。
@@ -131,3 +131,30 @@ Release 等操作。发布就绪条件及其最小权限边界请参阅
 贡献方式、安全问题报告流程以及 MIT/Apache-2.0 双重许可条款，分别见
 [`CONTRIBUTING.md`](CONTRIBUTING.md)、[`SECURITY.md`](SECURITY.md)、
 [`LICENSE-MIT`](LICENSE-MIT) 和 [`LICENSE-APACHE`](LICENSE-APACHE)。
+
+## 各目标首次获取时间
+
+0.4.0 为 schema v3 增加可选的获取时间报告：
+
+```bash
+ba-strategy analyze scenarios/golden/v3_atomic_cross_target.json --acquisition-timing --format json
+ba-strategy simulate scenarios/examples/four_target_independent_simulation_v3.json --runs 10000 --seed 42 --acquisition-timing --format json
+ba-strategy compare scenarios/golden/v3_atomic_cross_target.json --runs 1000 --seed 42 --acquisition-timing --format text
+```
+
+PMF 和 CDF 是覆盖全部执行路径的无条件概率，包含只取得部分目标的路径。
+初始已拥有的目标记在追加招募次数 0，表示观察开始时已可用，不表示历史获取日期。
+绝对次数等于初始活动次数加追加次数；报告随现有策略终止，不假设继续招募。
+原子招募动作中的获取时间按单次招募记录，重复获取不覆盖首次时间。
+
+新报告外层为 result schema 4，嵌入的原分析对象仍为 schema 3。不加标志时，
+v2/v3 的现有输出保持兼容。此标志仅支持 v3，与 `--trace` 冲突；无自动输入迁移。
+模拟保持串行和原随机流，省略种子时仍使用系统熵。95% Wilson 区间是逐点区间，
+并非同时置信带；比较的统计差异不会导致失败退出。
+
+每个数据集最多有 65,536 个不同的“目标／追加次数”支持点；比较支持还包括 0
+和策略上限，并有相同限制。新文本及 JSON 输出有 64 MiB UTF-8 字节上限。
+PMF 缺失点表示零概率，CDF 在相邻点间保持前值；未获取概率独立列出。
+超过支持或输出上限返回退出码 5，不输出部分报告。初始数据仍是 provisional，
+精确的数学计算不构成游戏机制来源认证。完整 API、字段和边界见
+[获取时间协议](docs/ACQUISITION_TIMING.md)和[兼容性说明](docs/COMPATIBILITY.md)。

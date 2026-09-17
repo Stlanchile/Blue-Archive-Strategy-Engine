@@ -217,8 +217,30 @@ fn internally_positive_tails_survive_public_underflow() {
     let report = exact(&compile(r, w, s));
     let target = &report.acquisition_timing.targets[0];
     assert_eq!(target.pmf.len(), 1200);
+    for count in 1022..=1074 {
+        assert_eq!(
+            target.pmf[count - 1].probability,
+            f64::from_bits(1_u64 << (1074 - count)),
+            "representable tail at draw {count}"
+        );
+    }
+    assert_eq!(target.pmf[1074].probability, 0.0);
     assert_eq!(target.pmf[1199].probability, 0.0);
     assert_eq!(target.cdf[1199].probability, 1.0);
+}
+
+#[test]
+fn representable_unacquired_tail_is_preserved_independently_of_rounded_cdf() {
+    let (r, w, mut s) = long_single_values(1200);
+    s["strategy"]["max_additional_recruitments"] = serde_json::json!(1074);
+    let report = exact(&compile(r, w, s));
+    let target = &report.acquisition_timing.targets[0];
+    assert_eq!(target.acquired_by_terminal_probability, 1.0);
+    assert_eq!(
+        target.not_acquired_by_terminal_probability,
+        f64::from_bits(1)
+    );
+    assert_eq!(target.pmf.last().unwrap().probability, f64::from_bits(1));
 }
 
 #[test]

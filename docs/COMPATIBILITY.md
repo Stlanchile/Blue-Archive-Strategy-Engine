@@ -6,7 +6,13 @@ tests passed (one statistical test intentionally ignored) before solver edits.
 The corrections preserve exact Wilson endpoints at 0/1 in both profiles, avoid
 false v3 terminal-ticket overflow after spending, and construct unused kernel
 errors lazily. Four regression tests cover the corrected outcomes. These are
-the only permitted behavioral differences from committed HEAD.
+the only behavioral differences in that qualified baseline.
+
+Subsequent review corrected premature underflow in both exact profiles: positive
+subnormal probabilities now survive projection whenever representable in f64.
+This intentionally changes previously zero long-tail values; the frozen shipped
+scenario outputs remain unchanged. Schema-4 timing probabilities also clamp
+endpoint roundoff to [0, 1] after validation, preventing false interval failures.
 
 Before timing loop changes, complete serialized v2/v3 exact, sampled, comparison
 and trace outputs and multiply-invalid diagnostic outputs were captured in

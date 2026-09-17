@@ -181,10 +181,13 @@ impl ScaledMass {
 }
 
 fn power_of_two(exponent: i128) -> f64 {
-    match i32::try_from(exponent) {
-        Ok(exponent) => 2.0_f64.powi(exponent),
-        Err(_) if exponent.is_negative() => 0.0,
-        Err(_) => f64::INFINITY,
+    // Construct exact powers directly: powi may overflow an intermediate
+    // reciprocal and return zero for a representable subnormal power.
+    match exponent {
+        ..=-1075 => 0.0,
+        -1074..=-1023 => f64::from_bits(1_u64 << (exponent + 1074)),
+        -1022..=1023 => f64::from_bits(((exponent + 1023) as u64) << 52),
+        _ => f64::INFINITY,
     }
 }
 
@@ -811,15 +814,17 @@ impl ExactTiming {
                 }
                 previous = cumulative;
                 let absolute = bundle.scenario().absolute_campaign_count(count)?;
+                // Bound only the public projection after validation. Keep raw
+                // masses for accumulation and the conservation checks below.
                 pmf.push(AcquisitionTimingPointV4 {
                     additional_recruitment_count: count,
                     absolute_campaign_recruitment_count: absolute,
-                    probability,
+                    probability: probability.clamp(0.0, 1.0),
                 });
                 cdf.push(AcquisitionTimingPointV4 {
                     additional_recruitment_count: count,
                     absolute_campaign_recruitment_count: absolute,
-                    probability: cumulative,
+                    probability: cumulative.clamp(0.0, 1.0),
                 });
             }
             let acquired = running.to_f64();
@@ -840,8 +845,8 @@ impl ExactTiming {
                 target_index: index,
                 target_id: bundle.scenario().targets()[index].student_id.clone(),
                 initially_owned: initial.owned_target_mask & (1 << index) != 0,
-                acquired_by_terminal_probability: acquired,
-                not_acquired_by_terminal_probability: not_acquired,
+                acquired_by_terminal_probability: acquired.clamp(0.0, 1.0),
+                not_acquired_by_terminal_probability: not_acquired.clamp(0.0, 1.0),
                 pmf,
                 cdf,
             });

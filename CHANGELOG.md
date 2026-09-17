@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Fixed premature underflow of representable subnormal probabilities in both
+  exact solvers, including first-acquisition and unacquired timing tails.
+- Bounded validated schema-4 timing probabilities to [0, 1] so endpoint roundoff
+  cannot produce probabilities above one or false Monte Carlo interval failures.
+
 ## 0.4.0
 
 - Added opt-in schema-v3 per-target first-acquisition PMFs/CDFs for exact analysis,

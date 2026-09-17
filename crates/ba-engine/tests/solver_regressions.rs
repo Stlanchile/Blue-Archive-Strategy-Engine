@@ -224,6 +224,14 @@ fn exact_analysis_continues_through_subnormal_long_tail_branches() {
         1.0
     );
     assert_eq!(exact.first_success_pmf.len(), 1_075);
+    for count in 1022..=1074 {
+        assert_eq!(
+            exact.first_success_pmf[count - 1].probability,
+            f64::from_bits(1_u64 << (1074 - count)),
+            "representable tail at draw {count}"
+        );
+    }
+    assert_eq!(exact.first_success_pmf[1074].probability, 0.0);
     assert_eq!(
         exact
             .first_success_pmf

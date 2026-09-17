@@ -235,3 +235,68 @@ fn certain_initial_and_impossible_outcomes_have_inclusive_intervals() {
             })
     }));
 }
+
+#[test]
+fn rounded_certain_probabilities_remain_bounded_and_inside_intervals() {
+    let (mut r, w, mut s) = long_single_values(4);
+    r["ordinary_featured_target_probability"] = serde_json::json!({"numerator":1,"denominator":5});
+    s["cross_target_probability_tables"][0]["ordinary"]["denominator"] = serde_json::json!(5);
+    let b = compile(r, w, s);
+    let report = compare_v3_with_acquisition_timing(
+        &b,
+        NonZeroU64::new(11).unwrap(),
+        42,
+        Default::default(),
+        Default::default(),
+        Default::default(),
+    )
+    .unwrap();
+    let target = &report.acquisition_timing.exact.targets[0];
+    assert_eq!(target.acquired_by_terminal_probability, 1.0);
+    assert_eq!(target.not_acquired_by_terminal_probability, 0.0);
+    assert_eq!(target.cdf.last().unwrap().probability, 1.0);
+    assert!(
+        target
+            .pmf
+            .iter()
+            .chain(&target.cdf)
+            .all(|p| (0.0..=1.0).contains(&p.probability))
+    );
+    let endpoint = report.acquisition_timing.comparisons[0]
+        .points
+        .last()
+        .unwrap();
+    assert_eq!(endpoint.cdf_simulation_minus_exact, 0.0);
+    assert!(endpoint.exact_cdf_within_monte_carlo_interval);
+    assert_legacy_eq(
+        &report.analysis,
+        &compare_v3(&b, NonZeroU64::new(11).unwrap(), 42).unwrap(),
+    );
+}
+
+#[test]
+fn rounded_unacquired_mass_remains_bounded_and_inside_interval() {
+    let (mut r, w, mut s) = fixture_values();
+    r["ordinary_featured_target_probability"] = serde_json::json!({"numerator":1,"denominator":5});
+    for table in s["cross_target_probability_tables"].as_array_mut().unwrap() {
+        table["ordinary"]["denominator"] = serde_json::json!(5);
+        table["ordinary"]["other_target_weights"][0]["weight"] = serde_json::json!(0);
+    }
+    let b = compile(r, w, s);
+    let report = compare_v3_with_acquisition_timing(
+        &b,
+        NonZeroU64::new(11).unwrap(),
+        42,
+        Default::default(),
+        Default::default(),
+        Default::default(),
+    )
+    .unwrap();
+    // The atomic ticket stays on banner A, so target B cannot be acquired.
+    let target = &report.acquisition_timing.exact.targets[1];
+    assert!(target.pmf.is_empty());
+    assert_eq!(target.not_acquired_by_terminal_probability, 1.0);
+    let comparison = &report.acquisition_timing.comparisons[1];
+    assert_eq!(comparison.not_acquired_simulation_minus_exact, 0.0);
+    assert!(comparison.exact_not_acquired_within_monte_carlo_interval);
+}

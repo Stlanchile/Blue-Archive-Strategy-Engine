@@ -178,10 +178,13 @@ impl ScaledMass {
 }
 
 fn power_of_two(exponent: i128) -> f64 {
-    match i32::try_from(exponent) {
-        Ok(exponent) => 2.0_f64.powi(exponent),
-        Err(_) if exponent.is_negative() => 0.0,
-        Err(_) => f64::INFINITY,
+    // Construct exact powers directly: powi may overflow an intermediate
+    // reciprocal and return zero for a representable subnormal power.
+    match exponent {
+        ..=-1075 => 0.0,
+        -1074..=-1023 => f64::from_bits(1_u64 << (exponent + 1074)),
+        -1022..=1023 => f64::from_bits(((exponent + 1023) as u64) << 52),
+        _ => f64::INFINITY,
     }
 }
 

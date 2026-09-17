@@ -108,7 +108,10 @@ positive exact bins remain present even when projection to f64 rounds to zero.
 Exact unacquired mass is accumulated from terminal states independently, not
 computed by subtracting a rounded marginal from one. Conservation uses the
 existing exact tolerance, with finite bounded probabilities and nondecreasing
-CDFs.
+CDFs. After validation, public timing probabilities are clamped to [0, 1] to
+remove endpoint roundoff; accumulation and conservation use the unclamped
+masses. Representable subnormal probabilities remain nonzero, including a
+separately accumulated unacquired tail when the CDF rounds to one.
 
 Comparison uses `engine_kind: acquisition_timing_comparison`, an embedded
 `ComparisonResultV3`, and `acquisition_timing: { exact, monte_carlo, comparisons }`.
